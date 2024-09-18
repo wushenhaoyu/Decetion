@@ -127,7 +127,6 @@ def test(argspar, model):
         # 加载输入图像并归一化
         haze = np.array(Image.open(argspar.intest + files[i])) / 255  
         model.eval()  # 设置为评估模式
-
         # 在不记录梯度的情况下进行前向传播
         with paddle.no_grad():
             haze = paddle.to_tensor(haze.transpose(2, 0, 1)[np.newaxis, :, :, :], dtype='float32')

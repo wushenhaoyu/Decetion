@@ -42,9 +42,10 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.paddle_infer.executor": "Run",
     "Python.test.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "new",
     "last_opened_file_path": "D:/data/data/cloud/code/Decetion",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -72,7 +73,7 @@
       <option name="presentableId" value="Default" />
       <updated>1726665365015</updated>
       <workItem from="1726665365985" duration="167000" />
-      <workItem from="1726665546664" duration="2443000" />
+      <workItem from="1726665546664" duration="4605000" />
     </task>
     <servers />
   </component>
@@ -80,6 +81,7 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Decetion$paddle_infer.coverage" NAME="paddle_infer 覆盖结果" MODIFIED="1726672011027" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/my_detection" />
     <SUITE FILE_PATH="coverage/Decetion$test.coverage" NAME="test 覆盖结果" MODIFIED="1726665599933" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/dark" />
   </component>
 </project>
