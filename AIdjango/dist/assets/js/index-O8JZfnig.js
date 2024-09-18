@@ -1,0 +1,1 @@
+import{d as e,o as t,c as o}from"./index-jvtWBQTx.js";import{_ as c}from"./_plugin-vue_export-helper-x3n3nnut.js";const n={class:"card content-box"},s=e({name:"authMenu"}),_=e({...s,setup(a){return(r,d)=>(t(),o("div",n))}}),f=c(_,[["__scopeId","data-v-09762ccd"]]);export{f as default};

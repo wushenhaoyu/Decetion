@@ -1,0 +1,1 @@
+import{ao as a,ap as t}from"./index-jvtWBQTx.js";const i=(o,s,e,l)=>{let r={email:s,name:e,location:JSON.stringify(l)};return a.upload(t+"/hospital",o,r,{})},n=()=>{},d=o=>a.post(t+"/file/upload/video",o,{cancel:!1}),u=o=>a.post(t+"/geturl/",o,{loading:!1});export{d as a,u as d,i as r,n as u};
