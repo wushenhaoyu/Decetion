@@ -48,13 +48,17 @@ async def send_video(websocket,dir):
                     start_time = time.time()
                     # print(image_file)  # 打印当前处理的图片文件路径
                     img = cv2.imread(str(image_file))
-                    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
-                    result, imgencode = cv2.imencode('.jpg', img, encode_param)
-                    data = np.array(imgencode)
-                    img = data.tobytes()
-                    # base64编码传输
-                    img = base64.b64encode(img).decode()
-                    await websocket.send("data:image/jpg;base64," + img)
+                    if img is None or img.size == 0:
+                        print("Error: Image is empty")
+                    else:
+                        
+                        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 95]
+                        result, imgencode = cv2.imencode('.jpg', img, encode_param)
+                        data = np.array(imgencode)
+                        img = data.tobytes()
+                        # base64编码传输
+                        img = base64.b64encode(img).decode()
+                        await websocket.send("data:image/jpg;base64," + img)
                 else:
                     i-=1
                     if start_time and time.time() - start_time < 50:

@@ -41,8 +41,8 @@ INSTALLED_APPS = [
 
     'user',
     "video",
-    'daphne',
-    'channels',
+    # 'daphne',
+    # 'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,7 +65,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mydjango.urls'
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -92,8 +93,8 @@ TEMPLATES = [
 # ]
 
 # settings.py
-MEDIA_ROOT = os.path.join(BASE_DIR, 'picture')
-MEDIA_URL = '/picture/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'picture')
+# MEDIA_URL = '/picture/'
 
 STATIC_URL = '/assets/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'assets')

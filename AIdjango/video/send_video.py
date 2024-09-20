@@ -60,7 +60,7 @@ async def send_video(websocket):
                 # base64编码传输
                 img = base64.b64encode(img).decode()
 
-                await websocket.send("data:image/jpg;base64," + img)
+                websocket.send("data:image/jpg;base64," + img)
 
                 # 每秒钟发送一张图片
                 # await asyncio.sleep(0.01)
@@ -74,9 +74,8 @@ async def send_video(websocket):
 async def main_logic():
 
     async with websockets.connect('ws://127.0.0.1:8000/ws/video/wms/') as websocket:
-        print(1111111111111111111)
         await send_video(websocket)
-        print(22222222222222222222)
+
 
 
 asyncio.get_event_loop().run_until_complete(main_logic())

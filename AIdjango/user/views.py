@@ -8,18 +8,20 @@ from multiprocessing import Process, Manager, Event
 import shutil
 import threading
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# 假设 send_video.py 与当前脚本位于平级目录，找到它的父目录
+import random
 parent_dir = os.path.join(current_dir, '..')
 sys.path.append(parent_dir)
+sys.path.append(current_dir)
+from haze.test_real import HazeRemover
+from my_detection.paddle_infer import PaddleDetection
 
 # 现在可以导入
 from send_video import video
 # Global variable to store the process
 camera_process = None
+haze_net = None
+paddle_detection_net =None
 stop_event = Event()
-
-
 
 def clean_up():
     global camera_process
@@ -33,6 +35,12 @@ atexit.register(clean_up)
 
 def detect(stop_event, save_folder):
     # Initialize camera inside the process
+    global haze_net
+    global paddle_detection_net
+    if haze_net is None:
+        haze_net = HazeRemover()
+    if paddle_detection_net is None:
+        paddle_detection_net = PaddleDetection('mot_ppyoloe_l_36e_ppvehicle')
     camera = cv2.VideoCapture(0)
 
     # Create "picture" folder
@@ -46,25 +54,29 @@ def detect(stop_event, save_folder):
         if not ret:
             print("Failed to capture frame")
             break
+        if random.random() < 0.9:  # Randomly decide whether to save the frame
+            if frame is None or frame.size == 0:
+                print("Error: Image is empty")
+            else:
+                # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame = haze_net.haze_frame(frame)
 
-        # Display the camera feed
-        # cv2.imshow('Live Video', frame)
+                # cv2.imshow('Live Video', frame)
+                
+                image_path = os.path.join(save_folder, f"{frame_count}.jpg")
+                cv2.imwrite(image_path, frame)
+                # print(f"Saved {image_path}")
+                # cv2.imshow("camera", frame)
 
-        # Save each frame as an image
-        image_path = os.path.join(save_folder, f"{frame_count}.jpg")
-        cv2.imwrite(image_path, frame)
-        # print(f"Saved {image_path}")
-        # cv2.imshow("camera", frame)
-
-        frame_count += 1  # Update frame counter
+                frame_count += 1  # Update frame counter
 
 
-    for i in range(100):
-        new_image_name = f"{frame_count}.png"
-        # 复制图片
-        image_path = os.path.join(save_folder, f"{frame_count}.jpg")
-        shutil.copy("C:\\Users\cat\Desktop\PaddleDetection\\test_image.png", image_path)
-        frame_count+=1
+    # for i in range(100):
+    #     new_image_name = f"{frame_count}.png"
+    #     # 复制图片
+    #     image_path = os.path.join(save_folder, f"{frame_count}.jpg")
+    #     shutil.copy("C:\\Users\cat\Desktop\PaddleDetection\\test_image.png", image_path)
+    #     frame_count+=1
     camera.release()
     cv2.destroyAllWindows()
 
@@ -111,3 +123,18 @@ def closecam(request):
         camera_process = None  # Clear global variable reference
 
     return HttpResponse("Camera closed and resources released.")
+
+
+def initialize(request):
+    global haze_net
+    global paddle_detection_net
+
+    if haze_net is None:
+        haze_net = HazeRemover()
+    if paddle_detection_net is None:
+        paddle_detection_net = PaddleDetection('mot_ppyoloe_l_36e_ppvehicle')
+
+    return HttpResponse("Models initialized and ready.")
+
+    
+    
