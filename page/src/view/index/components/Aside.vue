@@ -11,24 +11,18 @@
           <i class="el-icon-s-home"></i>
           <span slot="title">起始页</span>
         </el-menu-item>
-        <el-submenu index="camera">
-          <template slot="title">
+        <el-menu-item index="/detection/option1">         
             <i class="el-icon-video-camera"></i>
-            <span slot="title">摄像头检测</span>
-          </template>
-          </el-submenu>
-          <el-submenu index="video">
-          <template slot="title">
+            <span slot="title">摄像头检测</span>        
+        </el-menu-item>
+        <el-menu-item index="/detection/option2">        
             <i class="el-icon-video-camera"></i>
-            <span slot="title">视频检测</span>
-          </template>
-          </el-submenu>
-          <el-submenu index="photo">
-          <template slot="title">
+            <span slot="title">视频检测</span>        
+        </el-menu-item>
+        <el-menu-item index="/detection/option3">       
             <i class="el-icon-video-camera"></i>
-            <span slot="title">图片检测</span>
-          </template>
-          </el-submenu>
+            <span slot="title">图片检测</span>          
+        </el-menu-item>
       </el-menu>
     </div>
   </template>

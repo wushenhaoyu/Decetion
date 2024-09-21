@@ -1,46 +1,10 @@
 <template>
-  <div style="width: 100%; height: 100%" >
+  <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
-    <div :class="drawer_class_ctrl" style="width: 250px">
-      <div class="drawer-content" >
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+    <div :class="drawer_class_ctrl">
+      <div class="drawer-content">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">处理中心</el-menu-item>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">除雾</el-menu-item>
-          <el-switch
-            v-model="isFogRemovement"
-            active-text="开启"
-            inactive-text="关闭"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">去黑</el-menu-item>
-          <el-switch
-            v-model="isDackRemovement"
-            active-text="开启"
-            inactive-text="关闭"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">人脸检测</el-menu-item>
-          <el-switch
-            v-model="isFaceDetection"
-            active-text="开启"
-            inactive-text="关闭"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">车辆检测</el-menu-item>
-          <el-switch
-            v-model="isCarDetection"
-            active-text="开启"
-            inactive-text="关闭"
-          >
-          </el-switch>
         </el-menu>
       </div>
       <div class="drawer-button-bar" @click="toggleDrawer">
@@ -55,30 +19,69 @@
       <div style="height: 100%; width: 70%">
         <div style="height: 80%; width: 100%" class="upload">
           <!-- 上传视频  -->
-          <!-- <el-upload 
-                  class="upload-demo"
-                  drag
-                  :action="uploadUrl"
-                  multiple
-                  :before-upload="handleBeforeUpload"
-                  :on-success="handleSuccess"
-                  :on-error="handleError"
-                  :on-progress="handleProgress"
-                  v-if="!isShowCamera && !isShowVideo">
-                  <div v-if="!showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text" style="height: auto; line-height: 10vh;">将视频拖到此处，或<em>点击上传</em></div>
-                  </div>
-                  <div v-if="showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
-                  <el-progress v-if="showProgress" :percentage="progressPercentage" status="active"></el-progress>
-                </div>
-                </el-upload> -->
+          <el-upload
+            class="upload-demo"
+            drag
+            :action="uploadUrl"
+            multiple
+            :before-upload="handleBeforeUpload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :on-progress="handleProgress"
+            v-if="!isShowVideo"
+          >
+            <div
+              v-if="!showProgress"
+              style="
+                position: relative;
+                top: 50%;
+                left: 50%;
+                transform: translate3d(-50%, -50%, 0);
+                width: auto;
+                height: auto;
+              "
+            >
+              <i class="el-icon-upload"></i>
+              <div
+                class="el-upload__text"
+                style="height: auto; line-height: 10vh"
+              >
+                将视频拖到此处，或<em>点击上传</em>
+              </div>
+            </div>
+            <div
+              v-if="showProgress"
+              style="
+                position: relative;
+                top: 50%;
+                left: 50%;
+                transform: translate3d(-50%, -50%, 0);
+                width: auto;
+                height: auto;
+              "
+            >
+              <el-progress
+                v-if="showProgress"
+                :percentage="progressPercentage"
+                status="active"
+              ></el-progress>
+            </div>
+          </el-upload>
           <!-- 上传视频  -->
           <!-- 显示视频  -->
-          <myvideo
-            v-if="isShowCamera || isShowVideo"
-            style="width: 100%; height: 100%"
-          ></myvideo>
+          <video
+            v-if="isShowVideo"
+            id="example"
+            class="vjs-default-skin vjs-big-play-centered"
+            controls
+            preload="auto"
+          >
+            <source style="background: #000" :src="videoUrl" type="video/mp4" />
+            <p class="vjs-no-js">
+              To view this video please enable JavaScript, and consider
+              upgrading to a web browser
+            </p>
+          </video>
           <!-- 显示视频  -->
         </div>
         <div style="height: 5%"></div>
@@ -88,14 +91,12 @@
           style="height: 15%; width: 100%; font-size: 2vw"
         >
           <div class="bottom-ctrl-one">
-            <el-button
-              type="primary"
-              class="bottom-button"
-              @click="switchCamera"
-              >{{ isShowCamera ? "关闭摄像头" : "开启摄像头" }}</el-button
+            <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
+                <el-button type="primary" class="bottom-button">开始检测</el-button> -->
+            <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
+            <el-button type="primary" class="bottom-button" @click="getVideo"
+              >开始检测</el-button
             >
-            <el-button type="primary" class="bottom-button">开启录制</el-button>
-            <el-button type="primary" class="bottom-button">开始检测</el-button>
             <el-button type="primary" class="bottom-button" @click="resetVideo"
               >重置视频</el-button
             >
@@ -122,15 +123,10 @@ export default {
   },
   data() {
     return {
-      isCarDetection: false,
-      isDackRemovement: false,
-      isFaceDetection: false,
-      isFogRemovement: false,
-      isShowCamera: false,
       isShowVideo: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
-      videoUrl: "http://vjs.zencdn.net/v/oceans.mp4",
+      videoUrl: "",
       uploadUrl: "",
       showProgress: false,
       progressPercentage: 0,
@@ -151,29 +147,16 @@ export default {
     resetVideo() {
       this.isShowVideo = false;
     },
-    switchCamera() {
-      if (this.isShowCamera) {
-        this.isShowCamera = false;
-        this.$axios
-          .post("http://localhost:8000/closecam/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      } else {
-        this.isShowCamera = true;
-        this.isShowVideo = true;
-        this.$axios
-          .post("http://localhost:8000/opencam/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
+    getVideo() {
+      this.isShowVideo = True;
+      this.$axios
+        .post("http://localhost:8000/getvideo/")
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
