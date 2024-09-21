@@ -18,26 +18,38 @@
       <div class="main">
         <div style="height: 100%;width: 70%;">
             <div style="height: 80%;width: 100%;" class="upload">
-                <!-- 上传视频  -->
-                <el-upload :action="actionUrl" drag v-if="!isShowVideo">
-                            <div style="position: relative  ;top: 50%;left: 50%; transform: translate3d(-50%, -50%, 0);width: auto;height: auto;">
-                                <i class="el-icon-upload"></i>
-                            <div class="el-upload__text" style="height: auto;line-height: 10vh;">将视频拖到此处，或<em>点击上传</em></div>
-                        </div>
+                <!-- 上传图片  -->
+                <el-upload 
+                  class="upload-demo"
+                  drag
+                  :action="uploadUrl"
+                  multiple
+                  :before-upload="handleBeforeUpload"
+                  :on-success="handleSuccess"
+                  :on-error="handleError"
+                  :on-progress="handleProgress"
+                  v-if="!isShowCamera && !isShowVideo">
+                  <div v-if="!showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
+                    <i class="el-icon-upload"></i>
+                    <div class="el-upload__text" style="height: auto; line-height: 10vh;">将图片拖到此处，或<em>点击上传</em></div>
+                  </div>
+                  <div v-if="showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
+                  <el-progress v-if="showProgress" :percentage="progressPercentage" status="active"></el-progress>
+                </div>
                 </el-upload>
-                <!-- 上传视频  -->
+                <!-- 上传图片  -->
                  <!-- 显示视频  -->
-                    <video v-else :src="videoUrl" controls="controls" style="width: 100%;height: 100%;"></video>
+                    <!-- <myvideo v-if = "isShowCamera || isShowVideo"  style="width: 100%;height: 100%;"></myvideo> -->
                  <!-- 显示视频  -->
             </div>
         <div style="height: 5%;"></div>
         <!-- 视频下方操作按钮-->
         <div class="bottom-ctrl" style="height: 15%;width: 100%;font-size: 2vw;">
             <div class="bottom-ctrl-one">
-                <el-button type="primary" class="bottom-button">开启摄像头</el-button>
-                <el-button type="primary" class="bottom-button">开始检测</el-button>
-                <el-button type="primary" class="bottom-button">开启录制</el-button>
-                <el-button type="primary" class="bottom-button">重置视频</el-button>
+                <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
+                <el-button type="primary" class="bottom-button">开始检测</el-button> -->
+                <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
+                <el-button type="primary" class="bottom-button" @click="reset">重置图片</el-button>
             </div>
         </div>
         <!-- 视频下方操作按钮-->
@@ -56,14 +68,23 @@
   </template>
   
   <script>
+  import myvideo from '../../video/myvideo.vue';
   export default {
+    components: {
+    myvideo
+  },
     data() {
       return {
+        isShowCamera: false,
         isShowVideo: false,
         drawerVisible: false,
-        activeIndex: '4' // 更新为菜单项的实际索引
+        activeIndex: '4', // 更新为菜单项的实际索引
+        videoUrl: "http://vjs.zencdn.net/v/oceans.mp4",
+        uploadUrl: "",
+        showProgress: false,
+        progressPercentage: 0
       };
-    },
+    },  
     computed: {
       drawer_class_ctrl() {
         return this.drawerVisible ? 'drawer-open' : 'drawer-close';
@@ -76,9 +97,76 @@
     }
     },
     methods: {
+      resetPhoto(){
+        this.isShowVideo = false;
+      },
+      switchCamera(){
+        
+          if(this.isShowCamera){
+            this.isShowCamera = false;
+            this.$axios.post('http://localhost:8000/closecam/')
+            .then(response => {
+              console.log(response);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+          }else{
+            this.isShowCamera = true;
+            this.isShowVideo = true;
+            this.$axios.post('http://localhost:8000/opencam/')
+            .then(response => {
+              console.log(response);
+            })
+            .catch(error => {
+              console.error(error);
+            });
+          }
+      },
       toggleDrawer() {
         this.drawerVisible = !this.drawerVisible;
-      }
+      },
+      handleBeforeUpload(file) {
+        // 检查视频格式
+        const supportedFormats = ['mp4', 'avi', 'mov', 'mkv'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        const isSupportedFormat = supportedFormats.includes(fileExtension);
+
+        // 检查文件大小
+        const maxSize = 100 * 1024 * 1024; // 100 MB
+        const isSizeValid = file.size <= maxSize;
+
+        if (isSupportedFormat && isSizeValid) {
+          console.log('Valid video format and size');
+          return true;
+        } else {
+          let errorMessage = '';
+          if (!isSupportedFormat) {
+            errorMessage += '不支持的视频格式。';
+          }
+          if (!isSizeValid) {
+            errorMessage += '文件大小超过 100 MB。';
+          }
+          this.$message.error(errorMessage);
+          return false;
+        }
+      },
+        handleSuccess(response, file, fileList) {
+          console.log('上传成功:', response);
+          this.showProgress = false;
+          this.progressPercentage = 0;
+          this.$message.success('上传成功');
+        },
+        handleError(error, file, fileList) {
+          console.error('上传失败:', error);
+          this.showProgress = false;
+          this.progressPercentage = 0;
+          this.$message.error('上传失败');
+        },
+        handleProgress(event, file, fileList) {
+          this.showProgress = true;
+          this.progressPercentage = event.percent;
+        }
     }
   }
   </script>
@@ -213,5 +301,11 @@
     transform: translate3d(-100%, -50%, 0) rotateX(180deg);
     transition: all 0.5s;
   }
+  video::-webkit-media-controls-play-button {
+        display: none;
+    }
+  video::-webkit-media-controls-timeline {
+        display: none;
+    }
   </style>
   

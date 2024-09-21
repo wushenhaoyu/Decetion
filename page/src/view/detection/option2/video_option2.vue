@@ -39,16 +39,16 @@
                 </el-upload>
                 <!-- 上传视频  -->
                  <!-- 显示视频  -->
-                    <myvideo v-if = "isShowCamera || isShowVideo"  style="width: 100%;height: 100%;"></myvideo>
+                    <!-- <myvideo v-if = "isShowCamera || isShowVideo"  style="width: 100%;height: 100%;"></myvideo> -->
                  <!-- 显示视频  -->
             </div>
         <div style="height: 5%;"></div>
         <!-- 视频下方操作按钮-->
         <div class="bottom-ctrl" style="height: 15%;width: 100%;font-size: 2vw;">
             <div class="bottom-ctrl-one">
-                <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
-                <el-button type="primary" class="bottom-button">开始检测</el-button>
-                <el-button type="primary" class="bottom-button">开启录制</el-button>
+                <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
+                <el-button type="primary" class="bottom-button">开始检测</el-button> -->
+                <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
                 <el-button type="primary" class="bottom-button" @click="resetVideo">重置视频</el-button>
             </div>
         </div>
