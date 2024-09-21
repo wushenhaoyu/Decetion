@@ -117,5 +117,11 @@ class PaddleDetection:
 
 if __name__ == "__main__":
 
-    mask_detection = PaddleDetection('mot_ppyoloe_l_36e_ppvehicle')
+    mask_detection = PaddleDetection('vehicle_attribute_model')
     mask_detection.start_video_capture()
+
+#mot_ppyoloe_l_36e_pipeline    行人属性目标检测可用
+#mot_ppyoloe_s_36e_pipeline     行人检测跟踪可用
+# mot_ppyoloe_s_36e_ppvehicle  多目标车辆检测加跟踪可用
+    
+    # PPLCNet_x1_0_person_attribute_945_infer  行人属性目标识别 报了一次错，
