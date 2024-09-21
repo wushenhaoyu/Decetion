@@ -48,8 +48,6 @@ class HazeRemover:
     def haze_frame(self, frame):
         # haze = np.array(Image.open(argspar.intest + files[i])) / 255  
         haze = np.array(frame) / 255  
-        
-
         self.model.eval()
         with paddle.no_grad():
             haze = paddle.to_tensor(haze.transpose(2, 0, 1)[np.newaxis, :, :, :], dtype='float32')
