@@ -1,12 +1,12 @@
 <template>
-  <div style="width: 100%; height: 100%" >
+  <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 250px">
-      <div class="drawer-content" >
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+      <div class="drawer-content">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">处理中心</el-menu-item>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">除雾</el-menu-item>
           <el-switch
             v-model="haze"
@@ -16,7 +16,7 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">去黑</el-menu-item>
           <el-switch
             v-model="dark"
@@ -26,7 +26,7 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">车牌检查</el-menu-item>
           <el-switch
             v-model="vehicle_license_enabled"
@@ -36,17 +36,19 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">多目标车辆检测与跟踪</el-menu-item>
           <el-switch
             v-model="vehicle_detection_tracking_enabled"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeVehicleTracking(vehicle_detection_tracking_enabled)"
+            @change="
+              getChangeVehicleTracking(vehicle_detection_tracking_enabled)
+            "
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">车辆属性</el-menu-item>
           <el-switch
             v-model="vehicle_attribute_enabled"
@@ -56,7 +58,7 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">车道检测</el-menu-item>
           <el-switch
             v-model="lane_detection_enabled"
@@ -66,27 +68,35 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">行人属性目标检测</el-menu-item>
           <el-switch
             v-model="pedestrian_attribute_detection_enabled"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangePedestrianDetection(pedestrian_attribute_detection_enabled)"
+            @change="
+              getChangePedestrianDetection(
+                pedestrian_attribute_detection_enabled
+              )
+            "
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">人属性目标识别</el-menu-item>
           <el-switch
             v-model="pedestrian_attribute_recognition_enabled"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeLanePedestrianRecognition(pedestrian_attribute_recognition_enabled)"
+            @change="
+              getChangeLanePedestrianRecognition(
+                pedestrian_attribute_recognition_enabled
+              )
+            "
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">摔倒检测</el-menu-item>
           <el-switch
             v-model="fall_detection_enabled"
@@ -96,13 +106,15 @@
           >
           </el-switch>
         </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
+        <el-menu :default-active="activeIndex" class="el-menu-vertical">
           <el-menu-item index="1">行人检测与跟踪</el-menu-item>
           <el-switch
             v-model="pedestrian_detection_tracking_enabled"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangePedestrianTracking(pedestrian_detection_tracking_enabled)"
+            @change="
+              getChangePedestrianTracking(pedestrian_detection_tracking_enabled)
+            "
           >
           </el-switch>
         </el-menu>
@@ -139,7 +151,9 @@
                 </el-upload> -->
           <!-- 上传视频  -->
           <!-- 显示视频  -->
-          <div v-if="isShowCamera" align="center"><img src="http://127.0.0.1:8000/livedisplay" id="video"></div>
+          <div v-if="isShowCamera" align="center">
+            <img src="http://127.0.0.1:8000/livedisplay" id="video" />
+          </div>
           <myvideo
             v-if="isShowCamera"
             style="width: 100%; height: 100%"
@@ -172,6 +186,18 @@
       <div style="height: 100%; width: 30%">
         <div class="right-log">
           <div class="right-log-head">检测日志</div>
+          <div> 
+            <!-- 暂时放在reset函数里面 -->
+            <el-input id="textlog"
+              style="width: 100%; white-space: pre-line; "
+              readonly="true"
+              type="textarea"
+              :autosize="{ minRows: 30, maxRows: 30 }"
+              placeholder="等待检测内容"
+              v-model="textarea"
+            >
+            </el-input>
+          </div>
         </div>
       </div>
     </div>
@@ -187,6 +213,7 @@ export default {
   },
   data() {
     return {
+      textarea: "",
       haze: false,
       dark: false,
       vehicle_license_enabled: false,
@@ -219,36 +246,47 @@ export default {
   },
   methods: {
     getChangeHaze(haze) {
-      this.haze = haze
+      this.haze = haze;
     },
     getChangeDark(dark) {
-      this.dark = dark
+      this.dark = dark;
     },
     getChangeLicense(vehicle_license_enabled) {
-      this.vehicle_license_enabled = vehicle_license_enabled
+      this.vehicle_license_enabled = vehicle_license_enabled;
     },
     getChangeVehicleTracking(vehicle_detection_tracking_enabled) {
-      this.vehicle_detection_tracking_enabled = vehicle_detection_tracking_enabled
+      this.vehicle_detection_tracking_enabled =
+        vehicle_detection_tracking_enabled;
     },
     getChangeVehicleAttribute(vehicle_attribute_enabled) {
-      this.vehicle_attribute_enabled = vehicle_attribute_enabled
+      this.vehicle_attribute_enabled = vehicle_attribute_enabled;
     },
     getChangeLane(lane_detection_enabled) {
-      this.lane_detection_enabled = lane_detection_enabled
+      this.lane_detection_enabled = lane_detection_enabled;
     },
     getChangePedestrianTracking(pedestrian_detection_tracking_enabled) {
-      this.pedestrian_detection_tracking_enabled = pedestrian_detection_tracking_enabled
+      this.pedestrian_detection_tracking_enabled =
+        pedestrian_detection_tracking_enabled;
     },
     getChangeFall(fall_detection_enabled) {
-      this.fall_detection_enabled = fall_detection_enabled
+      this.fall_detection_enabled = fall_detection_enabled;
     },
-    getChangeLanePedestrianRecognition(pedestrian_attribute_recognition_enabled) {
-      this.pedestrian_attribute_recognition_enabled = pedestrian_attribute_recognition_enabled
+    getChangeLanePedestrianRecognition(
+      pedestrian_attribute_recognition_enabled
+    ) {
+      this.pedestrian_attribute_recognition_enabled =
+        pedestrian_attribute_recognition_enabled;
     },
     getChangePedestrianDetection(pedestrian_attribute_detection_enabled) {
-      this.pedestrian_attribute_detection_enabled = pedestrian_attribute_detection_enabled
+      this.pedestrian_attribute_detection_enabled =
+        pedestrian_attribute_detection_enabled;
     },
     resetVideo() {
+      const textarea1 = document.getElementById('textlog');
+      textarea1.scrollTop = textarea1.scrollHeight; 
+      var dat = new Date().getTime();
+      console.log(dat);
+      this.textarea += dat + "\n";
       this.isShowVideo = false;
     },
     switchCamera() {

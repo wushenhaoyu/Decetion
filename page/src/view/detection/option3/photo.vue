@@ -106,6 +106,16 @@
       <div style="height: 100%; width: 30%">
         <div class="right-log">
           <div class="right-log-head">检测日志</div>
+          <div>
+            <el-input
+              style="width: 100%; white-space: pre-line; "
+              type="textarea"
+              :autosize="{ minRows: 30, maxRows: 30 }"
+              placeholder="请输入内容"
+              v-model="textarea"
+            >
+            </el-input>
+          </div>
         </div>
       </div>
     </div>
