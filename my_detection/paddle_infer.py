@@ -1,3 +1,4 @@
+import argparse
 import os
 import yaml
 import glob
@@ -65,7 +66,7 @@ def vehicle_detector_init():
 
 def people_attr_detector_init():
     #初始化行人属性检测器
-    model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'PPHGNet_tiny_person_attribute_952_infer')
+    model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'PPLCNet_x1_0_person_attribute_945_infer')
     detector = AttrDetector(model_dir,
                     device='GPU',
                     run_mode='paddle',
@@ -93,36 +94,38 @@ def vehicle_attr_detector_init():
                             trt_calib_mode=False,
                             cpu_threads=1,
                             enable_mkldnn=False,
-                           output_dir='output',
-                           threshold=0.5,
+                           output_dir='output'
     )
     return detector
 
 def vehicleplate_detector_init():
     #初始化车牌识别器
-    args = {
-        'device': 'GPU',
-        'run_modd':'paddle',
-        'cpu_threads': 1,
-        'enable_mkldnn': False,
-        'enable_mkldnn_bfloat16': False
-    }
+    parser = argparse.ArgumentParser(description='Inference script')
+    parser.add_argument('--device', type=str, default='cpu', help='Device to use (cpu or gpu)')
+    parser.add_argument('--run_modd', type=str, default='paddle', help='Run mode (e.g., paddle)')
+    parser.add_argument('--cpu_threads', type=int, default=1, help='Number of CPU threads')
+    parser.add_argument('--enable_mkldnn', action='store_true', help='Enable MKL-DNN')
+    parser.add_argument('--enable_mkldnn_bfloat16', action='store_true', help='Enable MKL-DNN bfloat16')
+    args = parser.parse_args()
     cfg = {
         'det_limit_side_len': 480,
-        'det_model_dir':'output_inference/ch_PP-OCRv3_det_infer/',
+        'det_model_dir': os.path.join(current_dir,'my_detection', 'output_inference' , 'ch_PP-OCRv3_det_infer'),
         'det_limit_type': 'max',
         'rec_image_shape': [3, 48, 320],
         'rec_batch_num': 6,
-        'word_dict_path': 'deploy/pipeline/ppvehicle/rec_word_dict.txt',
+        'word_dict_path': os.path.join(current_dir,'my_detection', 'deploy','pipeline','ppvehicle','rec_word_dict.txt'),
         'basemode': "idbased",
-        'rec_model_dir': 'output_inference/ch_PP-OCRv3_rec_infer/'
+        'rec_model_dir': os.path.join(current_dir,'my_detection', 'output_inference' , 'ch_PP-OCRv3_rec_infer')
     }
+    print(args.device)
     recognizer = PlateRecognizer(args=args,cfg=cfg)
     return recognizer
 
 def vehicle_press_detector_init():
+    lane_seg_config = os.path.join(current_dir,'my_detection', 'deploy' , 'pipeline', 'config', 'lane_seg_config.yml')
+    model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'pp_lite_stdc2_bdd100k')
     #初始化车辆压线检测器
-    laneseg_predictor = LaneSegPredictor('deploy/pipeline/config/lane_seg_config.yml','output_inference/pp_lite_stdc2_bdd100k/')#实线识别
+    laneseg_predictor = LaneSegPredictor(lane_seg_config=lane_seg_config, model_dir=model_dir)#实线识别
     press_recoginizer = VehiclePressingRecognizer(cfg=None) #压线
 
     return laneseg_predictor, press_recoginizer
@@ -193,6 +196,7 @@ class my_paddledetection:
     def clear(self):
         self.people_res = None
         self.vehicle_res = None
+        self.people_attr_res = None
         self.vehicle_crops_res = None
         self.people_crops_res = None
         self.vehicle_attr_res = None
@@ -209,18 +213,19 @@ class my_paddledetection:
             self.vehicle_res = self.vehicle_detector.filter_box(self.vehicle_res,0.5) # 过滤掉置信度小于0.5的框
         if self.people_attr_detector_isOn:
             self.people_crops_res = crop_image_with_det([input], self.people_res)
-            self.people_attr_res = self.people_attr_detector.predict_image(self.people_crops_res,visual=False)
+            for crop_res in self.people_crops_res:
+                self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
         if self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn:
             self.vehicle_crops_res = crop_image_with_det([input], self.vehicle_res)
         if self.vehicle_attr_detector_isOn:
-            self.vehicle_crops_res = crop_image_with_det([input], self.vehicle_res)
-            self.vehicle_attr_res = self.vehicle_attr_detector.predict_image(self.vehicle_crops_res,visual=False)
+            for crop_res in self.vehicle_crops_res:
+                self.vehicle_attr_res = self.vehicle_attr_detector.predict_image(crop_res,visual=False)
         if self.vehicleplate_detector_isOn:
             platelicenses = []
             for crop_res in self.vehicle_crops_res:
-                platelicense = self.vehicleplate_detector.predict_image(crop_res,visual=False)
+                platelicense = self.vehicleplate_detector.get_platelicense(crop_res)
                 platelicenses.extend(platelicense['plate'])
-                self.vehicleplate_res = {'plate': platelicenses}
+                self.vehicleplate_res = {'vehicleplate': platelicenses}
                 
         if self.vehicle_press_detector_isOn:
             vehicle_press_res_list = []
@@ -288,13 +293,14 @@ class my_paddledetection:
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_people_attr_detector()
+    my_detection.turn_vehicle_attr_detector()
+    my_detection.turn_vehicleplate_detector()
     cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
         _, frame = cap.read()
-        img = my_detection(frame)
-        input = [frame[:, :, ::-1]]
+        input = frame[:, :, ::-1]
+        img = my_detection.predit(input)
         # 显示图像
         cv2.imshow('Mask Detection', img)
 
@@ -305,7 +311,7 @@ if __name__ == "__main__":
     # 释放资源
     cap.release()
     cv2.destroyAllWindows()
-"""    detector = people_detector_init()
+    """detector = people_detector_init()
     people_attr_detector = people_attr_detector_init()
     cap = cv2.VideoCapture(0)
     while True:
