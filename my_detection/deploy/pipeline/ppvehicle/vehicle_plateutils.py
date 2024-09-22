@@ -36,8 +36,8 @@ def create_predictor(args, cfg, mode):
         print("not find {} model file path {}".format(mode, model_dir))
         sys.exit(0)
 
-    model_file_path = model_dir + "/inference.pdmodel"
-    params_file_path = model_dir + "/inference.pdiparams"
+    model_file_path = model_dir + "\\inference.pdmodel"
+    params_file_path = model_dir + "\\inference.pdiparams"
     if not os.path.exists(model_file_path):
         raise ValueError("not find model file path {}".format(model_file_path))
     if not os.path.exists(params_file_path):

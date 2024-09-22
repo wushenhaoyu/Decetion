@@ -1,4 +1,5 @@
 import argparse
+import copy
 import os
 import yaml
 import glob
@@ -15,7 +16,7 @@ from paddle.inference import create_predictor
  
 from deploy.python.infer import Detector, visualize_box_mask
 from deploy.pipeline.pphuman.attr_infer import AttrDetector
-from deploy.pipeline.pipe_utils import crop_image_with_det
+from deploy.pipeline.pipe_utils import crop_image_with_det, parse_mot_res
 from deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
 from deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
 from deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
@@ -130,39 +131,61 @@ def vehicle_press_detector_init():
 
     return laneseg_predictor, press_recoginizer
 
-def vehicle_sde_detector_init():
-    region_type = [0,0,0,0]#矩形
+def vehicle_sde_detector_init(region_polygon):
     #初始化车辆违停检测器
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
-        tracker_config='deploy/pipeline/config/tracker_config.yml',
+        tracker_config=os.path.join(current_dir,'deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
-        run_mode='paddle'
+        run_mode='paddle',
+        region_type='custom',
+        region_polygon=region_polygon,
     )
+    return detector
 
 class my_paddledetection:
     def __init__(self):
-        # 定义控制变量
+        """
+        初始化检测器控制变量
+            people_detector_isOn                行人目标检测    
+            vehicle_detector_isOn               车辆目标检测
+            people_attr_detector_isOn           行人属性检测
+            vehicle_attr_detector_isOn          车辆属性检测
+            vehicleplate_detector_isOn          车牌检测
+            vehicle_press_detector_isOn         车辆压线检测
+        """
         self.people_detector_isOn = False
         self.vehicle_detector_isOn = False
         self.people_attr_detector_isOn = False
         self.vehicle_attr_detector_isOn = False
         self.vehicleplate_detector_isOn = False
         self.vehicle_press_detector_isOn = False
-        #初始化所有检测器
+        self.vehicle_invasion_detector_isOn = False
+        """
+        初始化检测器
+            people_detector                行人目标检测    
+            vehicle_detector               车辆目标检测
+            people_attr_detector           行人属性检测
+            vehicle_attr_detector          车辆属性检测
+            vehicleplate_detector          车牌检测
+            laneseg_predictor              实线检测
+            press_recoginizer              压线检测
+        """
         self.people_detector = people_detector_init()
         self.vehicle_detector = vehicle_detector_init()
         self.people_attr_detector = people_attr_detector_init()
         self.vehicle_attr_detector = vehicle_attr_detector_init()
         self.vehicleplate_detector = vehicleplate_detector_init()
         self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
-    def turn_people_detector(self):
+        self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[])
+        self.frame = 0
+    def turn_people_detector(self):#切换行人检测
         self.people_attr_detector_isOn = not self.people_attr_detector_isOn
-    def turn_vehicle_detector(self):
+    def turn_vehicle_detector(self):#切换车辆检测
         self.vehicle_detector_isOn = not self.vehicle_detector_isOn
         
-    def turn_people_attr_detector(self):
+    def turn_people_attr_detector(self):#切换行人属性检测
         if self.people_attr_detector_isOn:
             self.people_attr_detector_isOn = False
             self.people_detector_isOn = False
@@ -170,7 +193,7 @@ class my_paddledetection:
             self.people_attr_detector_isOn = True
             self.people_detector_isOn = True
     
-    def turn_vehicle_attr_detector(self):
+    def turn_vehicle_attr_detector(self):#切换车辆属性检测
         if self.vehicle_attr_detector_isOn:
             self.vehicle_attr_detector_isOn = False
             self.vehicle_detector_isOn = False
@@ -178,7 +201,7 @@ class my_paddledetection:
             self.vehicle_attr_detector_isOn = True
             self.vehicle_detector_isOn = True
             
-    def turn_vehicleplate_detector(self):
+    def turn_vehicleplate_detector(self):#切换车牌检测
         if self.vehicleplate_detector_isOn:
             self.vehicleplate_detector_isOn = False
             self.vehicle_detector_isOn = False
@@ -186,14 +209,14 @@ class my_paddledetection:
             self.vehicleplate_detector_isOn = True
             self.vehicle_detector_isOn = True
             
-    def turn_vehicle_press_detector(self):
+    def turn_vehicle_press_detector(self):#切换车辆压线检测
         if self.vehicle_press_detector_isOn:
             self.vehicle_press_detector_isOn = False
             self.vehicle_detector_isOn = False
         else:
             self.vehicle_press_detector_isOn = True
             self.vehicle_detector_isOn = True
-    def clear(self):
+    def clear(self):#结果清空
         self.people_res = None
         self.vehicle_res = None
         self.people_attr_res = None
@@ -205,29 +228,29 @@ class my_paddledetection:
         self.lanes_res = None
     def predit(self,input):
         self.clear()
-        if self.people_detector_isOn:
+        if self.people_detector_isOn:#行人检测
             self.people_res = self.people_detector.predict_image([input],visual=False)
             self.people_res = self.people_detector.filter_box(self.people_res,0.5) # 过滤掉置信度小于0.5的框
-        if self.vehicle_detector_isOn:
+        if self.vehicle_detector_isOn:#车辆检测
             self.vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
             self.vehicle_res = self.vehicle_detector.filter_box(self.vehicle_res,0.5) # 过滤掉置信度小于0.5的框
-        if self.people_attr_detector_isOn:
+        if self.people_attr_detector_isOn:#行人属性检测
             self.people_crops_res = crop_image_with_det([input], self.people_res)
-            for crop_res in self.people_crops_res:
+            for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
                 self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
-        if self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn:
+        if self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn:#车辆图像裁剪
             self.vehicle_crops_res = crop_image_with_det([input], self.vehicle_res)
         if self.vehicle_attr_detector_isOn:
-            for crop_res in self.vehicle_crops_res:
+            for crop_res in self.vehicle_crops_res:#车辆属性预测
                 self.vehicle_attr_res = self.vehicle_attr_detector.predict_image(crop_res,visual=False)
         if self.vehicleplate_detector_isOn:
-            platelicenses = []
-            for crop_res in self.vehicle_crops_res:
-                platelicense = self.vehicleplate_detector.get_platelicense(crop_res)
-                platelicenses.extend(platelicense['plate'])
-                self.vehicleplate_res = {'vehicleplate': platelicenses}
-                
-        if self.vehicle_press_detector_isOn:
+            if self.frame == 0:
+                platelicenses = []#车牌预测
+                for crop_res in self.vehicle_crops_res:
+                    platelicense = self.vehicleplate_detector.get_platelicense(crop_res)
+                    platelicenses.extend(platelicense['plate'])
+                    self.vehicleplate_res = {'vehicleplate': platelicenses}
+        if self.vehicle_press_detector_isOn:#车辆压线检测
             vehicle_press_res_list = []
             lanes, direction = self.laneseg_predictor.run([input])
             if len(lanes) == 0:
@@ -236,7 +259,14 @@ class my_paddledetection:
             vehicle_press_res_list = self.vehicle_press_predictor.run(
                     lanes, self.vehicle_res)
             self.vehiclepress_res = {'output': vehicle_press_res_list}
-
+        if self.vehicle_invasion_detector_isOn:
+            reuse_det_result = self.frame != 0 
+            res = self.vehicle_invasion_detector.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
+            mot_res = parse_mot_res(res)
+            print( "trackid number: {}".format( len(mot_res['boxes'])))
+        self.frame += 1
+        if self.frame == 10:
+            self.frame = 0
         self.visualize_image(input)
         return self.im
     
@@ -256,7 +286,7 @@ class my_paddledetection:
         
         if self.vehicle_attr_res is not None:
             vehicle_attr_res_i = self.vehicle_attr_res['output']
-            im = visualize_attr(image, vehicle_attr_res_i,self.vehicle_res['boxes'])
+            self.im = visualize_attr(image, vehicle_attr_res_i,self.vehicle_res['boxes'])
             
         if self.vehicleplate_res is not None:
             plates = self.vehicleplate_res['vehicleplate']
@@ -272,8 +302,8 @@ class my_paddledetection:
             self.im = np.ascontiguousarray(np.copy(self.im))
         if self.lanes_res is not None:
             lanes = self.lanes_res['output'][0]
-            im = visualize_lane(im, lanes)
-            im = np.ascontiguousarray(np.copy(im))
+            self.im = visualize_lane(self.im, lanes)
+            self.im = np.ascontiguousarray(np.copy(self.im))
             
             
         
