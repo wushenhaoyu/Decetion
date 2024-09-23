@@ -256,7 +256,7 @@ class my_paddledetection:
             if len(lanes) == 0:
                 print(" no lanes!")
             self.lanes_res = {'output': lanes, 'direction': direction}
-            vehicle_press_res_list = self.vehicle_press_predictor.run(
+            vehicle_press_res_list = self.press_recoginizer.run(
                     lanes, self.vehicle_res)
             self.vehiclepress_res = {'output': vehicle_press_res_list}
         if self.vehicle_invasion_detector_isOn:
@@ -296,9 +296,9 @@ class my_paddledetection:
             self.im  = visualize_vehicleplate(self.im, plates, vehicle_res_i['boxes'])
         
         if self.vehiclepress_res is not None:
-            press_vehicle = self.vehicle_res['output'][0]
+            press_vehicle =  self.vehiclepress_res['output'][0]
             if len(press_vehicle) > 0:
-                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'],0.5)
+                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'][0],0.5)
             self.im = np.ascontiguousarray(np.copy(self.im))
         if self.lanes_res is not None:
             lanes = self.lanes_res['output'][0]
@@ -312,21 +312,49 @@ class my_paddledetection:
             
 
 
-    
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_people_detector()
+    #my_detection.turn_people_detector()
     #my_detection.turn_vehicle_attr_detector()
     #my_detection.turn_vehicleplate_detector()
-    cap = cv2.VideoCapture(0)
+    my_detection.turn_vehicle_press_detector()
+    # 定义图像文件夹路径
+    image_folder = os.path.join(current_dir,'test')
+    images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
+    images.sort()  # 确保按照文件名顺序读取
+    
+    for image_name in images:
+        # 读取图像
+        img_path = os.path.join(image_folder, image_name)
+        frame = cv2.imread(img_path)
+        
+        if frame is not None:
+            input = frame[:, :, ::-1]
+            img = my_detection.predit(input)
+            
+            # 显示图像
+            cv2.imshow('Mask Detection', img)
+            
+            # 按 'q' 键退出
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    
+    # 关闭所有窗口
+    cv2.destroyAllWindows()    
+
+
+
+
+
+
+
+
+"""if __name__ == "__main__":
+    my_detection = my_paddledetection()
+    #my_detection.turn_people_detector()
+    my_detection.turn_vehicle_attr_detector()
+    #my_detection.turn_vehicleplate_detector()
+    cap = cv2.VideoCapture('../test')
     while True:
         # 读取一帧图像
         _, frame = cap.read()
@@ -341,8 +369,8 @@ if __name__ == "__main__":
 
     # 释放资源
     cap.release()
-    cv2.destroyAllWindows()
-    """detector = people_detector_init()
+    cv2.destroyAllWindows()"""
+"""detector = people_detector_init()
     people_attr_detector = people_attr_detector_init()
     cap = cv2.VideoCapture(0)
     while True:
