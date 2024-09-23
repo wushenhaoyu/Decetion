@@ -25,7 +25,7 @@ def get_args():
     arg(
         '--out',
         type=lambda x: process_path(x, True),
-        default=None,
+        default="None",
         help='Output location.',
     )
     arg(
@@ -77,7 +77,7 @@ def get_args():
     arg(
         '--use_weights',
         type=process_path,
-        default='weights_.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
+        default='hdr/weights_.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
         help='Weights to use for prediction',
     )
     arg(

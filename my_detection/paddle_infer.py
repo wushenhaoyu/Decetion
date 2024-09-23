@@ -12,16 +12,20 @@ import numpy as np
 import math
 import paddle
 from paddle.inference import Config
+import sys
 from paddle.inference import create_predictor
- 
-from deploy.python.infer import Detector, visualize_box_mask
-from deploy.pipeline.pphuman.attr_infer import AttrDetector
-from deploy.pipeline.pipe_utils import crop_image_with_det, parse_mot_res
-from deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
-from deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
-from deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
-from deploy.pipeline.ppvehicle.lane_seg_infer import LaneSegPredictor
-from deploy.pptracking.python.mot_sde_infer import SDE_Detector
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+parent_dir = os.path.join(current_dir, '..')
+sys.path.append(parent_dir)
+from my_detection.deploy.python.infer import Detector, visualize_box_mask
+from my_detection.deploy.pipeline.pphuman.attr_infer import AttrDetector
+from my_detection.deploy.pipeline.pipe_utils import crop_image_with_det, parse_mot_res
+from my_detection.deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
+from my_detection.deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
+from my_detection.deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
+from my_detection.deploy.pipeline.ppvehicle.lane_seg_infer import LaneSegPredictor
+from my_detection.deploy.pptracking.python.mot_sde_infer import SDE_Detector
 from visualize import visualize_attr, visualize_lane, visualize_vehicleplate, visualize_vehiclepress
  
 
@@ -136,7 +140,7 @@ def vehicle_sde_detector_init(region_polygon):
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
-        tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
+        tracker_config=os.path.join(current_dir,'deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
         run_mode='paddle',
         region_type='custom',
@@ -176,12 +180,12 @@ class my_paddledetection:
         self.vehicle_detector = vehicle_detector_init()
         self.people_attr_detector = people_attr_detector_init()
         self.vehicle_attr_detector = vehicle_attr_detector_init()
-        self.vehicleplate_detector = vehicleplate_detector_init()
+        # self.vehicleplate_detector = vehicleplate_detector_init()
         self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
-        self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[100, 1000, 1000, 1000, 900, 1700, 0 ,1700])
+        # self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[])
         self.frame = 0
     def turn_people_detector(self):#切换行人检测
-        self.people_detector_isOn = not self.people_detector_isOn
+        self.people_attr_detector_isOn = not self.people_attr_detector_isOn
     def turn_vehicle_detector(self):#切换车辆检测
         self.vehicle_detector_isOn = not self.vehicle_detector_isOn
         
@@ -319,18 +323,18 @@ class my_paddledetection:
 
 
 
-
+from PIL import Image
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_people_detector()
-    #my_detection.turn_vehicle_attr_detector()
-    #my_detection.turn_vehicleplate_detector()
+    my_detection.turn_people_attr_detector()
     cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
         _, frame = cap.read()
+        # input = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         input = frame[:, :, ::-1]
+        print(input.shape)
         img = my_detection.predit(input)
         # 显示图像
         cv2.imshow('Mask Detection', img)
