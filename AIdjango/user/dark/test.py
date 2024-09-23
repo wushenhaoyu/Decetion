@@ -7,7 +7,7 @@ from PIL.Image import Image
 from tqdm import tqdm
 import cv2
 
-from dark.model import IAT
+from model import IAT
 
 import os
 import paddle
@@ -18,25 +18,20 @@ import numpy as np
 from paddle.vision.transforms import Normalize
 from PIL import Image
 
-current_directory = os.getcwd()
-print(current_directory)
+current_directory = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=str, default=0)
-parser.add_argument('--file_name', type=str, default=os.path.join(current_directory, 'demo_imgs', '9.png'))
+parser.add_argument('--file_name', type=str, default=os.path.join(current_directory, 'demo_imgs', 't.jpg'))
 parser.add_argument('--normalize', type=bool, default=False)
 parser.add_argument('--task', type=str, default='enhance', help='Choose from exposure or enhance')
 config = parser.parse_args()
-
-# Weights path
-exposure_pretrain = r'best_Epoch_exposure.pdparams'
-enhance_pretrain = r'best_Epoch_lol_v1.pdparams'
 
 normalize_process = Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 
 paddle.set_device('gpu:' + str(config.gpu_id))
 ## Load Pre-train Weights
 model = IAT()
-model.load_dict(paddle.load('transform_paddle.pdparams'))
+model.load_dict(paddle.load(os.path.join(current_directory,'transform_paddle.pdparams')))
 model = model.to(paddle.CUDAPlace(0))  # 将模型移动到
 model.eval()
 

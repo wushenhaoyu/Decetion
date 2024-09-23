@@ -49,8 +49,7 @@ class ExpandNet(paddle.nn.Layer):
             overlap = 20
             skip = int(overlap / 2)
             result = x.clone()
-            x = paddle.nn.functional.pad(x=x, pad=(skip, skip, skip, skip),
-                pad_from_left_axis=False)
+            x = paddle.nn.functional.pad(x=x, pad=(skip, skip, skip, skip),)
             padded_height, padded_width = x.shape[-2], x.shape[-1]
             num_h = int(np.ceil(padded_height / (patch_size - overlap)))
             num_w = int(np.ceil(padded_width / (patch_size - overlap)))

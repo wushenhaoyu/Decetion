@@ -53,16 +53,28 @@ def str2bool(x):
 
 
 def cv2paddle(np_img):
+    # 确保输入是 NumPy 数组
+    if not isinstance(np_img, np.ndarray):
+        raise ValueError("Input should be a NumPy array.")
+    
+    # 调整 RGB 顺序
     rgb = np_img[:, :, (2, 1, 0)]
-    x = rgb
+    
+    # 将 NumPy 数组转换为 PaddlePaddle Tensor
+    x = paddle.to_tensor(rgb)
+    
+    # 执行维度转换
     perm_0 = list(range(x.ndim))
     perm_0[1] = 2
     perm_0[2] = 1
     x = paddle.transpose(x=x, perm=perm_0)
+    
     perm_1 = list(range(x.ndim))
     perm_1[0] = 1
     perm_1[1] = 0
-    return paddle.to_tensor(data=paddle.transpose(x=x, perm=perm_1))
+    x = paddle.transpose(x=x, perm=perm_1)
+    
+    return x
 
 
 def paddle2cv(t_img):
@@ -70,11 +82,12 @@ def paddle2cv(t_img):
     perm_2 = list(range(x.ndim))
     perm_2[0] = 2
     perm_2[2] = 0
-    x = paddle.transpose(x=x, perm=perm_2)
+    x = np.transpose(x, axes=perm_2)
     perm_3 = list(range(x.ndim))
     perm_3[0] = 1
     perm_3[1] = 0
-    return paddle.transpose(x=x, perm=perm_3)[:, :, (2, 1, 0)]
+    x = np.transpose(x, axes=perm_3)
+    return x[:, :, (2, 1, 0)]
 
 
 def resize(x, size):
@@ -178,7 +191,7 @@ def random_tone_map(x):
 
 
 def create_tmo_param_from_args(opt):
-    if opt.tmo == 'exposure':
+    if opt.tone_map == 'exposure':
         return {k: opt.get(k) for k in ['gamma', 'stops']}
     else:
         return {}

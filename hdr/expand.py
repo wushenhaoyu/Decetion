@@ -3,6 +3,7 @@ import os
 import numpy as np
 import cv2
 import paddle
+import time
 from smooth import smoothen_luminance
 from model import ExpandNet  # 假设模型定义已经适配了PaddlePaddle
 from util import (
@@ -76,7 +77,7 @@ def get_args():
     arg(
         '--use_weights',
         type=process_path,
-        default='weights.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
+        default='weights_.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
         help='Weights to use for prediction',
     )
     arg(
@@ -132,8 +133,7 @@ def create_video(opt):
         ldr_input = preprocess(loaded, opt)
         t_input = cv2paddle(ldr_input)
         if opt.use_gpu:
-            net = net.cuda()
-            t_input = t_input.cuda()
+            paddle.set_device('gpu')
         predictions.append(
             paddle2cv(net.predict(t_input, opt.patch_size).cpu())
         )
@@ -183,8 +183,8 @@ def create_images(opt):
 
         t_input = cv2paddle(ldr_input)
         if opt.use_gpu:
-            net = net.cuda()
-            t_input = t_input.cuda()
+            paddle.set_device('gpu')
+        lst_time = time.time()
         prediction = map_range(
             paddle2cv(net.predict(t_input, opt.patch_size).cpu()), 0, 1
         )
@@ -207,6 +207,7 @@ def create_images(opt):
                 opt.tag,
             )
             cv2.imwrite(out_name, (tmo_img * 255).astype(int))
+        print(time.time()-lst_time)
 
 def main():
     opt = get_args()
