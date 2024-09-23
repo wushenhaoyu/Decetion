@@ -136,7 +136,7 @@ def vehicle_sde_detector_init(region_polygon):
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
-        tracker_config=os.path.join(current_dir,'deploy','pipeline','config','tracker_config.yml'),
+        tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
         run_mode='paddle',
         region_type='custom',
@@ -178,10 +178,10 @@ class my_paddledetection:
         self.vehicle_attr_detector = vehicle_attr_detector_init()
         self.vehicleplate_detector = vehicleplate_detector_init()
         self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
-        self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[])
+        self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[100, 1000, 1000, 1000, 900, 1700, 0 ,1700])
         self.frame = 0
     def turn_people_detector(self):#切换行人检测
-        self.people_attr_detector_isOn = not self.people_attr_detector_isOn
+        self.people_detector_isOn = not self.people_detector_isOn
     def turn_vehicle_detector(self):#切换车辆检测
         self.vehicle_detector_isOn = not self.vehicle_detector_isOn
         
@@ -323,8 +323,9 @@ class my_paddledetection:
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_vehicle_attr_detector()
-    my_detection.turn_vehicleplate_detector()
+    my_detection.turn_people_detector()
+    #my_detection.turn_vehicle_attr_detector()
+    #my_detection.turn_vehicleplate_detector()
     cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
