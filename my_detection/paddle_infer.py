@@ -1,4 +1,5 @@
 import argparse
+from collections import defaultdict
 import copy
 import os
 import yaml
@@ -22,6 +23,9 @@ from deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
 from deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
 from deploy.pipeline.ppvehicle.lane_seg_infer import LaneSegPredictor
 from deploy.pptracking.python.mot_sde_infer import SDE_Detector
+from deploy.pptracking.python.mot.utils import flow_statistic, update_object_info
+from deploy.pipeline.datacollector import DataCollector
+from deploy.pptracking.python.mot.visualize import plot_tracking_dict
 from visualize import visualize_attr, visualize_lane, visualize_vehicleplate, visualize_vehiclepress
  
 
@@ -131,15 +135,28 @@ def vehicle_press_detector_init():
 
     return laneseg_predictor, press_recoginizer
 
-def vehicle_sde_detector_init(region_polygon):
-    #初始化车辆违停检测器
+def vehicle_sde_detector_init(region_type,region_polygon):
+    #初始化车辆跟踪器
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
         tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
         run_mode='paddle',
-        region_type='custom',
+        region_type=region_type,
+        region_polygon=region_polygon,
+    )
+    return detector
+
+def people_sde_detector_init(region_type,region_polygon):
+    #初始化人跟踪器
+    model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_pipeline')
+    detector = SDE_Detector(
+        model_dir=model_dir,
+        tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
+        device='GPU',
+        run_mode='paddle',
+        region_type=region_type,
         region_polygon=region_polygon,
     )
     return detector
@@ -161,6 +178,8 @@ class my_paddledetection:
         self.vehicle_attr_detector_isOn = False
         self.vehicleplate_detector_isOn = False
         self.vehicle_press_detector_isOn = False
+        self.people_tracker_isOn = False
+        self.vehicle_tracker_isOn = False
         self.vehicle_invasion_detector_isOn = False
         """
         初始化检测器
@@ -178,43 +197,68 @@ class my_paddledetection:
         self.vehicle_attr_detector = vehicle_attr_detector_init()
         self.vehicleplate_detector = vehicleplate_detector_init()
         self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
-        self.vehicle_invasion_detector = vehicle_sde_detector_init(region_polygon=[100, 1000, 1000, 1000, 900, 1700, 0 ,1700])
+        self.vehicle_tracker = vehicle_sde_detector_init(region_type='horizontal',region_polygon=[])
+        self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
         self.frame = 0
+        self.collector = DataCollector()
     def turn_people_detector(self):#切换行人检测
-        self.people_detector_isOn = not self.people_detector_isOn
+        if self.people_detector_isOn:
+            self.people_detector_isOn = False
+        else:
+            self.people_detector_isOn = True
+            self.people_tracker_isOn = False
     def turn_vehicle_detector(self):#切换车辆检测
-        self.vehicle_detector_isOn = not self.vehicle_detector_isOn
+        if self.vehicle_detector_isOn:
+            self.vehicle_detector_isOn = False
+        else:
+            self.vehicle_detector_isOn = True
+            self.vehicle_tracker_isOn = False
+    
+    def turn_vehicle_tracker(self):#切换车辆跟踪器
+        if self.vehicle_tracker_isOn:
+            self.vehicle_tracker_isOn = False
+        else:
+            self.vehicle_tracker_isOn = True
+            self.vehicle_detector_isOn = False
+    
+    def turn_people_tracker(self):#切换行人跟踪器
+        if self.people_tracker_isOn:
+            self.people_tracker_isOn = False
+        else:
+            self.people_tracker_isOn = True
+            self.people_detector_isOn = False
+    
         
     def turn_people_attr_detector(self):#切换行人属性检测
         if self.people_attr_detector_isOn:
             self.people_attr_detector_isOn = False
-            self.people_detector_isOn = False
         else:
             self.people_attr_detector_isOn = True
-            self.people_detector_isOn = True
     
     def turn_vehicle_attr_detector(self):#切换车辆属性检测
         if self.vehicle_attr_detector_isOn:
             self.vehicle_attr_detector_isOn = False
-            self.vehicle_detector_isOn = False
         else:
             self.vehicle_attr_detector_isOn = True
-            self.vehicle_detector_isOn = True
             
     def turn_vehicleplate_detector(self):#切换车牌检测
         if self.vehicleplate_detector_isOn:
             self.vehicleplate_detector_isOn = False
-            self.vehicle_detector_isOn = False
         else:
             self.vehicleplate_detector_isOn = True
-            self.vehicle_detector_isOn = True
             
     def turn_vehicle_press_detector(self):#切换车辆压线检测
         if self.vehicle_press_detector_isOn:
             self.vehicle_press_detector_isOn = False
-            self.vehicle_detector_isOn = False
         else:
             self.vehicle_press_detector_isOn = True
+            
+    def turn_vehicle_invasion_detector(self):#切换车辆违停检测
+        if self.vehicle_invasion_detector_isOn:
+            self.vehicle_invasion_detector_isOn = False
+            self.vehicle_detector_isOn = False
+        else:
+            self.vehicle_invasion_detector_isOn = True
             self.vehicle_detector_isOn = True
     def clear(self):#结果清空
         self.people_res = None
@@ -228,12 +272,79 @@ class my_paddledetection:
         self.lanes_res = None
     def predit(self,input):
         self.clear()
+        reuse_det_result = self.frame != 0 
         if self.people_detector_isOn:#行人检测
-            self.people_res = self.people_detector.predict_image([input],visual=False)
-            self.people_res = self.people_detector.filter_box(self.people_res,0.5) # 过滤掉置信度小于0.5的框
+            people_res = self.people_detector.predict_image([input],visual=False)
+            self.people_res = self.people_detector.filter_box(people_res,0.5) # 过滤掉置信度小于0.5的框
+        elif self.people_tracker_isOn:
+            people_res = self.people_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
+            self.people_res = parse_mot_res(people_res)
         if self.vehicle_detector_isOn:#车辆检测
-            self.vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
-            self.vehicle_res = self.vehicle_detector.filter_box(self.vehicle_res,0.5) # 过滤掉置信度小于0.5的框
+            vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
+            self.vehicle_res = self.vehicle_detector.filter_box(vehicle_res,0.5) # 过滤掉置信度小于0.5的框
+        elif self.vehicle_tracker_isOn:
+            self.entrance = None
+            id_set = set()
+            interval_id_set = set()
+            in_id_list = list()
+            out_id_list = list()
+            prev_center = dict()
+            self.records = list()
+            height = input.shape[0]
+            width = input.shape[1]
+            if self.vehicle_tracker.do_entrance_counting or self.vehicle_tracker.do_break_in_counting or self.vehicle_invasion_detector_isOn:
+                if self.vehicle_tracker.region_type == 'horizontal':
+                    self.entrance = [0, height / 2., width, height / 2.]
+                elif self.vehicle_tracker.region_type == 'vertical':
+                    self.entrance = [width / 2, 0., width / 2, height]
+                elif self.vehicle_tracker.region_type == 'custom':
+                    self.entrance = []
+                    assert len(
+                        self.vehicle_tracker.region_polygon
+                    ) % 2 == 0, "region_polygon should be pairs of coords points when do break_in counting."
+                    assert len(
+                        self.vehicle_tracker.region_polygon
+                    ) > 6, 'region_type is custom, region_polygon should be at least 3 pairs of point coords.'
+
+                    for i in range(0, len(self.region_polygon), 2):
+                        self.entrance.append(
+                            [self.region_polygon[i], self.region_polygon[i + 1]])
+                    self.entrance.append([width, height])
+                else:
+                    raise ValueError("region_type:{} unsupported.".format(
+                        self.region_type))
+            vehicle_res = self.vehicle_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
+            self.vehicle_res = parse_mot_res(vehicle_res)
+            boxes, scores , ids = vehicle_res[0]
+            mot_result = ( 1, boxes[0], scores[0],ids[0])
+            statistic = flow_statistic(
+                mot_result,
+                self.vehicle_tracker.secs_interval,
+                self.vehicle_tracker.do_entrance_counting,
+                self.vehicle_tracker.do_break_in_counting,
+                self.vehicle_tracker.region_type,
+                20,
+                self.entrance,
+                id_set,
+                interval_id_set,
+                in_id_list,
+                out_id_list,
+                prev_center,
+                self.records,
+                ids2names=self.vehicle_tracker.pred_config.labels
+            )
+            self.records = statistic['records']
+            if self.vehicle_invasion_detector_isOn:
+                object_in_region_info = {}
+                object_in_region_info, illegal_parking_dict = update_object_info(
+                        object_in_region_info, mot_result, self.vehicle_tracker.region_type,
+                        self.entrance, 20, 5)
+                if len(illegal_parking_dict) != 0:
+                    for key, value in illegal_parking_dict.items():
+                            plate = self.collector.get_carlp(key)
+                            illegal_parking_dict[key]['plate'] = plate
+            
+            
         if self.people_attr_detector_isOn:#行人属性检测
             self.people_crops_res = crop_image_with_det([input], self.people_res)
             for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
@@ -256,26 +367,109 @@ class my_paddledetection:
             if len(lanes) == 0:
                 print(" no lanes!")
             self.lanes_res = {'output': lanes, 'direction': direction}
-            vehicle_press_res_list = self.vehicle_press_predictor.run(
+            vehicle_press_res_list = self.press_recoginizer.run(
                     lanes, self.vehicle_res)
             self.vehiclepress_res = {'output': vehicle_press_res_list}
-        if self.vehicle_invasion_detector_isOn:
-            reuse_det_result = self.frame != 0 
-            res = self.vehicle_invasion_detector.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
-            mot_res = parse_mot_res(res)
-            print( "trackid number: {}".format( len(mot_res['boxes'])))
         self.frame += 1
+        if self.vehicle_tracker_isOn:
+            if frame == 10:
+                print( "trackid number: {}".format( len(self.vehicle_res['boxes'])))
         if self.frame == 10:
             self.frame = 0
+
         self.visualize_image(input)
         return self.im
     
     def visualize_image(self,image):
         self.im = image
-        if self.people_res is not None :
+        if self.vehicle_res is not None and self.vehicle_tracker_isOn:
+            ids = self.vehicle_res['boxes'][:,0]
+            scores = self.vehicle_res['boxes'][:,2]
+            boxes = self.vehicle_res['boxes'][:,3:]
+            boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
+            boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
+            online_tlwhs = defaultdict(list)
+            online_scores = defaultdict(list)
+            online_ids = defaultdict(list)
+            online_tlwhs[0] = boxes
+            online_scores[0] = scores
+            online_ids[0] = ids
+            if self.vehicle_invasion_detector_isOn:
+                do_illegal_parking_recognition = True
+                self.im = plot_tracking_dict(
+                    self.im,
+                    1,
+                    online_tlwhs,
+                    online_ids,
+                    online_scores,
+                    frame_id=0,
+                    fps=20,
+                    ids2names=self.vehicle_tracker.pred_config.labels,
+                    do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
+                    do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                    do_illegal_parking_recognition=do_illegal_parking_recognition,
+                    region_type=self.vehicle_tracker.region_type,
+                    region_polygon=self.vehicle_tracker.region_polygon,
+                    records=self.records,
+                    entrance=self.entrance,
+                    center_traj=[{}]
+                )
+            else:
+                do_illegal_parking_recognition = False
+                self.im = plot_tracking_dict(
+                    self.im,
+                    1,
+                    online_tlwhs,
+                    online_ids,
+                    online_scores,
+                    frame_id=0,
+                    fps=20,
+                    ids2names=self.vehicle_tracker.pred_config.labels,
+                    do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
+                    do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                    do_illegal_parking_recognition=do_illegal_parking_recognition,
+                    region_type=self.vehicle_tracker.region_type,
+                    region_polygon=self.vehicle_tracker.region_polygon,
+                    records=self.records,
+                    entrance=self.entrance,
+                    center_traj=[{}]
+                )
+                
+        if self.people_res is not None and self.people_tracker_isOn:
+            ids = self.vehicle_res['boxes'][:,0]
+            scores = self.vehicle_res['boxes'][:,2]
+            boxes = self.vehicle_res['boxes'][:,3:]
+            boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
+            boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
+            online_tlwhs = defaultdict(list)
+            online_scores = defaultdict(list)
+            online_ids = defaultdict(list)
+            online_tlwhs[0] = boxes
+            online_scores[0] = scores
+            online_ids[0] = ids
+            self.im = plot_tracking_dict(
+                self.im,
+                1,
+                online_tlwhs,
+                online_ids,
+                online_scores,
+                frame_id=0,
+                fps=20,
+                ids2names=self.vehicle_tracker.pred_config.labels,
+                do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
+                do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                do_illegal_parking_recognition=False,
+                region_type=self.vehicle_tracker.region_type,
+                region_polygon=self.vehicle_tracker.region_polygon,
+                records=self.records,
+                entrance=self.entrance,
+                center_traj=[{}]
+            )
+        
+        if self.people_res is not None and self.people_detector_isOn:
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
 
-        if self.vehicle_res is not None:
+        if self.vehicle_res is not None and self.vehicle_detector_isOn:
             self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
         self.im = np.ascontiguousarray(np.copy(self.im))
         self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
@@ -296,9 +490,9 @@ class my_paddledetection:
             self.im  = visualize_vehicleplate(self.im, plates, vehicle_res_i['boxes'])
         
         if self.vehiclepress_res is not None:
-            press_vehicle = self.vehicle_res['output'][0]
+            press_vehicle =  self.vehiclepress_res['output'][0]
             if len(press_vehicle) > 0:
-                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'],0.5)
+                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'][0],0.5)
             self.im = np.ascontiguousarray(np.copy(self.im))
         if self.lanes_res is not None:
             lanes = self.lanes_res['output'][0]
@@ -312,7 +506,36 @@ class my_paddledetection:
             
 
 
+"""if __name__ == "__main__":
+    my_detection = my_paddledetection()
+    #my_detection.turn_people_detector()
+    #my_detection.turn_vehicle_attr_detector()
+    #my_detection.turn_vehicleplate_detector()
+    my_detection.turn_vehicle_detector()
+    my_detection.turn_vehicle_press_detector()
+    # 定义图像文件夹路径
+    image_folder = os.path.join(current_dir,'test')
+    images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
+    images.sort()  # 确保按照文件名顺序读取
     
+    for image_name in images:
+        # 读取图像
+        img_path = os.path.join(image_folder, image_name)
+        frame = cv2.imread(img_path)
+        
+        if frame is not None:
+            input = frame[:, :, ::-1]
+            img = my_detection.predit(input)
+            
+            # 显示图像
+            cv2.imshow('Mask Detection', img)
+            
+            # 按 'q' 键退出
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    
+    # 关闭所有窗口
+    cv2.destroyAllWindows()    """
 
 
 
@@ -323,8 +546,10 @@ class my_paddledetection:
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
+    #my_detection.turn_people_detector()
     my_detection.turn_people_detector()
-    #my_detection.turn_vehicle_attr_detector()
+    my_detection.turn_people_attr_detector()
+
     #my_detection.turn_vehicleplate_detector()
     cap = cv2.VideoCapture(0)
     while True:
@@ -333,7 +558,7 @@ if __name__ == "__main__":
         input = frame[:, :, ::-1]
         img = my_detection.predit(input)
         # 显示图像
-        cv2.imshow('Mask Detection', img)
+        cv2.imshow('Mask Detection', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
         # 按 'q' 键退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -342,7 +567,7 @@ if __name__ == "__main__":
     # 释放资源
     cap.release()
     cv2.destroyAllWindows()
-    """detector = people_detector_init()
+"""detector = people_detector_init()
     people_attr_detector = people_attr_detector_init()
     cap = cv2.VideoCapture(0)
     while True:
