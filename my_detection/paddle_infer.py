@@ -141,7 +141,7 @@ def vehicle_sde_detector_init(region_type,region_polygon):
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
-        tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
+        tracker_config=os.path.join(current_dir,'deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
         run_mode='paddle',
         region_type=region_type,
@@ -506,29 +506,44 @@ class my_paddledetection:
             
 
 
-
-
-
-
-
-
-from PIL import Image
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_vehicle_tracker()
-    cap = cv2.VideoCapture(0)
-    while True:
-        # 读取一帧图像
-        _, frame = cap.read()
-        input = frame[:, :, ::-1]
-        img = my_detection.predit(input)
-        # 显示图像
-        cv2.imshow('Mask Detection', img)
+    #my_detection.turn_people_detector()
+    #my_detection.turn_vehicle_attr_detector()
+    #my_detection.turn_vehicleplate_detector()
+    my_detection.turn_vehicle_detector()
+    my_detection.turn_vehicle_press_detector()
+    # 定义图像文件夹路径
+    image_folder = os.path.join(current_dir,'test')
+    images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
+    images.sort()  # 确保按照文件名顺序读取
+    
+    for image_name in images:
+        # 读取图像
+        img_path = os.path.join(image_folder, image_name)
+        frame = cv2.imread(img_path)
+        
+        if frame is not None:
+            input = frame[:, :, ::-1]
+            img = my_detection.predit(input)
+            
+            # 显示图像
+            cv2.imshow('Mask Detection', img)
+            
+            # 按 'q' 键退出
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+    
+    # 关闭所有窗口
+    cv2.destroyAllWindows()    """
 
-        # 按 'q' 键退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-"""
+
+
+
+
+
+
+
 if __name__ == "__main__":
     my_detection = my_paddledetection()
     my_detection.turn_people_tracker()
@@ -561,26 +576,72 @@ if __name__ == "__main__":
     
     # 关闭所有窗口
     cv2.destroyAllWindows()    
-"""
-if __name__ == "__main__":
-    my_detection = my_paddledetection()
-    my_detection.turn_people_tracker()
-    cap = cv2.VideoCapture(0)
 
+
+
+
+
+
+
+
+"""if __name__ == "__main__":
+    my_detection = my_paddledetection()
+    #my_detection.turn_people_detector()
+    my_detection.turn_vehicle_attr_detector()
+    #my_detection.turn_vehicleplate_detector()
+    cap = cv2.VideoCapture('../test')
     while True:
         # 读取一帧图像
-        ret, frame = cap.read()
+        _, frame = cap.read()
+        input = frame[:, :, ::-1]
+        img = my_detection.predit(input)
+        # 显示图像
+        cv2.imshow('Mask Detection', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
 
-        img = my_detection.predit(frame)
-        
+        # 按 'q' 键退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-    # 释放摄像头资源
+    # 释放资源
     cap.release()
-    # 关闭所有 OpenCV 窗口
     cv2.destroyAllWindows()
-    
+""" 
+""" detector = people_detector_init()
+    people_attr_detector = people_attr_detector_init()
+    cap = cv2.VideoCapture(0)
+    while True:
+        # 读取一帧图像
+        _, frame = cap.read()
+        input = [frame[:, :, ::-1]]
+        # 检测图像
+        results = detector.predict_image(input, visual=False)  # bgr-->rgb
+        results = detector.filter_box(results,0.5)
+        crops_results = crop_image_with_det(input, results)
+        attr_res_list = []
+        for crop_result in crops_results:
+            attr_res = people_attr_detector.predict_image(crop_result, visual=False)
+            attr_res_list.append(attr_res)
+        #print(results)
+        #print(detector.det_times.info())
 
+        # 可视化结果
+        im = visualize_box_mask(frame, results, detector.pred_config.labels, detector.threshold)
+        im = np.array(im)
+        for attr_res in attr_res_list:
+            im = visualize_attr(im, attr_res, results['boxes'])
 
+        # 显示图像
+        cv2.imshow('Mask Detection', im)
 
+        # 按 'q' 键退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-
+    # 释放资源
+    cap.release()
+    cv2.destroyAllWindows()"""
+ 
+ 
+# def pre_img(detector, frame:cv2):
+#     results = detector.predict_image([frame[:, :, ::-1]], visual=False)  # bgr-->rgb
+ 
