@@ -11,39 +11,67 @@ import os
 from django.conf import settings
 from django.conf import settings
 import os
+import threading
 import json
 from django.conf import settings
 from django.shortcuts import render
 import subprocess
+current_directory = os.getcwd()
+print(sys.path)
+# 将子文件夹路径添加到 sys.path
+module_directory = os.path.join(current_directory)
+print(module_directory)
 
+sys.path.append(module_directory)
 from django.http import StreamingHttpResponse
 from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
-import shutil
-import threading
-current_dir = os.path.dirname(os.path.abspath(__file__))
-import random
-parent_dir = os.path.join(current_dir, '..')
-sys.path.append(parent_dir)
-sys.path.append(current_dir)
-# from haze.test_real import HazeRemover
-# from my_detection.paddle_infer import PaddleDetection
-# from dark.camera import VideoEnhancer
+from haze.test_real import HazeRemover
+from my_detection.paddle_infer import my_paddledetection
+from dark.camera import VideoEnhancer
 haze_net = None
 dark_net =None
 params = None
-VehicleLicense_net = None
-PedestrianAttributeDetection_net = None
-PedestrianAttributeRecognition_net = None
-PedestrianDetectionTracking_net = None
-VehicleDetectionTracking_net = None
-VehicleAttribute_net = None
-LaneDetection_net = None
-FallDetection_net = None
+paddledetection_net = None
+
+def initialize(request):
+    global haze_net
+    global dark_net
+    global paddledetection_net
+    try:
+        if haze_net is None:
+            haze_net = HazeRemover()
+            print("Haze Remover initialized.")
+
+        if dark_net is None:
+            dark_net = VideoEnhancer()
+            print("Video Enhancer initialized.")
+
+        if paddledetection_net is None:
+            paddledetection_net = my_paddledetection()
+            print("Vehicle License Detection initialized.")
+
+
+
+    except Exception as e:
+        print(f"Error initializing models: {e}")
+        return HttpResponse("Error initializing models.", status=500)
+
+    return HttpResponse("Models initialized and ready.")
+
+def get_camera_frame_size(camera):
+    ret, frame = camera.read()
+    if ret:
+        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        return frame.shape[1], frame.shape[0]  # 返回宽度和高度
+    return None
+
 def gen_display(camera):
     """
     视频流生成器功能。
     """
+    target_size = get_camera_frame_size(camera)
+    print(target_size)
     while True:
         # 读取图片
         ret, frame = camera.read()
@@ -53,36 +81,16 @@ def gen_display(camera):
             if ret:
                 # frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                
                 # if params["haze_enabled"]:
-                #     frame = haze_net.haze_frame(frame)
-
+                frame = haze_net.haze_frame(frame)
+                print(frame.shape)
                 # if params["dark_enabled"]:
-                #     frame = dark_net.process_frame(frame)
-
-                # if params["vehicle_license_enabled"]:
-                #     frame = VehicleLicense_net.process_frame(frame)
-
-                # if params["pedestrian_attribute_detection_enabled"]:
-                #     frame = PedestrianAttributeDetection_net.process_frame(frame)
-
-                # if params["pedestrian_attribute_recognition_enabled"]:
-                #     frame = PedestrianAttributeRecognition_net.process_frame(frame)
-
-                # if params["pedestrian_detection_tracking_enabled"]:
-                #     frame = PedestrianDetectionTracking_net.process_frame(frame)
-
-                # if params["vehicle_detection_tracking_enabled"]:
-                #     frame = VehicleDetectionTracking_net.process_frame(frame)
-
-                # if params["vehicle_attribute_enabled"]:
-                #     frame = VehicleAttribute_net.process_frame(frame)
-
-                # if params["lane_detection_enabled"]:
-                #     frame = LaneDetection_net.process_frame(frame)
-
-                # if params["fall_detection_enabled"]:
-                #     frame = FallDetection_net.process_frame(frame)
-                # 转换为byte类型的，存储在迭代器中
+                frame = dark_net.process_frame(frame)
+                print(frame.shape)
+                paddledetection_net.turn_people_attr_detector()
+                frame = paddledetection_net.predit(frame)
+                print(frame.shape)
                 ret, frame = cv2.imencode('.jpeg', frame)
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
@@ -93,18 +101,38 @@ def ConfirmParams(request):
     global params
     data = json.loads(request.body)
     print(data)
+    
     params = {
         'haze_enabled': data.get('haze'),
         'dark_enabled': data.get('dark'),
-        'vehicle_license_enabled': data.get('vehicle_license'),
-        'pedestrian_attribute_detection_enabled': data.get('pedestrian_attribute_detection'),
-        'pedestrian_attribute_recognition_enabled': data.get('pedestrian_attribute_recognition'),
-        'pedestrian_detection_tracking_enabled': data.get('pedestrian_detection_tracking'),
-        'vehicle_detection_tracking_enabled': data.get('vehicle_detection_tracking'),
-        'vehicle_attribute_enabled': data.get('vehicle_attribute'),
-        'lane_detection_enabled': data.get('lane_detection'),
-        'fall_detection_enabled': data.get('fall_detection'),
+        'people_attr_detector': data.get('people_attr_detector'),
+        'vehicle_detector': data.get('vehicle_detector'),
+        'vehicle_attr_detector': data.get('vehicle_attr_detector'),
+        'vehicleplate_detector': data.get('vehicleplate_detector'),
+        'vehicle_press_detector': data.get('vehicle_press_detector'),
     }
+
+    # 切换行人检测状态
+    if params['people_attr_detector'] != paddledetection_net.people_attr_detector_isOn:
+        paddledetection_net.turn_people_attr_detector()
+
+    # 切换车辆检测状态
+    if params['vehicle_detector'] != paddledetection_net.vehicle_detector_isOn:
+        paddledetection_net.turn_vehicle_detector()
+
+    # 切换车辆属性检测状态
+    if params['vehicle_attr_detector'] != paddledetection_net.vehicle_attr_detector_isOn:
+        paddledetection_net.turn_vehicle_attr_detector()
+
+    # 切换车牌检测状态
+    if params['vehicleplate_detector'] != paddledetection_net.vehicleplate_detector_isOn:
+        paddledetection_net.turn_vehicleplate_detector()
+
+    # 切换车辆压线检测状态
+    if params['vehicle_press_detector'] != paddledetection_net.vehicle_press_detector_isOn:
+        paddledetection_net.turn_vehicle_press_detector()
+
+
     return JsonResponse({'message': "success parms", "success": 1}, status=200)
 
 
@@ -115,76 +143,18 @@ def video(request):
     例如：<img src='https://ip:port/uri' >
     """
     # 视频流相机对象
-
+    paddledetection_net.clear()
     camera = cv2.VideoCapture(0)
     # 使用流传输传输视频流
     return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
 
 
-# def initialize(request):
-#     global haze_net
-#     global dark_net
-#     global VehicleLicense_net
-#     global PedestrianAttributeDetection_net 
-#     global PedestrianAttributeRecognition_net 
-#     global PedestrianDetectionTracking_net
-#     global VehicleDetectionTracking_net 
-#     global VehicleAttribute_net 
-#     global LaneDetection_net 
-#     global FallDetection_net 
-#     try:
-#         if haze_net is None:
-#             haze_net = HazeRemover()
-#             print("Haze Remover initialized.")
-
-#         if dark_net is None:
-#             dark_net = VideoEnhancer()
-#             print("Video Enhancer initialized.")
-
-#         if VehicleLicense_net is None:
-#             VehicleLicense_net = PaddleDetection('ch_PP-OCRv3_det_infer')##车牌检查
-#             print("Vehicle License Detection initialized.")
-
-#         if PedestrianAttributeDetection_net is None:
-#             PedestrianAttributeDetection_net = PaddleDetection('mot_ppyoloe_l_36e_pipeline')#行人属性目标检测
-#             print("Pedestrian Attribute Detection initialized.")
-
-#         if PedestrianDetectionTracking_net is None:
-#             PedestrianDetectionTracking_net = PaddleDetection('mot_ppyoloe_s_36e_pipeline')#行人检测与跟踪
-#             print("Pedestrian Detection Tracking initialized.")
-
-#         if VehicleDetectionTracking_net is None:
-#             VehicleDetectionTracking_net = PaddleDetection('ch_PP-OCRv3_det_infer')##多目标车辆检测与跟踪
-#             print("Vehicle Detection Tracking initialized.")
-
-#         if LaneDetection_net is None:
-#             LaneDetection_net = PaddleDetection('pp_lite_stdc2_bdd100k')#车道检测
-#             print("Lane Detection initialized.")
-
-#         if PedestrianAttributeRecognition_net is None:
-#             PedestrianAttributeRecognition_net = PaddleDetection('PPLCNet_x1_0_person_attribute_945_infer')#行人属性目标识别
-#             print("Pedestrian Attribute Recognition initialized.")
-
-
-#         if FallDetection_net is None:
-#             FallDetection_net = PaddleDetection('STGCN')#摔倒检测
-#             print("Fall Detection initialized.")
-
-
-#         if VehicleAttribute_net is None:
-#             VehicleAttribute_net = PaddleDetection('vehicle_attribute_model')#车辆属性
-#             print("Vehicle Attribute Detection initialized.")
-
-
-#     except Exception as e:
-#         print(11111111111111111)
-#         print(f"Error initializing models: {e}")
-#         return HttpResponse("Error initializing models.", status=500)
-
-#     return HttpResponse("Models initialized and ready.")
 
 
 
+
+TARGET_WIDTH = 640
+TARGET_HEIGHT = 480
 
 def upload_video(request):
     video_url = None  # 初始化为 None，防止首次加载时报错
@@ -196,85 +166,106 @@ def upload_video(request):
                 with open(file_path, 'wb') as f:
                     for chunk in video.chunks():
                         f.write(chunk)
-                # 生成视频的 URL 路径，确保文件上传目录与 MEDIA_URL 配置正确
-                video_url = os.path.join(settings.MEDIA_URL, video.name)
-                print(f"Video uploaded to {file_path}")
-                # threading.Thread(target=video_detection, args=(video.name,)).start()
+                
+                # 使用 OpenCV 处理视频
+                cap = cv2.VideoCapture(file_path)
+                if not cap.isOpened():
+                    return JsonResponse({'message': "Error opening video"}, status=500)
+
+                # 创建一个新的视频文件
+                output_file = os.path.join(settings.MEDIA_ROOT, 'resized_' + video.name)
+                fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+                out = cv2.VideoWriter(output_file, fourcc, cap.get(cv2.CAP_PROP_FPS), (TARGET_WIDTH, TARGET_HEIGHT))
+
+                while True:
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+
+                    # 获取当前帧的尺寸
+                    h, w = frame.shape[:2]
+
+                    # 计算等比例缩放系数，确保图像不会超过目标尺寸
+                    scale = min(TARGET_WIDTH / w, TARGET_HEIGHT / h)
+                    new_w = int(w * scale)
+                    new_h = int(h * scale)
+
+                    # 缩放图像
+                    resized_frame = cv2.resize(frame, (new_w, new_h))
+
+                    # 创建黑色背景，并将缩放后的图像放置在中央
+                    top = (TARGET_HEIGHT - new_h) // 2
+                    bottom = TARGET_HEIGHT - new_h - top
+                    left = (TARGET_WIDTH - new_w) // 2
+                    right = TARGET_WIDTH - new_w - left
+                    padded_frame = cv2.copyMakeBorder(resized_frame, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+
+                    # 写入输出视频
+                    out.write(padded_frame)
+
+                cap.release()
+                out.release()
+
+                # 删除原始视频（可选）
+                os.remove(file_path)
+                os.rename(output_file, file_path)
+                # 生成视频的 URL
+                video_url = os.path.join(settings.MEDIA_URL, 'resized_' + video.name)
+                threading.Thread(target=video_detection, args=(video.name,)).start()
             except Exception as e:
-                print(f"Failed to upload video: {e}")
+                return JsonResponse({'message': "Failed to process video", 'error': str(e)}, status=500)
+
         else:
-            print("No video file uploaded.")
-    return JsonResponse({'message': "success parms", "success": 1}, status=200)
+            return JsonResponse({'message': "No video file uploaded."}, status=400)
 
+    return JsonResponse({'message': "Success", 'video_url': video_url, 'success': 1}, status=200)
 
+def video_detection(video_name):
 
-# def video_detection(video_name):
+    video_path = os.path.join(settings.MEDIA_ROOT, video_name)
+    cap = cv2.VideoCapture(video_path)
 
-#     video_path = os.path.join(settings.MEDIA_ROOT, video_name)
-#     cap = cv2.VideoCapture(video_path)
+    # 获取视频的基本信息
+    fps = cap.get(cv2.CAP_PROP_FPS)  # 获取帧率
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取宽度
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 获取高度
 
-#     # 获取视频的基本信息
-#     fps = cap.get(cv2.CAP_PROP_FPS)  # 获取帧率
-#     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取宽度
-#     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 获取高度
+    # 创建保存处理后的视频的文件名
+    base_name = os.path.splitext(video_name)[0]
+    processed_video_name = f"{base_name}-processed.mp4"
+    processed_video_path = os.path.join(settings.MEDIA_ROOT, processed_video_name)
 
-#     # 创建保存处理后的视频的文件名
-#     base_name = os.path.splitext(video_name)[0]
-#     processed_video_name = f"{base_name}-processed.mp4"
-#     processed_video_path = os.path.join(settings.MEDIA_ROOT, processed_video_name)
+    # 创建 VideoWriter 对象
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码
+    out = cv2.VideoWriter(processed_video_path, fourcc, fps, (width, height))
 
-#     # 创建 VideoWriter 对象
-#     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码
-#     out = cv2.VideoWriter(processed_video_path, fourcc, fps, (width, height))
+    while True:
+        # 读取一帧图像
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-#     while True:
-#         # 读取一帧图像
-#         ret, frame = cap.read()
-#         if not ret:
-#             break
+        # 处理图像并获取结果
+        if params["haze_enabled"]:
+            frame = haze_net.haze_frame(frame)
 
-#         # 处理图像并获取结果
-#         if params["haze_enabled"]:
-#             frame = haze_net.haze_frame(frame)
+        if params["dark_enabled"]:
+            frame = dark_net.process_frame(frame)
+        frame = paddledetection_net.predit(frame)
 
-#         if params["dark_enabled"]:
-#             frame = dark_net.process_frame(frame)
+        
+        # 将处理后的帧写入新的视频文件
+        out.write(frame)
 
-#         if params["vehicle_license_enabled"]:
-#             frame = VehicleLicense_net.process_frame(frame)
-
-#         if params["pedestrian_attribute_detection_enabled"]:
-#             frame = PedestrianAttributeDetection_net.process_frame(frame)
-
-#         if params["pedestrian_attribute_recognition_enabled"]:
-#             frame = PedestrianAttributeRecognition_net.process_frame(frame)
-
-#         if params["pedestrian_detection_tracking_enabled"]:
-#             frame = PedestrianDetectionTracking_net.process_frame(frame)
-
-#         if params["vehicle_detection_tracking_enabled"]:
-#             frame = VehicleDetectionTracking_net.process_frame(frame)
-
-#         if params["vehicle_attribute_enabled"]:
-#             frame = VehicleAttribute_net.process_frame(frame)
-
-#         if params["lane_detection_enabled"]:
-#             frame = LaneDetection_net.process_frame(frame)
-
-#         if params["fall_detection_enabled"]:
-#             frame = FallDetection_net.process_frame(frame)
-
-#         # 将处理后的帧写入新的视频文件
-#         out.write(frame)
-
-#     # 释放资源
-#     cap.release()
-#     out.release()
-#     print(f"Processed video saved as {processed_video_path}")
+    # 释放资源
+    cap.release()
+    out.release()
+    print(f"Processed video saved as {processed_video_path}")
 
 def upload_photo(request):
     photo_url = None  # 初始化为 None，防止首次加载时报错
     if request.method == 'POST':
+        print(request.body)
         if 'photo' in request.FILES:
             photo = request.FILES['photo']
             file_path = os.path.join(settings.MEDIA_ROOT, photo.name)
@@ -289,7 +280,7 @@ def upload_photo(request):
                 print(f"Photo uploaded to {file_path}")
                 
                 # 在后台启动照片处理线程
-                # threading.Thread(target=photo_processing, args=(photo.name,)).start()
+                threading.Thread(target=photo_processing, args=(photo.name,)).start()
                 
             except Exception as e:
                 print(f"Failed to upload photo: {e}")
@@ -297,63 +288,101 @@ def upload_photo(request):
             print("No photo file uploaded.")
     return JsonResponse({'message': "success parms", "success": 1}, status=200)
 
-# def photo_processing(photo_name):
 
-#     photo_path = os.path.join(settings.MEDIA_ROOT, photo_name)
+def upload_photo(request):
+    photo_url = None  # 初始化为 None，防止首次加载时报错
+    if request.method == 'POST':
+        if 'photo' in request.FILES:
+            photo = request.FILES['photo']
+            file_path = os.path.join(settings.MEDIA_ROOT, photo.name)
+            try:
+                # 将上传的照片保存到指定路径
+                with open(file_path, 'wb') as f:
+                    for chunk in photo.chunks():
+                        f.write(chunk)
+                
+                # 使用 OpenCV 读取保存的照片
+                img = cv2.imread(file_path)
+                
+                # 获取当前图像的尺寸
+                h, w = img.shape[:2]
 
-#     # 读取照片
-#     img = cv2.imread(photo_path)
-#     if img is None:
-#         print(f"Failed to load image {photo_path}")
-#         return
+                # 计算等比例缩放系数，确保图像不会超过目标尺寸
+                scale = min(TARGET_WIDTH / w, TARGET_HEIGHT / h)
+                new_w = int(w * scale)
+                new_h = int(h * scale)
 
-#     # 处理照片（假设你有 haze_net 和 paddle_detection_net 处理帧的函数）
-#     if params["haze_enabled"]:
-#         frame = haze_net.haze_frame(frame)
+                # 缩放图像
+                resized_img = cv2.resize(img, (new_w, new_h))
 
-#     if params["dark_enabled"]:
-#         frame = dark_net.process_frame(frame)
+                # 创建黑色背景，并将缩放后的图像放置在中央
+                top = (TARGET_HEIGHT - new_h) // 2
+                bottom = TARGET_HEIGHT - new_h - top
+                left = (TARGET_WIDTH - new_w) // 2
+                right = TARGET_WIDTH - new_w - left
+                padded_img = cv2.copyMakeBorder(resized_img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=(0, 0, 0))
 
-#     if params["vehicle_license_enabled"]:
-#         frame = VehicleLicense_net.process_frame(frame)
+                # 保存处理后的照片
+                cv2.imwrite(file_path, padded_img)
 
-#     if params["pedestrian_attribute_detection_enabled"]:
-#             rame = PedestrianAttributeDetection_net.process_frame(frame)
+                # 生成照片的 URL 路径
+                photo_url = os.path.join(settings.MEDIA_URL, photo.name)
+                print(f"Photo uploaded and processed to {file_path}")
+                
+                # 在后台启动照片处理线程（如果需要）
+                threading.Thread(target=photo_processing, args=(photo.name,)).start()
 
-#     if params["pedestrian_attribute_recognition_enabled"]:
-#         frame = PedestrianAttributeRecognition_net.process_frame(frame)
+            except Exception as e:
+                print(f"Failed to upload photo: {e}")
+        else:
+            print("No photo file uploaded.")
 
-#     if params["pedestrian_detection_tracking_enabled"]:
-#         frame = PedestrianDetectionTracking_net.process_frame(frame)
+    return JsonResponse({'message': "Success", 'photo_url': photo_url, 'success': 1}, status=200)
+def photo_processing(photo_name):
 
-#     if params["vehicle_detection_tracking_enabled"]:
-#         frame = VehicleDetectionTracking_net.process_frame(frame)
+    photo_path = os.path.join(settings.MEDIA_ROOT, photo_name)
 
-#     if params["vehicle_attribute_enabled"]:
-#         frame = VehicleAttribute_net.process_frame(frame)
+    # 读取照片
+    img = cv2.imread(photo_path)
+    if img is None:
+        print(f"Failed to load image {photo_path}")
+        return
+    frame = img
+    # 处理照片（假设你有 haze_net 和 paddle_detection_net 处理帧的函数）
+    # if params["haze_enabled"]:
+    #     frame = haze_net.haze_frame(frame)
 
-#     if params["lane_detection_enabled"]:
-#         frame = LaneDetection_net.process_frame(frame)
+    # if params["dark_enabled"]:
+    #     frame = dark_net.process_frame(frame)
 
-#     if params["fall_detection_enabled"]:
-#         frame = FallDetection_net.process_frame(frame)
+    # frame = paddledetection_net.predit(frame)
+    base_name = os.path.splitext(photo_name)[0]
+    
 
-#     # 创建保存处理后照片的文件名
-#     base_name = os.path.splitext(photo_name)[0]
-#     processed_photo_name = f"{base_name}-processed.jpg"
-#     processed_photo_path = os.path.join(settings.MEDIA_ROOT, processed_photo_name)
+    processed_photo_name = f"{base_name}-processed.jpg"
 
-#     # 保存处理后的照片
-#     cv2.imwrite(processed_photo_path, img)
 
-#     print(f"Processed photo saved as {processed_photo_path}")
+
+    processed_photo_path = os.path.join(settings.MEDIA_ROOT, processed_photo_name)
+    # 保存处理后的照片
+    cv2.imwrite(processed_photo_path, img)
+    command = [
+        "python", "hdr/expand.py",
+        processed_photo_path,
+        "--out", "./AIdjango/media/",
+        "--tone_map", "reinhard"
+    ]
+    print(command)
+    result = subprocess.run(command, capture_output=True, text=True)
+
+    print(f"Processed photo saved as {processed_photo_path}")
 
 
 def video_view(request):
     # 视频文件的 URL
     if request.body:
         data = json.loads(request.body)
-        video_name = data.get(video_name)
+        video_name = data.get("video_name")
     else:
         video_name = None
     
@@ -365,9 +394,11 @@ def photo_view(request):
     # 视频文件的 URL
     if request.body:
         data = json.loads(request.body)
-        photo_name = data.get(photo_name)
+        photo_name = data.get("photo_name")
     else:
         photo_name = None
     photo_url = f'/media/{photo_name}'
     # return render(request, 'showphoto.html', {'photo_url': photo_url})
+    # delete_path = os.path.join(settings.MEDIA_ROOT,photo_name)
+    # os.remove(delete_path)
     return JsonResponse({'photo_url': photo_url,"success":1})

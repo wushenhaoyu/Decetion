@@ -13,6 +13,7 @@ import numpy as np
 import math
 import paddle
 from paddle.inference import Config
+import sys
 from paddle.inference import create_predictor
  
 from deploy.python.infer import Detector, visualize_box_mask
@@ -195,7 +196,7 @@ class my_paddledetection:
         self.vehicle_detector = vehicle_detector_init()
         self.people_attr_detector = people_attr_detector_init()
         self.vehicle_attr_detector = vehicle_attr_detector_init()
-        self.vehicleplate_detector = vehicleplate_detector_init()
+        # self.vehicleplate_detector = vehicleplate_detector_init()
         self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
         self.vehicle_tracker = vehicle_sde_detector_init(region_type='horizontal',region_polygon=[])
         self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
@@ -372,7 +373,7 @@ class my_paddledetection:
             self.vehiclepress_res = {'output': vehicle_press_res_list}
         self.frame += 1
         if self.vehicle_tracker_isOn:
-            if frame == 10:
+            if self.frame == 10:
                 print( "trackid number: {}".format( len(self.vehicle_res['boxes'])))
         if self.frame == 10:
             self.frame = 0
@@ -436,9 +437,9 @@ class my_paddledetection:
                 )
                 
         if self.people_res is not None and self.people_tracker_isOn:
-            ids = self.vehicle_res['boxes'][:,0]
-            scores = self.vehicle_res['boxes'][:,2]
-            boxes = self.vehicle_res['boxes'][:,3:]
+            ids = self.people_res['boxes'][:,0]
+            scores = self.people_res['boxes'][:,2]
+            boxes = self.people_res['boxes'][:,3:]
             boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
             boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
             online_tlwhs = defaultdict(list)
@@ -455,14 +456,12 @@ class my_paddledetection:
                 online_scores,
                 frame_id=0,
                 fps=20,
-                ids2names=self.vehicle_tracker.pred_config.labels,
-                do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
-                do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                ids2names=self.people_tracker.pred_config.labels,
+                do_entrance_counting=self.people_tracker.do_entrance_counting,
+                do_break_in_counting=self.people_tracker.do_break_in_counting,
                 do_illegal_parking_recognition=False,
-                region_type=self.vehicle_tracker.region_type,
-                region_polygon=self.vehicle_tracker.region_polygon,
-                records=self.records,
-                entrance=self.entrance,
+                records=None,
+                entrance=None,
                 center_traj=[{}]
             )
         
@@ -498,6 +497,7 @@ class my_paddledetection:
             lanes = self.lanes_res['output'][0]
             self.im = visualize_lane(self.im, lanes)
             self.im = np.ascontiguousarray(np.copy(self.im))
+        self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
             
             
         
@@ -506,49 +506,35 @@ class my_paddledetection:
             
 
 
-"""if __name__ == "__main__":
-    my_detection = my_paddledetection()
-    #my_detection.turn_people_detector()
-    #my_detection.turn_vehicle_attr_detector()
-    #my_detection.turn_vehicleplate_detector()
-    my_detection.turn_vehicle_detector()
-    my_detection.turn_vehicle_press_detector()
-    # 定义图像文件夹路径
-    image_folder = os.path.join(current_dir,'test')
-    images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
-    images.sort()  # 确保按照文件名顺序读取
-    
-    for image_name in images:
-        # 读取图像
-        img_path = os.path.join(image_folder, image_name)
-        frame = cv2.imread(img_path)
-        
-        if frame is not None:
-            input = frame[:, :, ::-1]
-            img = my_detection.predit(input)
-            
-            # 显示图像
-            cv2.imshow('Mask Detection', img)
-            
-            # 按 'q' 键退出
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-    
-    # 关闭所有窗口
-    cv2.destroyAllWindows()    """
 
 
 
 
 
 
-
-
+from PIL import Image
 if __name__ == "__main__":
     my_detection = my_paddledetection()
+    my_detection.turn_vehicle_tracker()
+    cap = cv2.VideoCapture(0)
+    while True:
+        # 读取一帧图像
+        _, frame = cap.read()
+        input = frame[:, :, ::-1]
+        img = my_detection.predit(input)
+        # 显示图像
+        cv2.imshow('Mask Detection', img)
+
+        # 按 'q' 键退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+"""
+if __name__ == "__main__":
+    my_detection = my_paddledetection()
+    my_detection.turn_people_tracker()
     #my_detection.turn_people_detector()
-    my_detection.turn_people_detector()
-    my_detection.turn_people_attr_detector()
+    #my_detection.turn_people_detector()
+    #my_detection.turn_people_attr_detector()
 
     #my_detection.turn_vehicleplate_detector()
     my_detection.turn_vehicle_press_detector()
@@ -575,72 +561,26 @@ if __name__ == "__main__":
     
     # 关闭所有窗口
     cv2.destroyAllWindows()    
-
-
-
-
-
-
-
-
-"""if __name__ == "__main__":
+"""
+if __name__ == "__main__":
     my_detection = my_paddledetection()
-    #my_detection.turn_people_detector()
-    my_detection.turn_vehicle_attr_detector()
-    #my_detection.turn_vehicleplate_detector()
-    cap = cv2.VideoCapture('../test')
-    while True:
-        # 读取一帧图像
-        _, frame = cap.read()
-        input = frame[:, :, ::-1]
-        img = my_detection.predit(input)
-        # 显示图像
-        cv2.imshow('Mask Detection', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-
-        # 按 'q' 键退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # 释放资源
-    cap.release()
-    cv2.destroyAllWindows()
-""" 
-""" detector = people_detector_init()
-    people_attr_detector = people_attr_detector_init()
+    my_detection.turn_people_tracker()
     cap = cv2.VideoCapture(0)
+
     while True:
         # 读取一帧图像
-        _, frame = cap.read()
-        input = [frame[:, :, ::-1]]
-        # 检测图像
-        results = detector.predict_image(input, visual=False)  # bgr-->rgb
-        results = detector.filter_box(results,0.5)
-        crops_results = crop_image_with_det(input, results)
-        attr_res_list = []
-        for crop_result in crops_results:
-            attr_res = people_attr_detector.predict_image(crop_result, visual=False)
-            attr_res_list.append(attr_res)
-        #print(results)
-        #print(detector.det_times.info())
+        ret, frame = cap.read()
 
-        # 可视化结果
-        im = visualize_box_mask(frame, results, detector.pred_config.labels, detector.threshold)
-        im = np.array(im)
-        for attr_res in attr_res_list:
-            im = visualize_attr(im, attr_res, results['boxes'])
+        img = my_detection.predit(frame)
+        
 
-        # 显示图像
-        cv2.imshow('Mask Detection', im)
-
-        # 按 'q' 键退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    # 释放资源
+    # 释放摄像头资源
     cap.release()
-    cv2.destroyAllWindows()"""
- 
- 
-# def pre_img(detector, frame:cv2):
-#     results = detector.predict_image([frame[:, :, ::-1]], visual=False)  # bgr-->rgb
- 
+    # 关闭所有 OpenCV 窗口
+    cv2.destroyAllWindows()
+    
+
+
+
+
+
