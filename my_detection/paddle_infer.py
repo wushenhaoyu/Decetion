@@ -141,7 +141,7 @@ def vehicle_sde_detector_init(region_type,region_polygon):
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_ppvehicle')
     detector = SDE_Detector(
         model_dir=model_dir,
-        tracker_config=os.path.join(current_dir,'deploy','pipeline','config','tracker_config.yml'),
+        tracker_config=os.path.join(current_dir,'my_detection','deploy','pipeline','config','tracker_config.yml'),
         device='GPU',
         run_mode='paddle',
         region_type=region_type,
@@ -261,6 +261,7 @@ class my_paddledetection:
         else:
             self.vehicle_invasion_detector_isOn = True
             self.vehicle_detector_isOn = True
+
     def clear(self):#结果清空
         self.people_res = None
         self.vehicle_res = None
@@ -384,90 +385,87 @@ class my_paddledetection:
     def visualize_image(self,image):
         self.im = image
         if self.vehicle_res is not None and self.vehicle_tracker_isOn:
-            ids = self.vehicle_res['boxes'][:,0]
-            scores = self.vehicle_res['boxes'][:,2]
-            boxes = self.vehicle_res['boxes'][:,3:]
-            boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
-            boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
-            online_tlwhs = defaultdict(list)
-            online_scores = defaultdict(list)
-            online_ids = defaultdict(list)
-            online_tlwhs[0] = boxes
-            online_scores[0] = scores
-            online_ids[0] = ids
-            if self.vehicle_invasion_detector_isOn:
-                do_illegal_parking_recognition = True
-                self.im = plot_tracking_dict(
-                    self.im,
-                    1,
-                    online_tlwhs,
-                    online_ids,
-                    online_scores,
-                    frame_id=0,
-                    fps=20,
-                    ids2names=self.vehicle_tracker.pred_config.labels,
-                    do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
-                    do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
-                    do_illegal_parking_recognition=do_illegal_parking_recognition,
-                    region_type=self.vehicle_tracker.region_type,
-                    region_polygon=self.vehicle_tracker.region_polygon,
-                    records=self.records,
-                    entrance=self.entrance,
-                    center_traj=[{}]
-                )
-            else:
-                do_illegal_parking_recognition = False
-                self.im = plot_tracking_dict(
-                    self.im,
-                    1,
-                    online_tlwhs,
-                    online_ids,
-                    online_scores,
-                    frame_id=0,
-                    fps=20,
-                    ids2names=self.vehicle_tracker.pred_config.labels,
-                    do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
-                    do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
-                    do_illegal_parking_recognition=do_illegal_parking_recognition,
-                    region_type=self.vehicle_tracker.region_type,
-                    region_polygon=self.vehicle_tracker.region_polygon,
-                    records=self.records,
-                    entrance=self.entrance,
-                    center_traj=[{}]
-                )
-                
+            if self.vehicle_res['boxes'].size > 0 :
+                ids = self.vehicle_res['boxes'][:,0]
+                scores = self.vehicle_res['boxes'][:,2]
+                boxes = self.vehicle_res['boxes'][:,3:]
+                boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
+                boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
+                online_tlwhs = defaultdict(list)
+                online_scores = defaultdict(list)
+                online_ids = defaultdict(list)
+                online_tlwhs[0] = boxes
+                online_scores[0] = scores
+                online_ids[0] = ids
+                if self.vehicle_invasion_detector_isOn:
+                    do_illegal_parking_recognition = True
+                    self.im = plot_tracking_dict(
+                        self.im,
+                        1,
+                        online_tlwhs,
+                        online_ids,
+                        online_scores,
+                        frame_id=0,
+                        fps=20,
+                        ids2names=self.vehicle_tracker.pred_config.labels,
+                        do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
+                        do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                        do_illegal_parking_recognition=do_illegal_parking_recognition,
+                        records=self.records,
+                        entrance=self.entrance,
+                        center_traj=[{}]
+                    )
+                else:
+                    do_illegal_parking_recognition = False
+                    self.im = plot_tracking_dict(
+                        self.im,
+                        1,
+                        online_tlwhs,
+                        online_ids,
+                        online_scores,
+                        frame_id=0,
+                        fps=20,
+                        ids2names=self.vehicle_tracker.pred_config.labels,
+                        do_entrance_counting=self.vehicle_tracker.do_entrance_counting,
+                        do_break_in_counting=self.vehicle_tracker.do_break_in_counting,
+                        do_illegal_parking_recognition=do_illegal_parking_recognition,
+                        records=self.records,
+                        entrance=self.entrance,
+                        center_traj=[{}]
+                    )
         if self.people_res is not None and self.people_tracker_isOn:
-            ids = self.people_res['boxes'][:,0]
-            scores = self.people_res['boxes'][:,2]
-            boxes = self.people_res['boxes'][:,3:]
-            boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
-            boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
-            online_tlwhs = defaultdict(list)
-            online_scores = defaultdict(list)
-            online_ids = defaultdict(list)
-            online_tlwhs[0] = boxes
-            online_scores[0] = scores
-            online_ids[0] = ids
-            self.im = plot_tracking_dict(
-                self.im,
-                1,
-                online_tlwhs,
-                online_ids,
-                online_scores,
-                frame_id=0,
-                fps=20,
-                ids2names=self.people_tracker.pred_config.labels,
-                do_entrance_counting=self.people_tracker.do_entrance_counting,
-                do_break_in_counting=self.people_tracker.do_break_in_counting,
-                do_illegal_parking_recognition=False,
-                records=None,
-                entrance=None,
-                center_traj=[{}]
-            )
+            if self.people_res['boxes'].size > 0 :
+                ids = self.people_res['boxes'][:,0]
+                scores = self.people_res['boxes'][:,2]
+                boxes = self.people_res['boxes'][:,3:]
+                boxes[:, 2] = boxes[:, 2] - boxes[:, 0]
+                boxes[:, 3] = boxes[:, 3] - boxes[:, 1]
+                online_tlwhs = defaultdict(list)
+                online_scores = defaultdict(list)
+                online_ids = defaultdict(list)
+                online_tlwhs[0] = boxes
+                online_scores[0] = scores
+                online_ids[0] = ids
+                self.im = plot_tracking_dict(
+                    self.im,
+                    1,
+                    online_tlwhs,
+                    online_ids,
+                    online_scores,
+                    frame_id=0,
+                    fps=20,
+                    ids2names=self.people_tracker.pred_config.labels,
+                    do_entrance_counting=self.people_tracker.do_entrance_counting,
+                    do_break_in_counting=self.people_tracker.do_break_in_counting,
+                    do_illegal_parking_recognition=False,
+                    records=None,
+                    entrance=None,
+                    center_traj=[{}]
+                )
         
         if self.people_res is not None and self.people_detector_isOn:
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
-
+            
         if self.vehicle_res is not None and self.vehicle_detector_isOn:
             self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
         self.im = np.ascontiguousarray(np.copy(self.im))
@@ -544,15 +542,16 @@ class my_paddledetection:
 
 
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_people_tracker()
+    #my_detection.turn_people_tracker()
     #my_detection.turn_people_detector()
     #my_detection.turn_people_detector()
     #my_detection.turn_people_attr_detector()
 
     #my_detection.turn_vehicleplate_detector()
-    my_detection.turn_vehicle_press_detector()
+    #my_detection.turn_vehicle_press_detector()
+    my_detection.turn_vehicle_tracker()
     # 定义图像文件夹路径
     image_folder = os.path.join(current_dir,'test')
     images = [img for img in os.listdir(image_folder) if img.endswith(".jpg")]
@@ -575,7 +574,7 @@ if __name__ == "__main__":
                 break
     
     # 关闭所有窗口
-    cv2.destroyAllWindows()    
+    cv2.destroyAllWindows()    """
 
 
 
@@ -584,20 +583,21 @@ if __name__ == "__main__":
 
 
 
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     my_detection = my_paddledetection()
     #my_detection.turn_people_detector()
-    my_detection.turn_vehicle_attr_detector()
+    my_detection.turn_vehicle_tracker()
+    my_detection.turn_vehicle_invasion_detector()
     #my_detection.turn_vehicleplate_detector()
-    cap = cv2.VideoCapture('../test')
+    cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
         _, frame = cap.read()
         input = frame[:, :, ::-1]
         img = my_detection.predit(input)
         # 显示图像
-        cv2.imshow('Mask Detection', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-
+        cv2.imshow('Mask Detection', img)
+        
         # 按 'q' 键退出
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -605,8 +605,9 @@ if __name__ == "__main__":
     # 释放资源
     cap.release()
     cv2.destroyAllWindows()
-""" 
-""" detector = people_detector_init()
+
+"""if __name__ == "__main__":
+    detector = people_detector_init()
     people_attr_detector = people_attr_detector_init()
     cap = cv2.VideoCapture(0)
     while True:
