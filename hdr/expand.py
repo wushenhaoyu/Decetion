@@ -5,7 +5,7 @@ import cv2
 import paddle
 import time
 from smooth import smoothen_luminance
-from model import ExpandNet  # 假设模型定义已经适配了PaddlePaddle
+from model import ExpandNet  
 from util import (
     process_path,
     split_path,
@@ -77,7 +77,7 @@ def get_args():
     arg(
         '--use_weights',
         type=process_path,
-        default='weights_.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
+        default='weights_.pdparams',  
         help='Weights to use for prediction',
     )
     arg(
