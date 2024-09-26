@@ -18,7 +18,7 @@ from paddle.inference import create_predictor
  
 from deploy.python.infer import Detector, visualize_box_mask
 from deploy.pipeline.pphuman.attr_infer import AttrDetector
-from deploy.pipeline.pipe_utils import crop_image_with_det, parse_mot_res
+from deploy.pipeline.pipe_utils import crop_image_with_det, crop_image_with_mot, parse_mot_res
 from deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
 from deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
 from deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
@@ -347,23 +347,32 @@ class my_paddledetection:
                             illegal_parking_dict[key]['plate'] = plate
             
             
-        if self.people_attr_detector_isOn:#行人属性检测
-            self.people_crops_res = crop_image_with_det([input], self.people_res)
+        if self.people_attr_detector_isOn and self.people_res['boxes'].size > 0:#行人属性检测
+            if self.people_detector_isOn:
+                self.people_crops_res = crop_image_with_det([input], self.people_res)
+            elif self.people_tracker_isOn :
+                self.people_crops_res , _ , _ = crop_image_with_mot(input, self.people_res)
+                self.people_crops_res = [self.people_crops_res]
             for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
                 self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
-        if self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn:#车辆图像裁剪
-            self.vehicle_crops_res = crop_image_with_det([input], self.vehicle_res)
-        if self.vehicle_attr_detector_isOn:
+        if ( self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn )and self.vehicle_res is not None:#车辆图像裁剪
+            if self.vehicle_res['boxes'].size > 0:
+                if self.vehicle_detector_isOn:
+                    self.vehicle_crops_res = crop_image_with_det([input], self.vehicle_res)
+                elif self.vehicle_tracker_isOn:
+                    self.vehicle_crops_res , _ , _ = crop_image_with_mot(input, self.vehicle_res)
+                    self.vehicle_crops_res = [self.vehicle_crops_res]
+        if self.vehicle_attr_detector_isOn and self.vehicle_crops_res is not None:
             for crop_res in self.vehicle_crops_res:#车辆属性预测
                 self.vehicle_attr_res = self.vehicle_attr_detector.predict_image(crop_res,visual=False)
-        if self.vehicleplate_detector_isOn:
+        if self.vehicleplate_detector_isOn and self.vehicle_crops_res is not None:
             if self.frame == 0:
                 platelicenses = []#车牌预测
                 for crop_res in self.vehicle_crops_res:
                     platelicense = self.vehicleplate_detector.get_platelicense(crop_res)
                     platelicenses.extend(platelicense['plate'])
                     self.vehicleplate_res = {'vehicleplate': platelicenses}
-        if self.vehicle_press_detector_isOn:#车辆压线检测
+        if self.vehicle_press_detector_isOn and self.vehicle_crops_res is not None:#车辆压线检测
             vehicle_press_res_list = []
             lanes, direction = self.laneseg_predictor.run([input])
             if len(lanes) == 0:
@@ -384,6 +393,7 @@ class my_paddledetection:
     
     def visualize_image(self,image):
         self.im = image
+        self.im = cv2.cvtColor(self.im, cv2.COLOR_BGR2RGB)
         if self.vehicle_res is not None and self.vehicle_tracker_isOn:
             if self.vehicle_res['boxes'].size > 0 :
                 ids = self.vehicle_res['boxes'][:,0]
@@ -469,7 +479,6 @@ class my_paddledetection:
         if self.vehicle_res is not None and self.vehicle_detector_isOn:
             self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
         self.im = np.ascontiguousarray(np.copy(self.im))
-        self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
 
         if self.people_attr_res is not None:
             people_attr_res_i = self.people_attr_res['output']
@@ -495,7 +504,6 @@ class my_paddledetection:
             lanes = self.lanes_res['output'][0]
             self.im = visualize_lane(self.im, lanes)
             self.im = np.ascontiguousarray(np.copy(self.im))
-        self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
             
             
         
@@ -585,9 +593,10 @@ class my_paddledetection:
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    #my_detection.turn_people_detector()
-    my_detection.turn_vehicle_tracker()
-    my_detection.turn_vehicle_invasion_detector()
+    my_detection.turn_people_tracker()
+    my_detection.turn_people_attr_detector()
+    #my_detection.turn_vehicle_tracker()
+    #my_detection.turn_vehicle_attr_detector()
     #my_detection.turn_vehicleplate_detector()
     cap = cv2.VideoCapture(0)
     while True:
