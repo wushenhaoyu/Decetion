@@ -28,10 +28,57 @@ from deploy.pptracking.python.mot.utils import flow_statistic, update_object_inf
 from deploy.pipeline.datacollector import DataCollector
 from deploy.pptracking.python.mot.visualize import plot_tracking_dict
 from visualize import visualize_attr, visualize_lane, visualize_vehicleplate, visualize_vehiclepress
- 
+from collections import deque
+
+class FixedLengthQueue:
+    def __init__(self, maxlen):
+        self.queue = deque(maxlen=maxlen)
+
+    def append(self, item):
+        self.queue.append(item)
+
+    def __len__(self):
+        return len(self.queue)
+
+    def __getitem__(self, index):
+        return self.queue[index]
+
+    def __iter__(self):
+        return iter(self.queue)
+
+    def __repr__(self):
+        return repr(self.queue)
 
 # paddle.enable_static()
 current_dir = current_directory = os.getcwd()
+
+
+def extract_crops(image, tlwhs_dict, obj_ids_dict, scores_dict):
+    crops = []
+    for cls_id in range(len(tlwhs_dict)):
+        tlwhs = tlwhs_dict[cls_id]
+        obj_ids = obj_ids_dict[cls_id]
+        scores = scores_dict[cls_id]
+
+        for i, tlwh in enumerate(tlwhs):
+            x1, y1, w, h = tlwh
+            intbox = (int(x1), int(y1), int(w), int(h))
+            obj_id = int(obj_ids[i])
+            score = float(scores[i]) if scores is not None else None
+
+            # 裁剪图像
+            crop = image[int(y1):int(y1 + h), int(x1):int(x1 + w)]
+
+            # 存储裁剪结果
+            crops.append({
+                'crop': crop,
+                'class_id': cls_id,
+                'object_id': obj_id,
+                'score': score,
+                'crop_box': tlwh,
+            })
+
+    return crops
 def people_detector_init():
     #初始化行人检测器
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_pipeline')
@@ -202,6 +249,12 @@ class my_paddledetection:
         self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
         self.frame = 0
         self.collector = DataCollector()
+        self.people_queue = FixedLengthQueue(maxlen=40)
+        self.vehicle_queue = FixedLengthQueue(maxlen=40)
+        self.people_waitting_dealwith_queue = []
+        self.vehicle_waitting_dealwith_queue = []
+        self.people_waitting_dealwith_flag = False
+        self.vehicle_waitting_dealwith_flag = False
     def turn_people_detector(self):#切换行人检测
         if self.people_detector_isOn:
             self.people_detector_isOn = False
@@ -472,7 +525,40 @@ class my_paddledetection:
                     entrance=None,
                     center_traj=[{}]
                 )
-        
+                selected_ids = []
+                selected_ids_ = []
+                # 遍历在线 ID
+                for index, id in enumerate(online_ids[0]):
+                    max_id = -1
+                    for i in self.people_queue:
+                        if i['object_id'] > max_id:
+                            max_id = i['object_id']
+                        if i['object_id'] == id:
+                            if online_tlwhs[0][index][2] > i['crop_box'][2] and online_tlwhs[0][index][3] > i['crop_box'][3]:
+                                selected_ids.append(id)
+                    if id > max_id:
+                        selected_ids_.append(id)
+
+                if selected_ids or selected_ids_:
+                    res = extract_crops(self.im, online_tlwhs, online_ids, online_scores)
+                    
+                    # 更新 people_queue 中的元素
+                    for index, id in enumerate(selected_ids):
+                        for crop in self.people_queue:
+                            if crop['object_id'] == id:
+                                # 找到对应的裁剪结果并更新
+                                crop['crop'] = res[index]['crop']
+                                crop['score'] = res[index]['score']
+                                #保存文件
+                                print('修改',id)
+                                self.people_waitting_dealwith_queue.append(res[index])
+                    for index , id in enumerate(selected_ids_):
+                        self.people_queue.append(res[index])
+                        print('添加',id)
+                        self.people_waitting_dealwith_queue.append(res[index])
+                        #保存文件
+                    if self.people_waitting_dealwith_queue:
+                        self.people_waitting_dealwith_flag = True
         if self.people_res is not None and self.people_detector_isOn:
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
             
@@ -504,6 +590,12 @@ class my_paddledetection:
             lanes = self.lanes_res['output'][0]
             self.im = visualize_lane(self.im, lanes)
             self.im = np.ascontiguousarray(np.copy(self.im))
+
+    def people_dealwith_queue(self):
+        if self.people_waitting_dealwith_flag:
+            #写入处理逻辑
+            for i in self.people_waitting_dealwith_queue:
+                pass
             
             
         
@@ -594,7 +686,8 @@ class my_paddledetection:
 if __name__ == "__main__":
     my_detection = my_paddledetection()
     my_detection.turn_people_tracker()
-    my_detection.turn_people_attr_detector()
+    #my_detection.turn_people_detector()
+    #my_detection.turn_people_attr_detector()
     #my_detection.turn_vehicle_tracker()
     #my_detection.turn_vehicle_attr_detector()
     #my_detection.turn_vehicleplate_detector()
