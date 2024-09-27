@@ -12,7 +12,6 @@ from model import IAT
 
 class IATTrainer:
     def __init__(self):
-        # 配置直接写入类中
         self.config = {
             'gpu_id': 0,
             'img_path': os.path.join(os.getcwd(), "data", "train", "Low"),

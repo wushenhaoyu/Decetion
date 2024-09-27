@@ -210,7 +210,7 @@ def people_sde_detector_init(region_type,region_polygon):
     return detector
 
 class my_paddledetection:
-    def __init__(self):
+    def __init__(self,is_init=True):#isinit=True 起始初始化全部检测，False需要自己开启
         """
         初始化检测器控制变量
             people_detector_isOn                行人目标检测    
@@ -239,14 +239,15 @@ class my_paddledetection:
             laneseg_predictor              实线检测
             press_recoginizer              压线检测
         """
-        self.people_detector = people_detector_init()
-        self.vehicle_detector = vehicle_detector_init()
-        self.people_attr_detector = people_attr_detector_init()
-        self.vehicle_attr_detector = vehicle_attr_detector_init()
-        # self.vehicleplate_detector = vehicleplate_detector_init()
-        self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
-        self.vehicle_tracker = vehicle_sde_detector_init(region_type='horizontal',region_polygon=[])
-        self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
+        if is_init:
+            self.people_detector = people_detector_init()
+            self.vehicle_detector = vehicle_detector_init()
+            self.people_attr_detector = people_attr_detector_init()
+            self.vehicle_attr_detector = vehicle_attr_detector_init()
+            # self.vehicleplate_detector = vehicleplate_detector_init()
+            self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
+            self.vehicle_tracker = vehicle_sde_detector_init(region_type='horizontal',region_polygon=[])
+            self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
         self.frame = 0
         self.collector = DataCollector()
         self.people_queue = FixedLengthQueue(maxlen=40)
@@ -255,6 +256,35 @@ class my_paddledetection:
         self.vehicle_waitting_dealwith_queue = []
         self.people_waitting_dealwith_flag = False
         self.vehicle_waitting_dealwith_flag = False
+    def people_detector_init(self):
+        """单初始化行人检测"""
+        self.people_detector = people_detector_init()
+    def vehicle_detector_init(self):
+        """单初始化车辆检测"""
+        self.vehicle_detector = vehicle_detector_init()
+    def people_attr_detector_init(self):
+        """单初始化行人属性检测"""
+        self.people_attr_detector = people_attr_detector_init()
+    
+    def vehicle_attr_detector_init(self):
+        """单初始化车辆属性检测"""
+        self.vehicle_attr_detector = vehicle_attr_detector_init()
+        
+    def vehicleplate_detector_init(self):
+        """单初始化车牌检测"""
+        self.vehicleplate_detector = vehicleplate_detector_init()
+        
+    def vehicle_press_detector_init(self):
+        """单初始化车辆压线检测"""
+        self.laneseg_predictor,self.press_recoginizer = vehicle_press_detector_init()
+        
+    def vehicle_sde_detector_init(self):
+        """单初始化车辆追踪器"""
+        self.vehicle_tracker = vehicle_sde_detector_init(region_type='horizontal',region_polygon=[])
+        
+    def people_sde_detector_init(self):
+        """单初始化行人追踪器"""
+        self.people_tracker = people_sde_detector_init(region_type='horizontal',region_polygon=[])
     def turn_people_detector(self):#切换行人检测
         if self.people_detector_isOn:
             self.people_detector_isOn = False

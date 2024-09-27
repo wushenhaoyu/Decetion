@@ -23,7 +23,7 @@ from skimage.metrics import mean_squared_error as compare_mse
 from skimage.metrics import structural_similarity as compare_ssim
 import paddle.optimizer as optim
 
-from paddle.vision.models import vgg16  # 替换为 PaddlePaddle 的 VGG16 实现
+from paddle.vision.models import vgg16  
 import math
 
 paddle.set_device('gpu:0')
