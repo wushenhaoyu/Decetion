@@ -496,6 +496,40 @@ class my_paddledetection:
                         entrance=self.entrance,
                         center_traj=[{}]
                     )
+                selected_ids = []
+                selected_ids_ = []
+                # 遍历在线 ID
+                for index, id in enumerate(online_ids[0]):
+                    max_id = -1
+                    for i in self.vehicle_queue:
+                        if i['object_id'] > max_id:
+                            max_id = i['object_id']
+                        if i['object_id'] == id:
+                            if online_tlwhs[0][index][2] > i['crop_box'][2] and online_tlwhs[0][index][3] > i['crop_box'][3]:
+                                selected_ids.append(id)
+                    if id > max_id:
+                        selected_ids_.append(id)
+
+                if selected_ids or selected_ids_:
+                    res = extract_crops(self.im, online_tlwhs, online_ids, online_scores)
+                    
+                    # 更新 people_queue 中的元素
+                    for index, id in enumerate(selected_ids):
+                        for crop in self.vehicle_queue:
+                            if crop['object_id'] == id:
+                                # 找到对应的裁剪结果并更新
+                                crop['crop'] = res[index]['crop']
+                                crop['score'] = res[index]['score']
+                                #保存文件
+                                print('修改',id)
+                                self.vehicle_waitting_dealwith_queue.append(res[index])
+                    for index , id in enumerate(selected_ids_):
+                        self.vehicle_queue.append(res[index])
+                        print('添加',id)
+                        self.vehicle_waitting_dealwith_queue.append(res[index])
+                        #保存文件
+                    if self.vehicle_waitting_dealwith_queue:
+                        self.vehicle_waitting_dealwith_flag = True
         if self.people_res is not None and self.people_tracker_isOn:
             if self.people_res['boxes'].size > 0 :
                 ids = self.people_res['boxes'][:,0]
@@ -593,8 +627,14 @@ class my_paddledetection:
 
     def people_dealwith_queue(self):
         if self.people_waitting_dealwith_flag:
-            #写入处理逻辑
+            #写入行人处理逻辑
             for i in self.people_waitting_dealwith_queue:
+                pass
+
+    def vehicle_dealwith_queue(self):
+        if self.vehicle_waitting_dealwith_flag:
+            #写入车辆处理逻辑
+            for i in self.vehicle_waitting_dealwith_queue:
                 pass
             
             
