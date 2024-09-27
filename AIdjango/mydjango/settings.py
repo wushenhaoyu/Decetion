@@ -40,7 +40,6 @@ CHANNEL_LAYERS = {
 INSTALLED_APPS = [
 
     'user',
-    "video",
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
