@@ -15,6 +15,8 @@ import paddle
 from paddle.inference import Config
 import sys
 from paddle.inference import create_predictor
+current_directory = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_directory)
  
 from deploy.python.infer import Detector, visualize_box_mask
 from deploy.pipeline.pphuman.attr_infer import AttrDetector
@@ -430,14 +432,15 @@ class my_paddledetection:
                             illegal_parking_dict[key]['plate'] = plate
             
             
-        if self.people_attr_detector_isOn and self.people_res['boxes'].size > 0:#行人属性检测
-            if self.people_detector_isOn:
-                self.people_crops_res = crop_image_with_det([input], self.people_res)
-            elif self.people_tracker_isOn :
-                self.people_crops_res , _ , _ = crop_image_with_mot(input, self.people_res)
-                self.people_crops_res = [self.people_crops_res]
-            for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
-                self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
+        if self.people_attr_detector_isOn and self.people_res is not None:#行人属性检测
+            if self.people_res['boxes'].size > 0:
+                if self.people_detector_isOn:
+                    self.people_crops_res = crop_image_with_det([input], self.people_res)
+                elif self.people_tracker_isOn :
+                    self.people_crops_res , _ , _ = crop_image_with_mot(input, self.people_res)
+                    self.people_crops_res = [self.people_crops_res]
+                for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
+                    self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
         if ( self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn )and self.vehicle_res is not None:#车辆图像裁剪
             if self.vehicle_res['boxes'].size > 0:
                 if self.vehicle_detector_isOn:
