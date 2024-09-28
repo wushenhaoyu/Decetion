@@ -662,7 +662,18 @@ class my_paddledetection:
         if self.people_waitting_dealwith_flag:
             #写入行人处理逻辑
             for i in self.people_waitting_dealwith_queue:
-                pass
+                crop = i['crop']
+                cls_id = i['class_id']
+                obj_id = i['object_id']
+                score = i['score']
+                crop_box = i['crop_box']
+                print(obj_id)
+                # 构造保存路径
+                save_dir = 'AIdjango/dist/livedisplay'
+                os.makedirs(save_dir, exist_ok=True)
+                file_name = f"{obj_id}.png"
+                if crop is not None and crop.size > 0:
+                    cv2.imwrite(os.path.join(save_dir, file_name), crop)
 
     def vehicle_dealwith_queue(self):
         if self.vehicle_waitting_dealwith_flag:
@@ -752,7 +763,10 @@ class my_paddledetection:
 
 
 
+from concurrent.futures import ThreadPoolExecutor
 
+# 创建线程池
+executor = ThreadPoolExecutor(max_workers=1)
 
 
 
@@ -770,6 +784,7 @@ if __name__ == "__main__":
         _, frame = cap.read()
         input = frame[:, :, ::-1]
         img = my_detection.predit(input)
+        my_detection.people_dealwith_queue()
         # 显示图像
         cv2.imshow('Mask Detection', img)
         

@@ -33,7 +33,7 @@ haze_net = None
 dark_net =None
 params = None
 paddledetection_net = None
-
+camera = None
 def initialize(request):
     global haze_net
     global dark_net
@@ -79,7 +79,6 @@ def gen_display(camera):
             # 将图片进行解码                
             if ret:
                 frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                                
                 if params["haze_enabled"]:
                     frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
@@ -149,12 +148,21 @@ def video(request):
     例如：<img src='https://ip:port/uri' >
     """
     # 视频流相机对象
-    paddledetection_net.clear()
-    camera = cv2.VideoCapture(0)
-    # 使用流传输传输视频流
-    return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
+    global camera
+    if request.method == 'GET':
+        camera = cv2.VideoCapture(0)
+        # 使用流传输传输视频流
+        return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
 
-
+def close_camera(request):
+    """
+    关闭摄像头路由。
+    """
+    global camera
+    if camera is not None:
+        camera.release()  # 释放摄像头资源
+        camera = None  # 清空摄像头对象
+    return JsonResponse({'status': 'Camera closed'})
 
 
 

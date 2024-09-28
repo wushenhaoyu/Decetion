@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from user.gen_display import video,upload_video,video_view,upload_photo,ConfirmParams,photo_view
+from user.gen_display import video,upload_video,video_view,upload_photo,ConfirmParams,photo_view, close_camera
 from user.gen_display import initialize
 from django.conf import settings
 from django.conf.urls.static import static
@@ -16,7 +16,8 @@ urlpatterns = [
     # video/是播放视频的页面
     path('showvideo', video_view),      #展示视频
     path('showphoto', photo_view),      #展示视频
-    path('livedisplay', video),     #实时演示功能
+    path('opencam', video),     #实时演示功能
+    path('closecam',  close_camera),     #实时演示功能
     path("",initialize) ,        #初始化深度学习模型
     path("ConfirmParams",ConfirmParams)
 ]
