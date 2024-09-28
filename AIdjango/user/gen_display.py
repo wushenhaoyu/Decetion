@@ -73,6 +73,8 @@ def gen_display(camera):
     target_size = get_camera_frame_size(camera)
     while True:
         # 读取图片
+        if camera is None:
+            break
         ret, frame = camera.read()
         if ret:
             frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
@@ -108,7 +110,7 @@ def ConfirmParams(request):
         'vehicle_attr_detector': data.get('vehicle_attr_detector'),#车辆属性检测
         'vehicleplate_detector': data.get('vehicleplate_detector'),#车牌检测
         'vehicle_press_detector': data.get('vehicle_press_detector'),#压线检测
-        "vehicle_invasion":data.get("vehicle_invasion")#违停检测
+        # "vehicle_invasion":data.get("vehicle_invasion")#违停检测
     }
     # 切换行人检测
     if params['people_detector'] != paddledetection_net.people_detector_isOn:
@@ -148,11 +150,10 @@ def video(request):
     """
     # 视频流相机对象
     global camera
-    if request.method == 'GET':
-        if camera is None:
-            camera = cv2.VideoCapture(0)    
-        # 使用流传输传输视频流
+    if camera is not None:
         return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
+    else:
+        return JsonResponse({'status': 'Camera open,please open'})
 
 def close_camera(request):
     """
@@ -161,10 +162,18 @@ def close_camera(request):
     global camera
     if camera is not None:
         camera.release()  # 释放摄像头资源
+        cv2.destroyAllWindows()
         camera = None  # 清空摄像头对象
     return JsonResponse({'status': 'Camera closed'})
 
-
+def open_camera(request):
+    """
+    关闭摄像头路由。
+    """
+    global camera
+    if camera is  None:
+        camera = cv2.VideoCapture(0)  
+    return JsonResponse({'status': 'Camera open'})
 
 
 TARGET_WIDTH = 640
