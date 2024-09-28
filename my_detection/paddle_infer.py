@@ -7,7 +7,8 @@ import glob
 import json
 from pathlib import Path
 import time
- 
+import threading
+import random
 import cv2
 import numpy as np
 import math
@@ -682,10 +683,14 @@ class my_paddledetection:
                 pass
             
             
+    # def people_dealwith(self):        
+    #     if random.random() < 0.1:  # 0.1 的概率
+    #     thread = threading.Thread(target=people_dealwith_queue)
+    #     thread.start()
         
         
-            
-            
+
+
 
 
 """if __name__ == "__main__":
