@@ -1,11 +1,102 @@
 <template>
   <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
-    <div :class="drawer_class_ctrl">
-      <div class="drawer-content">
-        <el-menu :default-active="activeIndex" class="el-menu-vertical">
-          <el-menu-item index="1">处理中心</el-menu-item>
-        </el-menu>
+    <div :class="drawer_class_ctrl" style="width: 250px">
+      <div class="drawer-content" >
+        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
+        <div style="height: 3vh;"></div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">散射增强</div>
+          <el-switch
+            v-model="haze"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          >
+          </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">弱光增强</div>
+          <el-switch
+            v-model="dark"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人跟踪</div>
+          <el-switch
+            v-model="people_tracker_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人属性检测</div>
+          <el-switch
+            v-model="people_attribute_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆跟踪</div>
+          <el-switch
+            v-model="vehicle_tracker_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆属性检测 </div>
+          <el-switch
+            v-model="vehicle_attribute_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">车牌检测 </div>
+          <el-switch
+            v-model="vehicle_license_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违章检测 </div>
+          <el-switch
+            v-model="vehicle_press_detector_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+      </div>
+      <el-divider></el-divider>
+        <div>
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违停检测 </div>
+          <el-switch
+            v-model="vehicle_invasion_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+
       </div>
       <div class="drawer-button-bar" @click="toggleDrawer">
         <!-- 小拉手按钮，点击它会调用 toggleDrawer 方法 -->
@@ -97,9 +188,16 @@
             <el-button type="primary" class="bottom-button" @click="getVideo"
               >开始检测</el-button
             >
+            <el-button type="primary" class="bottom-button" 
+              >导出视频</el-button
+            >
+            <el-button type="primary" class="bottom-button" 
+              >截取图片</el-button
+            >
             <el-button type="primary" class="bottom-button" @click="resetVideo"
               >重置视频</el-button
             >
+
           </div>
         </div>
         <!-- 视频下方操作按钮-->
@@ -123,6 +221,17 @@ export default {
   },
   data() {
     return {
+      haze: false,
+      dark: false,
+      people_detector_enable: false, // 行人监测
+      people_tracker_enable: false,
+      people_attribute_enable: false,
+      vehicle_detector_enable: false,//车辆监测
+      vehicle_tracker_enable:false,
+      vehicle_press_detector_enable: false,
+      vehicle_license_enable: false,
+      vehicle_attribute_enable: false,
+      vehicle_invasion_enable:false,
       isShowVideo: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
@@ -296,6 +405,9 @@ export default {
   z-index: 1000;
   transform: translateX(0);
   transition: transform 0.3s ease;
+  border-top-right-radius: 8px; /* 可选: 让边角变圆 */
+  border-top-left-radius: 8px;
+  user-select:none;
 }
 
 .drawer-close {
@@ -309,11 +421,17 @@ export default {
   z-index: 1000;
   transform: translateX(14vw);
   transition: transform 0.3s ease;
+  border-top-right-radius: 8px; /* 可选: 让边角变圆 */
+  border-top-left-radius: 8px;
+  user-select:none;
 }
 
 .drawer-content {
   height: 100%;
   overflow-y: auto;
+}
+.drawer-content::-webkit-scrollbar {
+  display: none; /* 针对 Chrome, Safari, Edge 浏览器隐藏滚动条 */
 }
 
 .drawer-button-bar {

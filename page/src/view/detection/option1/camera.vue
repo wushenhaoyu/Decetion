@@ -3,109 +3,100 @@
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 250px">
       <div class="drawer-content" >
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">处理中心</el-menu-item>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">除雾</el-menu-item>
+        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
+        <div style="height: 3vh;"></div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">散射增强</div>
           <el-switch
             v-model="haze"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeHaze(haze)"
+            @change="sendParameters"
           >
           </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">去黑</el-menu-item>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">弱光增强</div>
           <el-switch
             v-model="dark"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeDark(dark)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">车牌检查</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人跟踪</div>
           <el-switch
-            v-model="vehicle_license_enabled"
+            v-model="people_tracker_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeLicense(vehicle_license_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">多目标车辆检测与跟踪</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人属性检测</div>
           <el-switch
-            v-model="vehicle_detection_tracking_enabled"
+            v-model="people_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeVehicleTracking(vehicle_detection_tracking_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">车辆属性</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆跟踪</div>
           <el-switch
-            v-model="vehicle_attribute_enabled"
+            v-model="vehicle_tracker_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeVehicleAttribute(vehicle_attribute_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">车道检测</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆属性检测 </div>
           <el-switch
-            v-model="lane_detection_enabled"
+            v-model="vehicle_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeLane(lane_detection_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">行人属性目标检测</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">车牌检测 </div>
           <el-switch
-            v-model="pedestrian_attribute_detection_enabled"
+            v-model="vehicle_license_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangePedestrianDetection(pedestrian_attribute_detection_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">人属性目标识别</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违章检测 </div>
           <el-switch
-            v-model="pedestrian_attribute_recognition_enabled"
+            v-model="vehicle_press_detector_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeLanePedestrianRecognition(pedestrian_attribute_recognition_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">摔倒检测</el-menu-item>
+            @change="sendParameters"
+          > </el-switch>
+      </div>
+      <el-divider></el-divider>
+        <div>
+        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违停检测 </div>
           <el-switch
-            v-model="fall_detection_enabled"
+            v-model="vehicle_invasion_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="getChangeFall(fall_detection_enabled)"
-          >
-          </el-switch>
-        </el-menu>
-        <el-menu :default-active="activeIndex"  class="el-menu-vertical">
-          <el-menu-item index="1">行人检测与跟踪</el-menu-item>
-          <el-switch
-            v-model="pedestrian_detection_tracking_enabled"
-            active-text="开启"
-            inactive-text="关闭"
-            @change="getChangePedestrianTracking(pedestrian_detection_tracking_enabled)"
-          >
-          </el-switch>
-        </el-menu>
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+
       </div>
       <div class="drawer-button-bar" @click="toggleDrawer">
         <!-- 小拉手按钮，点击它会调用 toggleDrawer 方法 -->
@@ -140,10 +131,6 @@
           <!-- 上传视频  -->
           <!-- 显示视频  -->
           <div v-if="isShowCamera" align="center"><img src="http://127.0.0.1:8000/livedisplay" id="video"></div>
-          <myvideo
-            v-if="isShowCamera"
-            style="width: 100%; height: 100%"
-          ></myvideo>
           <!-- 显示视频  -->
         </div>
         <div style="height: 5%"></div>
@@ -189,14 +176,15 @@ export default {
     return {
       haze: false,
       dark: false,
-      vehicle_license_enabled: false,
-      vehicle_detection_tracking_enabled: false,
-      vehicle_attribute_enabled: false,
-      lane_detection_enabled: false,
-      pedestrian_attribute_detection_enabled: false,
-      pedestrian_detection_tracking_enabled: false,
-      fall_detection_enabled: false,
-      pedestrian_attribute_recognition_enabled: false,
+      people_detector_enable: false, // 行人监测
+      people_tracker_enable: false,
+      people_attribute_enable: false,
+      vehicle_detector_enable: false,//车辆监测
+      vehicle_tracker_enable:false,
+      vehicle_press_detector_enable: false,
+      vehicle_license_enable: false,
+      vehicle_attribute_enable: false,
+      vehicle_invasion_enable:false,
       isShowCamera: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
@@ -218,61 +206,75 @@ export default {
     },
   },
   methods: {
-    getChangeHaze(haze) {
-      this.haze = haze
+    sendParameters(value) {
+      this.checkParameter(value)
+      let data = {
+        haze: this.haze,
+        dark: this.dark,
+        hdr:  false,
+        people_detector: this.people_detector_enable,
+        people_tracker: this.people_tracker_enable,
+        people_attr_detector: this.people_attribute_enable,
+        vehicle_tracker: this.vehicle_tracker_enable,
+        vehicle_detector: this.vehicle_detector_enable,
+        vehicle_attr_detector: this.vehicle_attribute_enable,
+        vehicleplate_detector: this.vehicle_license_enable,
+        vehicle_press_detector: this.vehicle_press_detector_enable,
+        vehicle_invasion:this.vehicle_invasion_enable
+      }
+      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
+        console.log(res)
+      })
     },
-    getChangeDark(dark) {
-      this.dark = dark
+    checkParameter(value){
+      var that = this
+      if (value){ //有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
+        console.log(that.people_attribute_enable)
+        const people_list = [that.people_attribute_enable]
+        for (let i = 0; i < people_list.length; i++) {
+          if(people_list[i]){
+            that.people_tracker_enable = true
+          }
+        }
+        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable,that.vehicle_invasion_enable]
+        for (let i = 0; i < vehicle_list.length; i++) {
+          if(vehicle_list[i]){
+            that.vehicle_tracker_enable = true
+          }
+        }
+      }else{ //检测关闭，额外功能也要关闭
+        if (!(that.people_detector_enable && that.people_tracker_enable))
+        {
+            that.people_attribute_enable = false
+        }
+        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable))
+        {
+            that.vehicle_attribute_enable = false
+            that.vehicle_license_enable = false
+            that.vehicle_press_detector_enable = false
+            that.vehicle_invasion_enable = false
+        }
+
+      }
     },
-    getChangeLicense(vehicle_license_enabled) {
-      this.vehicle_license_enabled = vehicle_license_enabled
-    },
-    getChangeVehicleTracking(vehicle_detection_tracking_enabled) {
-      this.vehicle_detection_tracking_enabled = vehicle_detection_tracking_enabled
-    },
-    getChangeVehicleAttribute(vehicle_attribute_enabled) {
-      this.vehicle_attribute_enabled = vehicle_attribute_enabled
-    },
-    getChangeLane(lane_detection_enabled) {
-      this.lane_detection_enabled = lane_detection_enabled
-    },
-    getChangePedestrianTracking(pedestrian_detection_tracking_enabled) {
-      this.pedestrian_detection_tracking_enabled = pedestrian_detection_tracking_enabled
-    },
-    getChangeFall(fall_detection_enabled) {
-      this.fall_detection_enabled = fall_detection_enabled
-    },
-    getChangeLanePedestrianRecognition(pedestrian_attribute_recognition_enabled) {
-      this.pedestrian_attribute_recognition_enabled = pedestrian_attribute_recognition_enabled
-    },
-    getChangePedestrianDetection(pedestrian_attribute_detection_enabled) {
-      this.pedestrian_attribute_detection_enabled = pedestrian_attribute_detection_enabled
-    },
-    resetVideo() {
+      resetVideo() {
       this.isShowVideo = false;
     },
     switchCamera() {
       if (this.isShowCamera) {
         this.isShowCamera = false;
-        this.$axios
+        /*this.$axios
           .post("http://localhost:8000/closecam/")
           .then((response) => {
             console.log(response);
           })
           .catch((error) => {
             console.error(error);
-          });
+          });*/
       } else {
         this.isShowCamera = true;
         this.isShowVideo = true;
-        this.$axios
-          .post("http://localhost:8000/opencam/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        this.sendParameters()
       }
     },
     toggleDrawer() {
@@ -331,6 +333,7 @@ export default {
   margin-left: 10%;
   margin-right: 10%;
   border-radius: 8px;
+  user-select:none;
 }
 .right-log-head {
   height: 5vh;
@@ -341,6 +344,7 @@ export default {
   line-height: 5vh;
   border-top-right-radius: 8px; /* 可选: 让边角变圆 */
   border-top-left-radius: 8px;
+  user-select:none;
 }
 .bottom-ctrl {
   border-radius: 8px; /* 可选: 让边角变圆 */
@@ -370,9 +374,9 @@ export default {
   align-items: center; /* 水平方向居中对齐 */
   height: 100%; /* 确保容器有足够的高度 */
   width: 100%; /* 确保容器有足够的宽度 */
-  border: 1px dashed #dcdfe6; /* 可选: 只是为了视觉效果 */
   border-radius: 8px; /* 可选: 让边角变圆 */
   margin-bottom: -2vh;
+  background-color: black;
 }
 .upload div {
   width: 100%;
@@ -402,6 +406,10 @@ export default {
   width: 100%;
   justify-content: space-evenly;
 }
+.drawer_switch{
+  height: 8vh;
+  
+}
 .drawer-open {
   position: fixed;
   top: 7vh;
@@ -413,6 +421,9 @@ export default {
   z-index: 1000;
   transform: translateX(0);
   transition: transform 0.3s ease;
+  border-top-right-radius: 8px; /* 可选: 让边角变圆 */
+  border-top-left-radius: 8px;
+  user-select:none;
 }
 
 .drawer-close {
@@ -426,11 +437,17 @@ export default {
   z-index: 1000;
   transform: translateX(14vw);
   transition: transform 0.3s ease;
+  border-top-right-radius: 8px; /* 可选: 让边角变圆 */
+  border-top-left-radius: 8px;
+  user-select:none;
 }
 
 .drawer-content {
   height: 100%;
   overflow-y: auto;
+}
+.drawer-content::-webkit-scrollbar {
+  display: none; /* 针对 Chrome, Safari, Edge 浏览器隐藏滚动条 */
 }
 
 .drawer-button-bar {
