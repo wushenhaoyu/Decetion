@@ -1,40 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Stream</title>
-</head>
-<body>
-    <h1>Camera Stream</h1>
-    <img id="cameraStream" alt="Camera Stream" style="width: 100%; height: auto;">
 
-    <script>
-        async function startCameraStream() {
-            const response = await fetch('http://127.0.0.1:8000/opencam', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({}) // 这里可以传递需要的请求体
-            });
 
-            if (response.ok) {
-                // 设置图像源
-                const img = document.getElementById('cameraStream');
-                img.src = URL.createObjectURL(await response.blob());
-                
-                // 定时更新图像
-                setInterval(() => {
-                    img.src = URL.createObjectURL(await response.blob());
-                }, 1000); // 每秒更新一次
-            } else {
-                console.error('Failed to start camera stream:', response.statusText);
-            }
-        }
+    <!-- 显示视频流 -->
+    <div align="center"><img src="http://127.0.0.1:8000/opencam" id="video"></div>
 
-        // 开始摄像头流
-        startCameraStream();
-    </script>
-</body>
 </html>

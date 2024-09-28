@@ -85,7 +85,6 @@ def gen_display(camera):
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
-                paddledetection_net.turn_people_detector()
                 frame = paddledetection_net.predit(frame)#传入RGB，传出BGR
                 # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 ret, frame = cv2.imencode('.jpeg', frame)
@@ -150,7 +149,8 @@ def video(request):
     # 视频流相机对象
     global camera
     if request.method == 'GET':
-        camera = cv2.VideoCapture(0)
+        if camera is None:
+            camera = cv2.VideoCapture(0)    
         # 使用流传输传输视频流
         return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
 
@@ -263,7 +263,6 @@ def video_detection(video_name):
 
         if params["dark_enabled"]:
             frame = dark_net.process_frame(frame)
-        paddledetection_net.turn_people_detector()
         frame = paddledetection_net.predit(frame)
 
         # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
