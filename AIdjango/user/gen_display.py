@@ -161,6 +161,7 @@ def close_camera(request):
     global camera
     if camera is not None:
         camera.release()  # 释放摄像头资源
+        cv2.destroyAllWindows()
         camera = None  # 清空摄像头对象
     return JsonResponse({'status': 'Camera closed'})
 
