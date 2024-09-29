@@ -26,6 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
 const button = document.getElementById("action");
 button.onclick = async function() {
     const result = await window.electronAPI.runBatFile();
+    action_info.style.display = 'block'
+    action_info_text.innerText =  "散射增强模块初始化中"
     if (result.success) {
         console.log("BAT 文件运行成功");
     }
@@ -39,3 +41,42 @@ window.electronAPI.onBatOutput((data) => {
     output.innerHTML += data;  // 将输出追加到输出区域
     output.scrollTop = output.scrollHeight;  // 自动滚动到最新输出
 });
+const action_info = document.getElementById("action_info");
+const action_info_text = document.getElementById("action_info_text");
+let progress =  0 
+window.electronAPI.onBatStatus((statusMessage) => {
+    // 处理模块状态消息
+    action_info_text.innerText = dealWithProgress(statusMessage)
+});
+progress_dict = [
+    "散射增强模块初始化中",
+    "弱光增强模块初始化中",
+    "行人检测初始化中",
+    "车辆检测初始化中",
+    "行人属性初始化中",
+    "车辆属性初始化中",
+    "行人追踪初始化中",
+    "车辆追踪初始化中", 
+    "初始化完毕",
+    "正在进入"
+]
+dealWithProgress = (data) => {
+    console.log(data)
+    if (data == 1){
+        progress += 1
+    }
+    else if (data == 2){
+        progress = 0
+        action_info.style.display = 'none'
+    }
+    else if (data == 3){
+        progress += 1
+        setTimeout(() => {
+            console.log('延时')
+            document.getElementById("action_info").style.display = 'none'
+            progress = 0
+            window.electronAPI.enterPage()
+        }, 3000);
+    }
+    return progress_dict[progress]
+}
