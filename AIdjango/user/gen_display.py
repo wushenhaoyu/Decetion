@@ -11,6 +11,8 @@ import os
 from django.conf import settings
 from django.conf import settings
 import os
+import mimetypes
+import re
 import threading
 import json
 from django.conf import settings
@@ -25,6 +27,7 @@ module_directory = os.path.join(current_directory)
 
 sys.path.append(module_directory)
 from django.http import StreamingHttpResponse
+from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
 from haze.test_real import HazeRemover
@@ -66,41 +69,41 @@ def initialize():
     global params
     global isrecord
     global RecordCounter
-    try:
-        if haze_net is None:
-            haze_net = HazeRemover()
-            print("Haze Remover initialized.")
+    # try:
+    #     if haze_net is None:
+    #         haze_net = HazeRemover()
+    #         print("Haze Remover initialized.")
 
-        if dark_net is None:
-            dark_net = VideoEnhancer()
-            print("Video Enhancer initialized.")
+    #     if dark_net is None:
+    #         dark_net = VideoEnhancer()
+    #         print("Video Enhancer initialized.")
 
-        if paddledetection_net is None:
-            paddledetection_net = my_paddledetection()
-            print("Vehicle License Detection initialized.")
-        if params is None:
-            params = {
-            'haze_enabled': False,
-            'dark_enabled': False,#去雾
-            'hdr_enabled': False,#hdr
-            "people_detector":False,#行人检测
-            "people_tracker":False,#行人追踪
-            'people_attr_detector': False,#行人属性检测
-            "vehicle_tracker":False,#车辆追踪
-            'vehicle_detector': False,#车辆检测
-            'vehicle_attr_detector': False,#车辆属性检测
-            'vehicleplate_detector': False,#车牌检测
-            'vehicle_press_detector': False
-        }
-        if isrecord is None:
-            isrecord = False
-        if RecordCounter is None:
-            RecordCounter=0
-    except Exception as e:
-        print(f"Error initializing models: {e}")
-        return HttpResponse("Error initializing models.", status=500)
+    #     if paddledetection_net is None:
+    #         paddledetection_net = my_paddledetection()
+    #         print("Vehicle License Detection initialized.")
+    #     if params is None:
+    #         params = {
+    #         'haze_enabled': False,
+    #         'dark_enabled': False,#去雾
+    #         'hdr_enabled': False,#hdr
+    #         "people_detector":False,#行人检测
+    #         "people_tracker":False,#行人追踪
+    #         'people_attr_detector': False,#行人属性检测
+    #         "vehicle_tracker":False,#车辆追踪
+    #         'vehicle_detector': False,#车辆检测
+    #         'vehicle_attr_detector': False,#车辆属性检测
+    #         'vehicleplate_detector': False,#车牌检测
+    #         'vehicle_press_detector': False
+    #     }
+    #     if isrecord is None:
+    #         isrecord = False
+    #     if RecordCounter is None:
+    #         RecordCounter=0
+    # except Exception as e:
+    #     print(f"Error initializing models: {e}")
+    #     return HttpResponse("Error initializing models.", status=500)
 
-    return HttpResponse("Models initialized and ready.")
+    # return HttpResponse("Models initialized and ready.")
 
 def ConfirmParams(request):
     global params
@@ -230,43 +233,87 @@ def video_record_off(request):
         save_thread.start()
         return JsonResponse({'status': 'process finish'})
 
-def saverecord():
-        base_dir = 'AIdjango/dist/livedisplay_record'
+# def saverecord():
+#         base_dir = 'AIdjango/dist/livedisplay_record'
 
-        folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
+#         folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
 
-        # 按时间戳排序，找到最新的文件夹
-        if folders:
-            latest_folder = max(folders, key=lambda x: datetime.strptime(x, "%Y-%m-%d-%H-%M-%S"))
-            save_photo_dir = os.path.join(base_dir, latest_folder)
-        image_files = [f for f in os.listdir(save_photo_dir) if f.endswith('.jpg') or f.endswith('.png')]
-        image_files.sort(key=lambda x: int(os.path.splitext(x)[0]))
+#         # 按时间戳排序，找到最新的文件夹
+#         if folders:
+#             latest_folder = max(folders, key=lambda x: datetime.strptime(x, "%Y-%m-%d-%H-%M-%S"))
+#             save_photo_dir = os.path.join(base_dir, latest_folder)
+#         image_files = [f for f in os.listdir(save_photo_dir) if f.endswith('.jpg') or f.endswith('.png')]
+#         image_files.sort(key=lambda x: int(os.path.splitext(x)[0]))
 
-        # 检查是否有图像
-        if not image_files:
-            print("没有找到任何图像文件。")
-            exit()
+#         # 检查是否有图像
+#         if not image_files:
+#             print("没有找到任何图像文件。")
+#             exit()
 
-        # 获取第一张图像以获取宽高
-        first_image_path = os.path.join(save_photo_dir, image_files[0])
-        frame = cv2.imread(first_image_path)
-        height, width, layers = frame.shape
+#         # 获取第一张图像以获取宽高
+#         first_image_path = os.path.join(save_photo_dir, image_files[0])
+#         frame = cv2.imread(first_image_path)
+#         height, width, layers = frame.shape
 
-        # 定义视频编写器
-        save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
-        video_name = os.path.join(save_video_dir, latest_folder+'.avi')
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 编码方式
-        video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
+#         # 定义视频编写器
+#         save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
+#         video_name = os.path.join(save_video_dir, latest_folder+'.avi')
+#         fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 编码方式
+#         video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
 
-        # 读取并写入图像到视频
-        for image_file in image_files:
-            image_path = os.path.join(save_photo_dir, image_file)
-            frame = cv2.imread(image_path)
-            video_writer.write(frame)
+#         # 读取并写入图像到视频
+#         for image_file in image_files:
+#             image_path = os.path.join(save_photo_dir, image_file)
+#             frame = cv2.imread(image_path)
+#             video_writer.write(frame)
 
-        # 释放视频编写器
+#         # 释放视频编写器
             
-        video_writer.release()
+#         video_writer.release()
+
+
+def saverecord():
+    base_dir = 'AIdjango/dist/livedisplay_record'
+
+    folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
+
+    # 按时间戳排序，找到最新的文件夹
+    if folders:
+        latest_folder = max(folders, key=lambda x: datetime.strptime(x, "%Y-%m-%d-%H-%M-%S"))
+        save_photo_dir = os.path.join(base_dir, latest_folder)
+    else:
+        print("没有找到任何文件夹。")
+        return
+
+    image_files = [f for f in os.listdir(save_photo_dir) if f.endswith('.jpg') or f.endswith('.png')]
+    image_files.sort(key=lambda x: int(os.path.splitext(x)[0]))
+
+    # 检查是否有图像
+    if not image_files:
+        print("没有找到任何图像文件。")
+        return
+
+    # 获取第一张图像以获取宽高
+    first_image_path = os.path.join(save_photo_dir, image_files[0])
+    frame = cv2.imread(first_image_path)
+    height, width, layers = frame.shape
+
+    # 定义视频编写器
+    save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
+    os.makedirs(save_video_dir, exist_ok=True)  # 确保输出目录存在
+    video_name = os.path.join(save_video_dir, latest_folder + '.mp4')
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码方式
+    video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
+
+    # 读取并写入图像到视频
+    for image_file in image_files:
+        image_path = os.path.join(save_photo_dir, image_file)
+        frame = cv2.imread(image_path)
+        video_writer.write(frame)
+
+    # 释放视频编写器
+    video_writer.release()
+    print(f"视频已成功保存为: {video_name}")
 
 def stream_record_download(request):
         data = json.loads(request.body)
@@ -537,3 +584,78 @@ def photo_view(request):
     # delete_path = os.path.join(settings.MEDIA_ROOT,photo_name)
     # os.remove(delete_path)
     return JsonResponse({'photo_url': photo_url,"success":1})
+
+# def stream_video(request):
+#     video_path = "AIdjango/dist/UploadvideoSave/show.mp4"  # 替换为视频文件的实际路径
+#     wrapper = FileWrapper(open(video_path, 'rb'))
+#     response = HttpResponse(wrapper, content_type='video/mp4')
+#     response['Content-Length'] = os.path.getsize(video_path)
+#     return response
+
+def stream_video(request):
+    data = json.loads(request.body)
+    name = data.get("name")
+    style = data.get("style")
+    if style==1:
+        video_path = "AIdjango/dist/livedisplay_record2video/"+name
+    elif style==2:
+        video_path = "AIdjango/dist/UploadvideoProcess/"+name
+    elif style==3:
+        video_path = "AIdjango/dist/UploadvideoSave/"+name
+    print(video_path)
+    range_header = request.META.get('HTTP_RANGE', '').strip()
+
+    if range_header:
+        size = os.path.getsize(video_path)
+        start, end = parse_range_header(range_header, size)
+
+        if start is None or end is None:
+            return HttpResponse(status=416)
+
+        if start >= size or end >= size:
+            return HttpResponse(status=416)
+
+        length = end - start + 1
+        file = open(video_path, 'rb')
+        file.seek(start)
+        wrapper = FileWrapper(file)
+        response = HttpResponse(wrapper, content_type='video/mp4', status=206)
+        response['Content-Disposition'] = 'inline'
+        response['Content-Length'] = str(length)
+        response['Content-Range'] = f'bytes {start}-{end}/{size}'
+        return response
+
+    wrapper = FileWrapper(open(video_path, 'rb'))
+    response = HttpResponse(wrapper, content_type='video/mp4')
+    response['Content-Length'] = os.path.getsize(video_path)
+    return response
+def parse_range_header(range_header, size):
+    if range_header:
+        start, end = range_header.replace('bytes=', '').split('-')
+        start = int(start) if start else 0
+        end = int(end) if end else size - 1
+        return start, end
+    return None, None
+
+
+def stream_photo(request):
+    data = json.loads(request.body)
+    name = data.get("name")
+    style = data.get("style")
+    if style==1:
+        image_path = "AIdjango/dist/UploadphotoSave/"+name
+    elif style==2:
+        image_path = "AIdjango/dist/UploadphotoProcess/"+name
+    print(image_path)
+    # 定义存储照片的文件夹路径
+    # image_folder = 'AIdjango/dist/livedisplay_record'  # 根据你的实际路径调整
+    # image_path = os.path.join(image_folder, image_name)
+    # 检查文件是否存在
+    if os.path.exists(image_path):
+        frame = cv2.imread(image_path)
+        if frame is not None:
+            # 编码为 JPEG 格式
+            ret, buffer = cv2.imencode('.jpg', frame)
+            return HttpResponse(buffer.tobytes(), content_type='image/jpeg')
+    
+    return HttpResponse(status=404)
