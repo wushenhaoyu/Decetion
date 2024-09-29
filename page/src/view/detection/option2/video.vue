@@ -168,10 +168,6 @@
             preload="auto"
           >
             <source style="background: #000" :src="videoUrl" type="video/mp4" />
-            <p class="vjs-no-js">
-              To view this video please enable JavaScript, and consider
-              upgrading to a web browser
-            </p>
           </video>
           <!-- 显示视频  -->
         </div>
@@ -236,7 +232,7 @@ export default {
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
       videoUrl: "",
-      uploadUrl: "",
+      uploadUrl: "http://localhost:8000/uploadVideo",
       showProgress: false,
       progressPercentage: 0,
     };
@@ -253,6 +249,25 @@ export default {
     },
   },
   methods: {
+    sendParameters(value) {
+      this.checkParameter(value)
+      let data = {
+        haze: this.haze,
+        dark: this.dark,
+        hdr:  false,
+        people_detector: this.people_detector_enable,
+        people_tracker: this.people_tracker_enable,
+        people_attr_detector: this.people_attribute_enable,
+        vehicle_tracker: this.vehicle_tracker_enable,
+        vehicle_detector: this.vehicle_detector_enable,
+        vehicle_attr_detector: this.vehicle_attribute_enable,
+        vehicleplate_detector: this.vehicle_license_enable,
+        vehicle_press_detector: this.vehicle_press_detector_enable,
+        vehicle_invasion:this.vehicle_invasion_enable
+      }
+      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
+      })
+    },
     resetVideo() {
       this.isShowVideo = false;
     },
@@ -316,14 +331,17 @@ export default {
       // 手动触发上传
       const formData = new FormData();
       formData.append('file', file);
-      this.$http.post(this.uploadUrl, formData).then(response => {
+      this.$axios.post(this.uploadUrl, formData).then(response => {
         this.handleSuccess(response, file);
       }).catch(error => {
         this.handleError(error, file);
       });
     },
     handleSuccess(response, file) {
-      console.log('上传成功:', response);
+      this.$message({
+            type: 'success',
+            message: '上传成功!'
+          });
       // 处理成功逻辑
     },
     handleError(error, file) {
