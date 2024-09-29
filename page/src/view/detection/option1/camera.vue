@@ -130,7 +130,7 @@
                 </el-upload> -->
           <!-- 上传视频  -->
           <!-- 显示视频  -->
-          <div v-if="isShowCamera" align="center"><img src="http://127.0.0.1:8000/livedisplay" id="video"></div>
+          <div  align="center"><img  :src="cameraUrl" id="video" style="height:100%;"></div>
           <!-- 显示视频  -->
         </div>
         <div style="height: 5%"></div>
@@ -188,7 +188,7 @@ export default {
       isShowCamera: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
-      videoUrl: "http://vjs.zencdn.net/v/oceans.mp4",
+      cameraUrl: "http://localhost:8000/livedisplay",
       uploadUrl: "",
       showProgress: false,
       progressPercentage: 0,
@@ -263,6 +263,11 @@ export default {
     switchCamera() {
       if (this.isShowCamera) {
         this.isShowCamera = false;
+        this.$axios.get("http://localhost:8000/closecam").then((response) => {
+            console.log(response);
+            //src让其为空
+          })
+          this.cameraUrl = ""
         /*this.$axios
           .post("http://localhost:8000/closecam/")
           .then((response) => {
@@ -275,6 +280,11 @@ export default {
         this.isShowCamera = true;
         this.isShowVideo = true;
         this.sendParameters()
+        this.$axios.get("http://localhost:8000/opencam").then((response) => {
+            console.log(response);
+          
+          })
+        this.cameraUrl = "http://localhost:8000/livedisplay"
       }
     },
     toggleDrawer() {
@@ -297,7 +307,7 @@ export default {
         let errorMessage = "";
         if (!isSupportedFormat) {
           errorMessage += "不支持的视频格式。";
-        }
+        } 
         if (!isSizeValid) {
           errorMessage += "文件大小超过 100 MB。";
         }

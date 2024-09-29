@@ -232,6 +232,7 @@ class my_paddledetection:
         self.people_tracker_isOn = False
         self.vehicle_tracker_isOn = False
         self.vehicle_invasion_detector_isOn = False
+        self.updated_ids = {}
         """
         初始化检测器
             people_detector                行人目标检测    
@@ -365,7 +366,7 @@ class my_paddledetection:
             people_res = self.people_detector.predict_image([input],visual=False)
             self.people_res = self.people_detector.filter_box(people_res,0.5) # 过滤掉置信度小于0.5的框
         elif self.people_tracker_isOn:
-            people_res = self.people_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
+            people_res = self.people_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=False)
             self.people_res = parse_mot_res(people_res)
         if self.vehicle_detector_isOn:#车辆检测
             vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
@@ -401,7 +402,7 @@ class my_paddledetection:
                 else:
                     raise ValueError("region_type:{} unsupported.".format(
                         self.region_type))
-            vehicle_res = self.vehicle_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=reuse_det_result)
+            vehicle_res = self.vehicle_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=False)
             self.vehicle_res = parse_mot_res(vehicle_res)
             boxes, scores , ids = vehicle_res[0]
             mot_result = ( 1, boxes[0], scores[0],ids[0])
@@ -555,12 +556,14 @@ class my_paddledetection:
                                 crop['crop'] = res[index]['crop']
                                 crop['score'] = res[index]['score']
                                 #保存文件
-                                print('修改',id)
                                 self.vehicle_waitting_dealwith_queue.append(res[index])
                     for index , id in enumerate(selected_ids_):
                         self.vehicle_queue.append(res[index])
                         print('添加',id)
-                        self.vehicle_waitting_dealwith_queue.append(res[index])
+                        try:
+                            self.vehicle_waitting_dealwith_queue.append(res[index])
+                        except Exception as e:
+                            print(e)
                         #保存文件
                     if self.vehicle_waitting_dealwith_queue:
                         self.vehicle_waitting_dealwith_flag = True
@@ -615,10 +618,11 @@ class my_paddledetection:
                         for crop in self.people_queue:
                             if crop['object_id'] == id:
                                 # 找到对应的裁剪结果并更新
+
                                 crop['crop'] = res[index]['crop']
                                 crop['score'] = res[index]['score']
                                 #保存文件
-                                print('修改',id)
+                                # print('修改',id)
                                 self.people_waitting_dealwith_queue.append(res[index])
                     for index , id in enumerate(selected_ids_):
                         self.people_queue.append(res[index])
@@ -659,22 +663,39 @@ class my_paddledetection:
             self.im = visualize_lane(self.im, lanes)
             self.im = np.ascontiguousarray(np.copy(self.im))
 
+    # def people_dealwith_queue(self):
+    #     if self.people_waitting_dealwith_flag:
+    #         #写入行人处理逻辑
+    #         for i in self.people_waitting_dealwith_queue:
+    #             crop = i['crop']
+    #             cls_id = i['class_id']
+    #             obj_id = i['object_id']
+    #             score = i['score']
+    #             crop_box = i['crop_box']
+    #             # 构造保存路径
+    #             save_dir = 'AIdjango/dist/livedisplay'
+    #             os.makedirs(save_dir, exist_ok=True)
+    #             file_name = f"{obj_id}.png"
+    #             if crop is not None and crop.size > 0:
+    #                 cv2.imwrite(os.path.join(save_dir, file_name), crop)
     def people_dealwith_queue(self):
-        if self.people_waitting_dealwith_flag:
-            #写入行人处理逻辑
-            for i in self.people_waitting_dealwith_queue:
-                crop = i['crop']
-                cls_id = i['class_id']
-                obj_id = i['object_id']
-                score = i['score']
-                crop_box = i['crop_box']
-                print(obj_id)
-                # 构造保存路径
+            if self.people_waitting_dealwith_flag:
                 save_dir = 'AIdjango/dist/livedisplay'
-                os.makedirs(save_dir, exist_ok=True)
-                file_name = f"{obj_id}.png"
-                if crop is not None and crop.size > 0:
-                    cv2.imwrite(os.path.join(save_dir, file_name), crop)
+                for i in self.people_waitting_dealwith_queue:
+                    print(len(self.people_waitting_dealwith_queue))
+                    crop = i['crop']
+                    obj_id = i['object_id']
+
+                    # 检查对象是否第一次监测或以 0.1 概率更新
+                    if obj_id not in self.updated_ids:
+                        self.updated_ids[obj_id] = True  # 标记为已更新
+                        should_update = True
+                    else:
+                        should_update = random.random() < 0.05  # 0.1 的概率
+                    if crop is not None and crop.size > 0 and should_update:
+                        file_name = f"{obj_id}.png"
+                        cv2.imwrite(os.path.join(save_dir, file_name), crop)
+            self.people_waitting_dealwith_queue = []
 
     def vehicle_dealwith_queue(self):
         if self.vehicle_waitting_dealwith_flag:
@@ -683,10 +704,7 @@ class my_paddledetection:
                 pass
             
             
-    # def people_dealwith(self):        
-    #     if random.random() < 0.1:  # 0.1 的概率
-    #     thread = threading.Thread(target=people_dealwith_queue)
-    #     thread.start()
+
         
         
 
@@ -768,28 +786,26 @@ class my_paddledetection:
 
 
 
-from concurrent.futures import ThreadPoolExecutor
 
-# 创建线程池
-executor = ThreadPoolExecutor(max_workers=1)
 
+def background_processing():
+    while True:
+        my_detection.people_dealwith_queue()
+        time.sleep(1)
+    # 启动后台线程
 
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
     my_detection.turn_people_tracker()
-    #my_detection.turn_people_detector()
-    #my_detection.turn_people_attr_detector()
-    #my_detection.turn_vehicle_tracker()
-    #my_detection.turn_vehicle_attr_detector()
-    #my_detection.turn_vehicleplate_detector()
+    background_thread = threading.Thread(target=background_processing, daemon=True)
+    background_thread.start()
     cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
         _, frame = cap.read()
         input = frame[:, :, ::-1]
         img = my_detection.predit(input)
-        my_detection.people_dealwith_queue()
         # 显示图像
         cv2.imshow('Mask Detection', img)
         
