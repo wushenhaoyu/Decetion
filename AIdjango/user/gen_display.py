@@ -33,9 +33,12 @@ from dark.camera import VideoEnhancer
 haze_net = None
 dark_net =None
 params = None
+isrecord = None
 paddledetection_net = None
 camera = None
 camId = 0
+save_thread =None
+RecordCounter = None
 from PyCameraList.camera_device import test_list_cameras, list_video_devices, list_audio_devices
 def getAllCam(request):
     cameras = list_video_devices()
@@ -61,6 +64,8 @@ def initialize():
     global dark_net
     global paddledetection_net
     global params
+    global isrecord
+    global RecordCounter
     try:
         if haze_net is None:
             haze_net = HazeRemover()
@@ -87,6 +92,10 @@ def initialize():
             'vehicleplate_detector': False,#车牌检测
             'vehicle_press_detector': False
         }
+        if isrecord is None:
+            isrecord = False
+        if RecordCounter is None:
+            RecordCounter=0
     except Exception as e:
         print(f"Error initializing models: {e}")
         return HttpResponse("Error initializing models.", status=500)
@@ -160,26 +169,21 @@ def open_camera(request):
         camera = cv2.VideoCapture(camId)  
     return JsonResponse({'status': 'Camera open'})
 
-def gen_display_record(camera):
-
+def gen_display(camera):
+    global RecordCounter
     target_size = get_camera_frame_size(camera)
-    i=0
+    RecordCounter=0
     target_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record")
     items = os.listdir(target_dir)
     folders = [item for item in items if os.path.isdir(os.path.join(target_dir, item))]
     folder_count = len(folders)
-    current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    save_dir = f'AIdjango/dist/livedisplay_record/{current_time}'
-    os.makedirs(save_dir, exist_ok=True)
+
     while True:
         # 读取图片
         if camera is None:
             break
         ret, frame = camera.read()
         if ret:
-            save_path = os.path.join(save_dir, f"{i}.jpg")
-            print(save_path)
-            cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
             frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             # 将图片进行解码                
             if ret:
@@ -190,63 +194,113 @@ def gen_display_record(camera):
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
-                frame = paddledetection_net.predit(frame)#传入RGB，传出BGR
-                # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                frame = paddledetection_net.predit(frame)#传入RGB，
+                if isrecord:
+                    if RecordCounter==0:
+                            current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                            save_dir = f'AIdjango/dist/livedisplay_record/{current_time}'
+                            os.makedirs(save_dir, exist_ok=True)
+                    save_path = os.path.join(save_dir, f"{RecordCounter}.jpg")
+                    print(save_path)
+                    cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
+                frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 ret, frame = cv2.imencode('.jpeg', frame)
                 # 递增计数器
-                i += 1
+                RecordCounter += 1
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
-                
-def gen_display(camera):
-    """
-    视频流生成器功能。
-    """
-    target_size = get_camera_frame_size(camera)
-    while True:
-        # 读取图片
-        if camera is None:
-            break
-        ret, frame = camera.read()
-        if ret:
-            frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-            # 将图片进行解码                
-            if ret:
-                frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                if params["haze_enabled"]:
-                    frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                if params["dark_enabled"]:
-                    frame = dark_net.process_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                frame = paddledetection_net.predit(frame)#传入RGB，传出BGR
-                # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                ret, frame = cv2.imencode('.jpeg', frame)
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
-
-                
+  
 
 
+def video_record_on(request):
+    global isrecord
+    global RecordCounter 
+    if request.method == 'POST':
+        isrecord = True
+        RecordCounter = 0
+        return JsonResponse({'status': 'start record'})
+def video_record_off(request):
+    global RecordCounter
+    global isrecord
+    global save_thread 
+    if request.method == 'POST':
+        isrecord = False
+        RecordCounter = 0
+        save_thread = threading.Thread(target=saverecord)
+        save_thread.start()
+        return JsonResponse({'status': 'process finish'})
 
-def video_record(request):
-    """
-    视频流路由。将其放入img标记的src属性中。
-    例如：<img src='https://ip:port/uri' >
-    """
-    # 视频流相机对象
-    global camera
-    if camera is not None:
-        return StreamingHttpResponse(gen_display_record(camera), content_type='multipart/x-mixed-replace; boundary=frame')
-    else:
-        return JsonResponse({'status': 'Camera open,please open'})
+def saverecord():
+        base_dir = 'AIdjango/dist/livedisplay_record'
 
+        folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
+
+        # 按时间戳排序，找到最新的文件夹
+        if folders:
+            latest_folder = max(folders, key=lambda x: datetime.strptime(x, "%Y-%m-%d-%H-%M-%S"))
+            save_photo_dir = os.path.join(base_dir, latest_folder)
+        image_files = [f for f in os.listdir(save_photo_dir) if f.endswith('.jpg') or f.endswith('.png')]
+        image_files.sort(key=lambda x: int(os.path.splitext(x)[0]))
+
+        # 检查是否有图像
+        if not image_files:
+            print("没有找到任何图像文件。")
+            exit()
+
+        # 获取第一张图像以获取宽高
+        first_image_path = os.path.join(save_photo_dir, image_files[0])
+        frame = cv2.imread(first_image_path)
+        height, width, layers = frame.shape
+
+        # 定义视频编写器
+        save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
+        video_name = os.path.join(save_video_dir, latest_folder+'.avi')
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 编码方式
+        video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
+
+        # 读取并写入图像到视频
+        for image_file in image_files:
+            image_path = os.path.join(save_photo_dir, image_file)
+            frame = cv2.imread(image_path)
+            video_writer.write(frame)
+
+        # 释放视频编写器
+            
+        video_writer.release()
+
+def stream_record_download(request):
+        data = json.loads(request.body)
+        video_name = data.get('name')
+        file_path =  f'AIdjango/dist/livedisplay_record2video/{video_name}'
+        response = StreamingHttpResponse(open(file_path, 'rb'))
+        response['content_type'] = "application/octet-stream"
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+        return response
+
+def stream_video_download(request):
+        data = json.loads(request.body)
+        video_name = data.get('name')
+        # video_name = "2024-09-29-21-36-45.avi"
+        file_path =  f'AIdjango/dist/UploadvideoProcess/{video_name}'
+        response = StreamingHttpResponse(open(file_path, 'rb'))
+        response['content_type'] = "application/octet-stream"
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+        return response
+
+def stream_photo_download(request):
+        data = json.loads(request.body)
+        photo_name = data.get('name')
+        # photo_name = "6bd979a269cb070014f1a1a71e90e364.png"
+        file_path =  f'AIdjango/dist/UploadphotoProcess/{photo_name}'
+        response = StreamingHttpResponse(open(file_path, 'rb'))
+        response['content_type'] = "application/octet-stream"
+        response['Content-Disposition'] = 'attachment; filename=' + os.path.basename(file_path)
+        return response
+
+
+    
 def video(request):
-    """
-    视频流路由。将其放入img标记的src属性中。
-    例如：<img src='https://ip:port/uri' >
-    """
-    # 视频流相机对象
+
     global camera
     if camera is not None:
         return StreamingHttpResponse(gen_display(camera), content_type='multipart/x-mixed-replace; boundary=frame')
@@ -263,51 +317,7 @@ def close_camera(request):
         cv2.destroyAllWindows()
         camera = None  # 清空摄像头对象
     return JsonResponse({'status': 'Camera closed'})
-def close_camera_record(request):
-    """
-    关闭摄像头路由。
-    """
-    global camera
-    if camera is not None:
-        camera.release()  # 释放摄像头资源
-        cv2.destroyAllWindows()
-        camera = None  # 清空摄像头对象
-    base_dir = 'AIdjango/dist/livedisplay_record'
 
-    folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
-
-    # 按时间戳排序，找到最新的文件夹
-    if folders:
-        latest_folder = max(folders, key=lambda x: datetime.strptime(x, "%Y-%m-%d-%H-%M-%S"))
-        save_photo_dir = os.path.join(base_dir, latest_folder)
-    image_files = [f for f in os.listdir(save_photo_dir) if f.endswith('.jpg') or f.endswith('.png')]
-    image_files.sort(key=lambda x: int(os.path.splitext(x)[0]))
-
-    # 检查是否有图像
-    if not image_files:
-        print("没有找到任何图像文件。")
-        exit()
-
-    # 获取第一张图像以获取宽高
-    first_image_path = os.path.join(save_photo_dir, image_files[0])
-    frame = cv2.imread(first_image_path)
-    height, width, layers = frame.shape
-
-    # 定义视频编写器
-    save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
-    video_name = os.path.join(save_video_dir, latest_folder+'.avi')
-    fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 编码方式
-    video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
-
-    # 读取并写入图像到视频
-    for image_file in image_files:
-        image_path = os.path.join(save_photo_dir, image_file)
-        frame = cv2.imread(image_path)
-        video_writer.write(frame)
-
-    # 释放视频编写器
-    video_writer.release()
-    return JsonResponse({'status': 'Camera closed'})
 
 
 def getAllRecordFile(request):
