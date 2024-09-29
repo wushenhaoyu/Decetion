@@ -345,7 +345,7 @@ def visualize_attr(im, results, boxes=None, is_mtmct=False):
     if isinstance(im, str):
         im = Image.open(im)
         im = np.ascontiguousarray(np.copy(im))
-        im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
+        # im = cv2.cvtColor(im, cv2.COLOR_RGB2BGR)
     else:
         im = np.ascontiguousarray(np.copy(im))
 

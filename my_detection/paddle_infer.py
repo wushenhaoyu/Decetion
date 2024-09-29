@@ -362,12 +362,14 @@ class my_paddledetection:
     def predit(self,input):
         self.clear()
         reuse_det_result = self.frame != 0 
+
         if self.people_detector_isOn:#行人检测
             people_res = self.people_detector.predict_image([input],visual=False)
             self.people_res = self.people_detector.filter_box(people_res,0.5) # 过滤掉置信度小于0.5的框
         elif self.people_tracker_isOn:
             people_res = self.people_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=False)
             self.people_res = parse_mot_res(people_res)
+
         if self.vehicle_detector_isOn:#车辆检测
             vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
             self.vehicle_res = self.vehicle_detector.filter_box(vehicle_res,0.5) # 过滤掉置信度小于0.5的框
@@ -436,11 +438,13 @@ class my_paddledetection:
             
         if self.people_attr_detector_isOn and self.people_res is not None:#行人属性检测
             if self.people_res['boxes'].size > 0:
+
                 if self.people_detector_isOn:
                     self.people_crops_res = crop_image_with_det([input], self.people_res)
                 elif self.people_tracker_isOn :
                     self.people_crops_res , _ , _ = crop_image_with_mot(input, self.people_res)
                     self.people_crops_res = [self.people_crops_res]
+
                 for crop_res in self.people_crops_res:#把行人的小图片裁剪出来并属性预测
                     self.people_attr_res = self.people_attr_detector.predict_image(crop_res,visual=False)
         if ( self.vehicle_attr_detector_isOn or self.vehicleplate_detector_isOn )and self.vehicle_res is not None:#车辆图像裁剪
@@ -556,7 +560,7 @@ class my_paddledetection:
                                 crop['crop'] = res[id[0]]['crop']
                                 crop['score'] = res[id[0]]['score']
                                 #保存文件
-                                print('修改',id[1])
+                                # print('修改',id[1])
                                 self.vehicle_waitting_dealwith_queue.append(res[id[0]])
                     for index , id in enumerate(selected_ids_):
                         self.vehicle_queue.append(res[id[0]])
@@ -566,6 +570,7 @@ class my_paddledetection:
                     if self.vehicle_waitting_dealwith_queue:
                         self.vehicle_waitting_dealwith_flag = True
         if self.people_res is not None and self.people_tracker_isOn:
+            
             if self.people_res['boxes'].size > 0 :
                 ids = self.people_res['boxes'][:,0]
                 scores = self.people_res['boxes'][:,2]
@@ -619,7 +624,7 @@ class my_paddledetection:
                                 crop['crop'] = res[id[0]]['crop']
                                 crop['score'] = res[id[0]]['score']
                                 #保存文件
-                                print('修改',id)
+                                # print('修改',id)
                                 self.people_waitting_dealwith_queue.append(res[id[0]])
                     for index , id in enumerate(selected_ids_):
                         self.people_queue.append(res[id[0]])
@@ -628,6 +633,8 @@ class my_paddledetection:
                         #保存文件
                     if self.people_waitting_dealwith_queue:
                         self.people_waitting_dealwith_flag = True
+            else:
+                self.im =  cv2.cvtColor(self.im, cv2.COLOR_BGR2RGB)
         if self.people_res is not None and self.people_detector_isOn:
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
             
@@ -679,10 +686,9 @@ class my_paddledetection:
             if self.people_waitting_dealwith_flag:
                 save_dir = 'AIdjango/dist/livedisplay'
                 for i in self.people_waitting_dealwith_queue:
-                    print(len(self.people_waitting_dealwith_queue))
                     crop = i['crop']
                     obj_id = i['object_id']
-
+                    print("obj",obj_id)
                     # 检查对象是否第一次监测或以 0.1 概率更新
                     if obj_id not in self.updated_ids:
                         self.updated_ids[obj_id] = True  # 标记为已更新
@@ -795,15 +801,22 @@ def background_processing():
 if __name__ == "__main__":
     my_detection = my_paddledetection()
     my_detection.turn_people_tracker()
-    background_thread = threading.Thread(target=background_processing, daemon=True)
-    background_thread.start()
+    # my_detection.turn_people_detector()
+    # my_detection.turn_people_attr_detector()
+    # my_detection.turn_vehicle_detector()
+    # my_detection.turn_vehicle_attr_detector()
+    # my_detection.turn_vehicle_press_detector()
+    # background_thread = threading.Thread(target=background_processing, daemon=True)
+    # background_thread.start()
     cap = cv2.VideoCapture(0)
     while True:
         # 读取一帧图像
         _, frame = cap.read()
-        input = frame[:, :, ::-1]
+        input =  cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
         img = my_detection.predit(input)
         # 显示图像
+        img =  cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imshow('Mask Detection', img)
         
         # 按 'q' 键退出

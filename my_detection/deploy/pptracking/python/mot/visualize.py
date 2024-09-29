@@ -219,6 +219,7 @@ def plot_tracking_dict(image,
                        records=None,
                        center_traj=None):
     im = np.ascontiguousarray(np.copy(image))
+    im =  cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
     im_h, im_w = im.shape[:2]
     if do_break_in_counting or do_illegal_parking_recognition:
         entrance = np.array(entrance[:-1])  # last pair is [im_w, im_h] 
@@ -381,6 +382,7 @@ def plot_tracking_dict(image,
                         continue
                     for point in traj[i]:
                         cv2.circle(im, point, 3, (0, 0, 255), -1)
+    
     return im
 
 
