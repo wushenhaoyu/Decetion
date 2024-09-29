@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
-    <div :class="drawer_class_ctrl" style="width: 250px">
+    <div :class="drawer_class_ctrl" style="width: 15vw">
       <div class="drawer-content" >
         <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
         <div style="height: 3vh;"></div>

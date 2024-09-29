@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路况监测系统启动器</title>
+</head>
+<body>
+    <div class="container">
+        <img src="../../assets/bg.jpg" style="max-width: 100%; max-height: 100%;position: absolute;top: 0;left: 0;" >
+        <div style="display: flex;position: absolute;top: 0;left: 0;z-index: 5;">
+            <div class="left"> 
+                <div style="text-align: center;width: 100%;color: rgb(255, 255, 255);font-size: 6vh;font-weight: 900;line-height: 20vh;">欢迎使用</div>
+                <div class="divider"></div>   
+                <div class="left-font" style="display: flex;align-items: center;">
+                    <div style="width: 10%;"></div>
+                    <div style="height: 10vh;width: 25%;padding: 1.5vw;"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 1024 1024" ><path fill="currentColor" d="M512 128L128 447.936V896h255.936V640H640v256h255.936V447.936z"/></svg></div>
+                    <div >首页</div>
+                </div> 
+                <div class="divider"></div>  
+                <div class="left-font" style="display: flex;align-items: center;">
+                    <div style="width: 10%;"></div>
+                    <div style="height: 10vh;width: 25%;padding: 1.5vw;"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 1024 1024" ><path fill="currentColor" d="M764.416 254.72a351.7 351.7 0 0 1 86.336 149.184H960v192.064H850.752a351.7 351.7 0 0 1-86.336 149.312l54.72 94.72l-166.272 96l-54.592-94.72a352.64 352.64 0 0 1-172.48 0L371.136 936l-166.272-96l54.72-94.72a351.7 351.7 0 0 1-86.336-149.312H64v-192h109.248a351.7 351.7 0 0 1 86.336-149.312L204.8 160l166.208-96h.192l54.656 94.592a352.64 352.64 0 0 1 172.48 0L652.8 64h.128L819.2 160l-54.72 94.72zM704 499.968a192 192 0 1 0-384 0a192 192 0 0 0 384 0"/></svg></div>
+                    <div >设置</div>
+                </div> 
+                <div class="divider"></div>     
+                <div class="left-font" style="display: flex;align-items: center;">
+                    <div style="width: 10%;"></div>
+                    <div style="height: 10vh;width: 25%;padding: 1.5vw;"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 16 16" ><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M1.75 4.75L8 1.25l6.25 3.5v6.5L8 14.75l-6.25-3.5zM8 14V8m5.75-3L8 8M2 5l6 3"/></svg></div>
+                    <div>修复</div>
+                </div> 
+                <div class="divider"></div>
+                <div class="left-font" style="display: flex;align-items: center;">
+                    <div style="width: 10%;"></div>
+                    <div style="height: 10vh;width: 25%;padding: 1.5vw;"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 16 16" > <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.75 14.25s-.5-2 .5-3c0 0-2 0-3.5-1.5s-1-4.5 0-5.5c-.5-1.5.5-2.5.5-2.5s1.5 0 2.5 1c1-.5 3.5-.5 4.5 0c1-1 2.5-1 2.5-1s1 1 .5 2.5c1 1 1.5 4 0 5.5s-3.5 1.5-3.5 1.5c1 1 .5 3 .5 3m-5-.5c-1.5.5-3-.5-3.5-1"/></svg></div>
+                    <div >反馈</div>
+                </div> 
+                <div class="divider"></div>
+                <div class="left-font" style="display: flex;align-items: center;">
+                    <div style="width: 10%;"></div>
+                    <div style="height: 10vh;width: 25%;padding: 1.5vw;"><svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 16 16"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.25 2.25h-3.5v12h3.5m4-9.5l-3.5 3.5l3.5 3.5m5-3.5h-8.5"/></svg></div>
+                    <div >退出</div>
+                </div>            
+            </div>
+            <div  style="height: 100vh;width: 75vw;">
+                <div id="action" class="child"  style="position: absolute; right: 10vw; bottom: 10vh; width: 20vw; height: 15vh; background-color: rgba(255, 204, 0, 0.866); color: white; font-size: 5vh; font-weight: 900; text-align: center; line-height: 15vh; border-radius: 0.5vw;">一键启动</div>
+                <div  id="setting"  class="child" ></div>
+                <div id="repair" class="child" style="width: 90%;height: 90%;padding: 5%;">
+                    <div  style="width: 100%;height: 80%;background-color: rgba(0, 0, 0, 0.778);border-radius: 0.5vw;overflow-y:auto;overflow-x: hidden;">
+                    <div id="output" style="color: white; white-space: pre-wrap;user-select: text;"></div>
+                    </div>
+                    <div style="height: 5%;"></div>
+                            <div style="width: 100%;height: 15%;display: flex;justify-content: space-between;">
+                            <div class="button-font">一键修复</div>
+                            <div class="button-font"></div>
+                            <div class="button-font"></div>
+                         </div>
+                </div>
+                <div id ="feedback" class="child"></div>
+                <div id ="exit" class="child"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<style>
+    /* 设置 html 和 body 占据整个窗口 */
+    svg{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+    .left{
+    height: 100vh;
+    width: 25vw;
+    background-color: rgba(0, 0, 0, 0.32);
+    border-right: 0.3vw solid rgb(51, 51, 51);
+    box-shadow: -10px 0 20px rgb(26, 26, 26); /* 水平偏移，垂直偏移，模糊距离，颜色 */
+    }
+    .left-font {
+        color: rgb(255, 255, 255);font-size: 5vh;font-weight: 900;
+    }
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* 设置 div 作为容器 */
+    .container {
+        width: 100%;
+        height: 100%;
+        background-image: url('../../assets/bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    .divider {
+        height: 0.55vh; /* 分割线的高度 */
+        background-color: #ccc; /* 分割线的颜色 */
+        margin-left: 15%;
+        margin-right: 15%;
+        margin-top:1vh ;
+    }
+    .choice{
+        user-select: none;
+    }
+    .highlight{
+        color:rgb(255, 204, 0);
+    }
+    .button-font{
+            width: 30%;height: 100%;background-color: rgb(255,204,0);border-radius: 0.5vw;font-size: 4vw;color: white;font-weight: 900;text-align: center;line-height: 13.5vh;
+        }
+        ::-webkit-scrollbar
+        {
+            width:16px;
+            height:16px;
+            background-color:rgb(0, 0, 0, 0.778);
+        }
+        /*定义滚动条轨道
+        内阴影+圆角*/
+        ::-webkit-scrollbar-track
+        {
+            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,0.3);
+            border-radius:10px;
+            background-color:rgba(0, 0, 0, 0.471);
+        }
+        /*定义滑块
+        内阴影+圆角*/
+        ::-webkit-scrollbar-thumb
+        {
+            border-radius:10px;
+            -webkit-box-shadow:inset 0 0 6px rgba(0,0,0,.3);
+            background-color:#565656;
+        }
+        .child{
+            transition: all 0.5s;
+            display: none;
+        }
+</style>
+<script src="render.js"> 
+</script>
+
+</html>

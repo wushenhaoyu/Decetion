@@ -1,26 +1,30 @@
 from django.contrib import admin
 from django.urls import path
-from user.gen_display import video,upload_video,video_view,upload_photo,ConfirmParams,photo_view, close_camera, open_camera
-from user.gen_display import initialize
+from user.gen_display import video,upload_video,video_view,upload_photo,ConfirmParams,photo_view, close_camera, open_camera,video_record,close_camera_record,getAllRecordFile,get_progress
+from user.gen_display import initialize,getAllPhotoFile,getAllVideoFile,getAllCam, Camchoice
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('opencam/', opencam),
-    # path('closecam/', closecam),
-    # path("",initialize),
-    # path('video/', index),  # 匹配 /video/
-    # path('video/<str:v_name>/', v_name, name='v_name'),  # 匹配 /video/<v_name>/,打开摄像头之后进入http://127.0.0.1:8000/video/wms/就可以看到了
-    path('uploadVideo', upload_video, name='upload_video'),#上传视频
-    path('uploadPhoto', upload_photo, name='upload_photo'),#上传照片
-    # video/是播放视频的页面
-    path('showvideo', video_view),      #展示视频
-    path('showphoto', photo_view),      #展示视频
-    path('livedisplay', video),     #实时演示功能
-    path('opencam', open_camera),     #实时演示功能
-    path('closecam',  close_camera),     #实时演示功能
     path("",initialize) ,        #初始化深度学习模型
-    path("ConfirmParams",ConfirmParams)
+    path("ConfirmParams",ConfirmParams),
+    path("getAllCam",getAllCam),#得到所有的摄像头设备
+    path("Camchoice",Camchoice),#给出使用的摄像头
+    path('opencam', open_camera),     #打开摄像头
+    path('closecam',  close_camera),     #关闭摄像头
+    path('livedisplay', video),     #实时演示功能
+    path('livedisplayRecord', video_record),     #录制演示功能外加保存
+    path('closecamRecord',  close_camera_record),    #关闭录制
+    path("getAllRecordFile",getAllRecordFile),#得到所有的录制文件
+
+    path('uploadVideo', upload_video, name='upload_video'),#上传视频
+    path("get_progress",get_progress),#得到视频处理的进度条
+
+    path('uploadPhoto', upload_photo, name='upload_photo'),#上传照片
+    
+    path("getAllPhotoFile",getAllPhotoFile),#得到所有的照片文件
+    path("getAllVideoFile",getAllVideoFile)#得到所有的视频文件
+
 ]
 
 

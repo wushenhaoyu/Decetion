@@ -25,7 +25,7 @@ def get_args():
     arg(
         '--out',
         type=lambda x: process_path(x, True),
-        default="None",
+        default="AIdjango/dist/UploadphotoProcess",
         help='Output location.',
     )
     arg(

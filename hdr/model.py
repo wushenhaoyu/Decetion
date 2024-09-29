@@ -36,23 +36,22 @@ class ExpandNet(paddle.nn.Layer):
         glob = self.glob_net(resized).expand(shape=[b, 64, h, w])
         fuse = paddle.concat(x=(local, mid, glob), axis=-3)
         return self.end_net(fuse)
-
     def predict(self, x, patch_size):
         with paddle.no_grad():
             if x.dim() == 3:
                 x = x.unsqueeze(axis=0)
             if x.shape[-3] == 1:
                 x = x.expand(shape=[1, 3, *tuple(x.shape)[-2:]])
-            resized = paddle.nn.functional.interpolate(x=x, size=(256, 256),
-                mode='bilinear', align_corners=False)
+            resized = paddle.nn.functional.interpolate(x=x, size=(256, 256), mode='bilinear', align_corners=False)
             glob = self.glob_net(resized)
             overlap = 20
             skip = int(overlap / 2)
             result = x.clone()
-            x = paddle.nn.functional.pad(x=x, pad=(skip, skip, skip, skip),)
+            x = paddle.nn.functional.pad(x=x, pad=(skip, skip, skip, skip))
             padded_height, padded_width = x.shape[-2], x.shape[-1]
             num_h = int(np.ceil(padded_height / (patch_size - overlap)))
             num_w = int(np.ceil(padded_width / (patch_size - overlap)))
+
             for h_index in range(num_h):
                 for w_index in range(num_w):
                     h_start = h_index * (patch_size - overlap)
@@ -62,19 +61,61 @@ class ExpandNet(paddle.nn.Layer):
                     x_slice = x[:, :, h_start:h_end, w_start:w_end]
                     loc = self.local_net(x_slice)
                     mid = self.mid_net(x_slice)
-                    exp_glob = glob.expand(shape=[1, 64, h_end - h_start, 
-                        w_end - w_start])
+                    exp_glob = glob.expand(shape=[1, 64, h_end - h_start, w_end - w_start])
                     fuse = paddle.concat(x=(loc, mid, exp_glob), axis=1)
                     res = self.end_net(fuse).data
+                    
                     h_start_stitch = h_index * (patch_size - overlap)
                     w_start_stitch = w_index * (patch_size - overlap)
-                    h_end_stitch = min(h_start + patch_size - overlap,
-                        padded_height)
-                    w_end_stitch = min(w_start + patch_size - overlap,
-                        padded_width)
-                    res_slice = res[:, :, skip:-skip, skip:-skip]
-                    paddle.assign(res_slice, output=result[:, :,
-                        h_start_stitch:h_end_stitch, w_start_stitch:
-                        w_end_stitch])
+                    h_end_stitch = min(h_start + patch_size - overlap, padded_height)
+                    w_end_stitch = min(w_start + patch_size - overlap, padded_width)
+
+                    # 添加条件检查以避免切片错误
+                    if res.shape[2] > 2 * skip and res.shape[3] > 2 * skip:
+                        res_slice = res[:, :, skip:-skip, skip:-skip]
+                        paddle.assign(res_slice, result[:, :, h_start_stitch:h_end_stitch, w_start_stitch:w_end_stitch])
+                    
                     del fuse, loc, mid, res
             return result[0]
+
+    # def predict(self, x, patch_size):
+    #     with paddle.no_grad():
+    #         if x.dim() == 3:
+    #             x = x.unsqueeze(axis=0)
+    #         if x.shape[-3] == 1:
+    #             x = x.expand(shape=[1, 3, *tuple(x.shape)[-2:]])
+    #         resized = paddle.nn.functional.interpolate(x=x, size=(256, 256),
+    #             mode='bilinear', align_corners=False)
+    #         glob = self.glob_net(resized)
+    #         overlap = 20
+    #         skip = int(overlap / 2)
+    #         result = x.clone()
+    #         x = paddle.nn.functional.pad(x=x, pad=(skip, skip, skip, skip),)
+    #         padded_height, padded_width = x.shape[-2], x.shape[-1]
+    #         num_h = int(np.ceil(padded_height / (patch_size - overlap)))
+    #         num_w = int(np.ceil(padded_width / (patch_size - overlap)))
+    #         for h_index in range(num_h):
+    #             for w_index in range(num_w):
+    #                 h_start = h_index * (patch_size - overlap)
+    #                 w_start = w_index * (patch_size - overlap)
+    #                 h_end = min(h_start + patch_size, padded_height)
+    #                 w_end = min(w_start + patch_size, padded_width)
+    #                 x_slice = x[:, :, h_start:h_end, w_start:w_end]
+    #                 loc = self.local_net(x_slice)
+    #                 mid = self.mid_net(x_slice)
+    #                 exp_glob = glob.expand(shape=[1, 64, h_end - h_start, 
+    #                     w_end - w_start])
+    #                 fuse = paddle.concat(x=(loc, mid, exp_glob), axis=1)
+    #                 res = self.end_net(fuse).data
+    #                 h_start_stitch = h_index * (patch_size - overlap)
+    #                 w_start_stitch = w_index * (patch_size - overlap)
+    #                 h_end_stitch = min(h_start + patch_size - overlap,
+    #                     padded_height)
+    #                 w_end_stitch = min(w_start + patch_size - overlap,
+    #                     padded_width)
+    #                 res_slice = res[:, :, skip:-skip, skip:-skip]
+    #                 paddle.assign(res_slice, output=result[:, :,
+    #                     h_start_stitch:h_end_stitch, w_start_stitch:
+    #                     w_end_stitch])
+    #                 del fuse, loc, mid, res
+    #         return result[0]
