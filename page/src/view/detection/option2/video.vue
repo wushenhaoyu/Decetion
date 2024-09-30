@@ -327,15 +327,11 @@ export default {
         });
       });
     },
-    uploadFile(file) {
-      // 手动触发上传
-      const formData = new FormData();
-      formData.append('video', file);
-      this.$axios.post(this.uploadUrl, formData).then(response => {
-        this.handleSuccess(response, file);
-      }).catch(error => {
-        this.handleError(error, file);
-      });
+    handleError(error, file, fileList) {
+      console.error("上传失败:", error);
+      this.showProgress = false;
+      this.progressPercentage = 0;
+      this.$message.error("上传失败");
     },
     handleSuccess(response, file) {
       this.$message({
