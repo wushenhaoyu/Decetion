@@ -539,6 +539,7 @@ def get_progress(request):
 
 def upload_photo(request):
     photo_url = None  # 初始化为 None，防止首次加载时报错
+    print(request.method)
     if request.method == 'POST':
         if 'photo' in request.FILES:
             photo = request.FILES['photo']
@@ -757,6 +758,7 @@ def parse_range_header(range_header, size):
 def stream_photo(request):
     name = request.GET.get("name")
     style = request.GET.get("style")
+    print(name)
     
     if style is not None:
         style = int(style)  # 将 style 转换为整数

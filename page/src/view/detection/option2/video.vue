@@ -286,17 +286,14 @@ export default {
       this.drawerVisible = !this.drawerVisible;
     },
     handleBeforeUpload(file) {
-      // 检查视频格式
       const supportedFormats = ["mp4", "avi", "mov", "mkv"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isSupportedFormat = supportedFormats.includes(fileExtension);
 
-      // 检查文件大小
       const maxSize = 100 * 1024 * 1024; // 100 MB
       const isSizeValid = file.size <= maxSize;
 
       if (isSupportedFormat && isSizeValid) {
-        // 弹出确认框
         this.showConfirmDialog(file);
         return false; // 阻止自动上传
       } else {
@@ -327,31 +324,66 @@ export default {
         });
       });
     },
+    handleError(error, file) {
+      console.error('上传失败:', error);
+      this.$message.error("上传失败");
+    },
+    handleSuccess(response, file) {
+      this.$message({
+        type: 'success',
+        message: '上传成功!'
+      });
+      // 处理成功逻辑
+    },
+    handleProgress(event, file, fileList) {
+      this.progressPercentage = event.percent;
+      this.showProgress = true;
+      console.log('上传进度:', event.percent);
+    },
     uploadFile(file) {
-      // 手动触发上传
       const formData = new FormData();
-      formData.append('file', file);
-      this.$axios.post(this.uploadUrl, formData).then(response => {
+      formData.append('video', file);
+
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          this.progressPercentage = percentCompleted;
+          this.showProgress = true;
+        }
+      }; 
+
+      this.$axios.post(this.uploadUrl, formData, config).then(response => {
+        this.videoName = response.data.videoname; // 假设服务器返回的数据结构为 { video_name: 'some-video-name' }
+        console.log('Video name:', this.videoName);
+        this.startProgressPolling(); // 开始轮询进度
         this.handleSuccess(response, file);
       }).catch(error => {
         this.handleError(error, file);
       });
     },
-    handleSuccess(response, file) {
-      this.$message({
-            type: 'success',
-            message: '上传成功!'
-          });
-      // 处理成功逻辑
+    startProgressPolling() {
+      this.intervalId = setInterval(() => {
+        let data = {
+          video_name: this.videoName
+        }
+        console.log(data)
+        this.$axios.get(`http://localhost:8000/get_progress`,data).then(response => {
+          const { progress, current, total } = response.data;
+          this.progressPercentage = progress;
+          this.currentFrame = current;
+          this.totalFrames = total;
+          if (progress === 100) {
+            clearInterval(this.intervalId); // 处理完成，停止轮询
+            this.onProcessingComplete();
+          }
+        }).catch(error => {
+          console.error('Error fetching progress:', error);
+        });
+      }, 500); // 每5秒查询一次
     },
-    handleError(error, file) {
-      console.error('上传失败:', error);
-      // 处理失败逻辑
-    },
-    handleProgress(event, file) {
-      console.log('上传进度:', event.percent);
-      // 显示上传进度
-    }
   },
 };
 </script>
