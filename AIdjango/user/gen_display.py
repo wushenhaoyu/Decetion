@@ -691,6 +691,7 @@ def parse_range_header(range_header, size):
 def stream_photo(request):
     name = request.GET.get("name")
     style = request.GET.get("style")
+    print(name)
     
     if style is not None:
         style = int(style)  # 将 style 转换为整数
