@@ -1,9 +1,9 @@
 <template>
-  <div style="width: 100%; height: 100%" >
+<div style="width: 100%; height: 100%" >
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 15vw">
       <div class="drawer-content" >
-        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
+        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 3  ;height: 6vh;">处理中心</div>
         <div style="height: 3vh;"></div>
         <el-divider></el-divider>
         <div style="user-select:none;">
@@ -103,35 +103,36 @@
         <i :class="drawer_button_class_ctrl"></i>
       </div>
     </div>
-
+    
+    <div v-if="isShowCameraSelectList" style="position: absolute;height: 90%;width: 90%;z-index: 4" @click="closeSelectCamera"></div>
     <!-- 以下为主内容 -->
     <div style="height: 5%"></div>
     <div class="main">
       <div style="height: 100%; width: 70%">
-        <div style="height: 80%; width: 100%" class="upload">
-          <!-- 上传视频  -->
-          <!-- <el-upload 
-                  class="upload-demo"
-                  drag
-                  :action="uploadUrl"
-                  multiple
-                  :before-upload="handleBeforeUpload"
-                  :on-success="handleSuccess"
-                  :on-error="handleError"
-                  :on-progress="handleProgress"
-                  v-if="!isShowCamera && !isShowVideo">
-                  <div v-if="!showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text" style="height: auto; line-height: 10vh;">将视频拖到此处，或<em>点击上传</em></div>
-                  </div>
-                  <div v-if="showProgress" style="position: relative; top: 50%; left: 50%; transform: translate3d(-50%, -50%, 0); width: auto; height: auto;">
-                  <el-progress v-if="showProgress" :percentage="progressPercentage" status="active"></el-progress>
+        <div style="height: 80%; width: 100%;position: relative;" class="upload">
+          <!-- 显示视频  -->
+          <div  align="center"><img  :src="cameraUrl" id="video" style="height:100%;">
+          </div>
+          <!-- 显示视频  -->
+           
+          <!--提示部分-->
+          <div v-if="isShowCameraSelectList" style="height: 80%;width: 60%;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);z-index: 8;background-color: white;border-radius: 0.5vw;">
+            <div style="width: 100%; height: 7vh;border-top-left-radius: 0.5vw;border-top-right-radius: 0.5vw;background-color: rgb(66,159,255);text-align: center;line-height: 7vh;;font-size: 2vw;color: white;font-weight: 900;">选择摄像头</div>
+            <div v-if="cameraList.length>0">
+                <div
+                  v-for="(item, index) in cameraList"
+                  :key="index"
+                  style="height: 10vh;line-height: 10vh;text-align: center;font-size: 2vw;display: flex;justify-content: space-between;"
+                >
+                  <div style="width: 70%;">{{ item[1] }}</div>
+                  <div style="width: 30%;"><el-button type="primary" style="font-size: 2vw;" @click="selectCamera(item[0])">选择</el-button></div>
                 </div>
-                </el-upload> -->
-          <!-- 上传视频  -->
-          <!-- 显示视频  -->
-          <div  align="center"><img  :src="cameraUrl" id="video" style="height:100%;"></div>
-          <!-- 显示视频  -->
+            </div>
+            <div v-else style="text-align: center;line-height: 40vh;font-size: 3vw;color: gray;font-weight: 900;">
+              暂无摄像头
+            </div>
+            
+          </div>
         </div>
         <div style="height: 5%"></div>
         <!-- 视频下方操作按钮-->
@@ -143,13 +144,12 @@
             <el-button
               type="primary"
               class="bottom-button"
-              @click="switchCamera"
+              @click="getCamera"
               >{{ isShowCamera ? "关闭摄像头" : "开启摄像头" }}</el-button
             >
             <el-button type="primary" class="bottom-button">开启录制</el-button>
-            <el-button type="primary" class="bottom-button">开始检测</el-button>
-            <el-button type="primary" class="bottom-button" @click="resetVideo"
-              >重置视频</el-button
+            <el-button type="primary" class="bottom-button">执行检测</el-button>
+            <el-button type="primary" class="bottom-button">导出视频</el-button
             >
           </div>
         </div>
@@ -192,6 +192,8 @@ export default {
       uploadUrl: "",
       showProgress: false,
       progressPercentage: 0,
+      cameraList :[],
+      isShowCameraSelectList:false
     };
   },
   computed: {
@@ -206,6 +208,10 @@ export default {
     },
   },
   methods: {
+    startRecordVideo(){
+      this.$axios.post('http://127.0.0.1:8000/livedisplayRecord').then(res => {
+      })
+    },
     sendParameters(value) {
       this.checkParameter(value)
       let data = {
@@ -223,13 +229,11 @@ export default {
         vehicle_invasion:this.vehicle_invasion_enable
       }
       this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
-        console.log(res)
       })
     },
     checkParameter(value){
       var that = this
       if (value){ //有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
-        console.log(that.people_attribute_enable)
         const people_list = [that.people_attribute_enable]
         for (let i = 0; i < people_list.length; i++) {
           if(people_list[i]){
@@ -257,14 +261,41 @@ export default {
 
       }
     },
-      resetVideo() {
-      this.isShowVideo = false;
+    selectCamera(id){
+      let data = {
+        camId : id
+      }
+      this.$axios.post("http://localhost:8000/Camchoice",data).then((response) => {
+          console.log(response)
+          if (response.data.success == 1)
+          {
+            this.isShowCameraSelectList = false
+            this.switchCamera()
+          }
+        })
+    },
+    closeSelectCamera(){
+      this.isShowCameraSelectList = false
+    },
+    getCamera(){
+      if (this.isShowCamera)
+      {
+        this.switchCamera()
+      }else{
+        this.$axios.get("http://localhost:8000/getAllCam").then((response) => {
+            if (response.data.success == 1)
+            {
+              this.cameraList = response.data.cam  
+            }
+          })
+          this.isShowCameraSelectList = true
+      }
+
     },
     switchCamera() {
       if (this.isShowCamera) {
         this.isShowCamera = false;
         this.$axios.get("http://localhost:8000/closecam").then((response) => {
-            console.log(response);
             //src让其为空
           })
           this.cameraUrl = ""
@@ -278,10 +309,8 @@ export default {
           });*/
       } else {
         this.isShowCamera = true;
-        this.isShowVideo = true;
         this.sendParameters()
         this.$axios.get("http://localhost:8000/opencam").then((response) => {
-            console.log(response);
           
           })
         this.cameraUrl = "http://localhost:8000/livedisplay"
@@ -301,7 +330,6 @@ export default {
       const isSizeValid = file.size <= maxSize;
 
       if (isSupportedFormat && isSizeValid) {
-        console.log("Valid video format and size");
         return true;
       } else {
         let errorMessage = "";
@@ -316,13 +344,11 @@ export default {
       }
     },
     handleSuccess(response, file, fileList) {
-      console.log("上传成功:", response);
       this.showProgress = false;
       this.progressPercentage = 0;
       this.$message.success("上传成功");
     },
     handleError(error, file, fileList) {
-      console.error("上传失败:", error);
       this.showProgress = false;
       this.progressPercentage = 0;
       this.$message.error("上传失败");
@@ -422,13 +448,13 @@ export default {
 }
 .drawer-open {
   position: fixed;
-  top: 7vh;
+  top: 10vh;
   right: 0;
   width: 15vw;
   height: 100%;
   background-color: #fff;
   box-shadow: -1px 0 2px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 3;
   transform: translateX(0);
   transition: transform 0.3s ease;
   border-top-right-radius: 8px; /* 可选: 让边角变圆 */
@@ -438,13 +464,13 @@ export default {
 
 .drawer-close {
   position: fixed;
-  top: 7vh;
+  top: 10vh;
   right: 0;
   width: 15vw;
   height: 100%;
   background-color: #fff;
   box-shadow: -1px 0 2px rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 3;
   transform: translateX(14vw);
   transition: transform 0.3s ease;
   border-top-right-radius: 8px; /* 可选: 让边角变圆 */

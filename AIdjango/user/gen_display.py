@@ -109,6 +109,7 @@ def initialize():
     return HttpResponse("Models initialized and ready.")
 
 def ConfirmParams(request):
+    global paddledetection_net
     global params
     data = json.loads(request.body)
     params = {
@@ -498,6 +499,7 @@ def get_progress(request):
 
 def upload_photo(request):
     photo_url = None  # 初始化为 None，防止首次加载时报错
+    print(request.method)
     if request.method == 'POST':
         if 'photo' in request.FILES:
             photo = request.FILES['photo']

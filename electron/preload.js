@@ -13,5 +13,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('bat-output', (event, data) => {
             callback(data); // 将 bat 输出传递给回调
         });
+    },
+    onBatStatus: (callback) => {
+        ipcRenderer.on('bat-status', (event, data) => {
+            callback(data); // 将 bat 状态传递给回调
+        });
+    },
+    enterPage: () => {
+       ipcRenderer.send('enter-page');
     }
 });
