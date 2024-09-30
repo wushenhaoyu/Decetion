@@ -102,6 +102,20 @@ def initialize():
             isrecord = False
         if RecordCounter is None:
             RecordCounter=0
+        if not os.path.exists('AIdjango/dist/livedisplay/'):
+            os.makedirs('AIdjango/dist/livedisplay/')
+        if not os.path.exists('AIdjango/dist/livedisplay_record/'):
+            os.makedirs('AIdjango/dist/livedisplay_record/')
+        if not os.path.exists('AIdjango/dist/livedisplay_record2video/'):
+            os.makedirs('AIdjango/dist/livedisplay_record2video/')
+        if not os.path.exists('AIdjango/dist/UploadvideoProcess/'):
+            os.makedirs('AIdjango/dist/UploadvideoProcess/')             
+        if not os.path.exists('AIdjango/dist/UploadphotoSave/'):
+            os.makedirs('AIdjango/dist/UploadphotoSave/')                 
+        if not os.path.exists('AIdjango/dist/UploadvideoSave/'):
+            os.makedirs('AIdjango/dist/UploadvideoSave/')  
+        if not os.path.exists('AIdjango/dist/UploadphotoProcess/'):
+            os.makedirs('AIdjango/dist/UploadphotoProcess/')                      
     except Exception as e:
         print(f"Error initializing models: {e}")
         return HttpResponse("Error initializing models.", status=500)
