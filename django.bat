@@ -6,5 +6,5 @@ REM 激活 Anaconda 环境
 call conda activate paddle
 
 REM 运行 Django 服务器
-python AIdjango/manage.py runserver > django_output.log 2>&1
+python AIdjango/manage.py runserver 
 

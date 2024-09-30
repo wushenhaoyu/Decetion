@@ -109,6 +109,7 @@ def initialize():
     return HttpResponse("Models initialized and ready.")
 
 def ConfirmParams(request):
+    global paddledetection_net
     global params
     data = json.loads(request.body)
     params = {

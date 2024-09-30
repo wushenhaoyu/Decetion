@@ -168,10 +168,6 @@
             preload="auto"
           >
             <source style="background: #000" :src="videoUrl" type="video/mp4" />
-            <p class="vjs-no-js">
-              To view this video please enable JavaScript, and consider
-              upgrading to a web browser
-            </p>
           </video>
           <!-- 显示视频  -->
         </div>
@@ -236,7 +232,7 @@ export default {
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
       videoUrl: "",
-      uploadUrl: "",
+      uploadUrl: "http://localhost:8000/uploadVideo",
       showProgress: false,
       progressPercentage: 0,
     };
@@ -253,6 +249,25 @@ export default {
     },
   },
   methods: {
+    sendParameters(value) {
+      this.checkParameter(value)
+      let data = {
+        haze: this.haze,
+        dark: this.dark,
+        hdr:  false,
+        people_detector: this.people_detector_enable,
+        people_tracker: this.people_tracker_enable,
+        people_attr_detector: this.people_attribute_enable,
+        vehicle_tracker: this.vehicle_tracker_enable,
+        vehicle_detector: this.vehicle_detector_enable,
+        vehicle_attr_detector: this.vehicle_attribute_enable,
+        vehicleplate_detector: this.vehicle_license_enable,
+        vehicle_press_detector: this.vehicle_press_detector_enable,
+        vehicle_invasion:this.vehicle_invasion_enable
+      }
+      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
+      })
+    },
     resetVideo() {
       this.isShowVideo = false;
     },
@@ -281,8 +296,9 @@ export default {
       const isSizeValid = file.size <= maxSize;
 
       if (isSupportedFormat && isSizeValid) {
-        console.log("Valid video format and size");
-        return true;
+        // 弹出确认框
+        this.showConfirmDialog(file);
+        return false; // 阻止自动上传
       } else {
         let errorMessage = "";
         if (!isSupportedFormat) {
@@ -295,22 +311,47 @@ export default {
         return false;
       }
     },
-    handleSuccess(response, file, fileList) {
-      console.log("上传成功:", response);
-      this.showProgress = false;
-      this.progressPercentage = 0;
-      this.$message.success("上传成功");
+    showConfirmDialog(file) {
+      this.$confirm('确认上传此文件？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 用户点击确定按钮，允许上传
+        this.uploadFile(file);
+      }).catch(() => {
+        // 用户点击取消按钮，取消上传
+        this.$message({
+          type: 'info',
+          message: '已取消上传'
+        });
+      });
     },
-    handleError(error, file, fileList) {
-      console.error("上传失败:", error);
-      this.showProgress = false;
-      this.progressPercentage = 0;
-      this.$message.error("上传失败");
+    uploadFile(file) {
+      // 手动触发上传
+      const formData = new FormData();
+      formData.append('file', file);
+      this.$axios.post(this.uploadUrl, formData).then(response => {
+        this.handleSuccess(response, file);
+      }).catch(error => {
+        this.handleError(error, file);
+      });
     },
-    handleProgress(event, file, fileList) {
-      this.showProgress = true;
-      this.progressPercentage = event.percent;
+    handleSuccess(response, file) {
+      this.$message({
+            type: 'success',
+            message: '上传成功!'
+          });
+      // 处理成功逻辑
     },
+    handleError(error, file) {
+      console.error('上传失败:', error);
+      // 处理失败逻辑
+    },
+    handleProgress(event, file) {
+      console.log('上传进度:', event.percent);
+      // 显示上传进度
+    }
   },
 };
 </script>
@@ -396,7 +437,7 @@ export default {
 }
 .drawer-open {
   position: fixed;
-  top: 7vh;
+  top: 10vh;
   right: 0;
   width: 15vw;
   height: 100%;
@@ -412,7 +453,7 @@ export default {
 
 .drawer-close {
   position: fixed;
-  top: 7vh;
+  top: 10vh;
   right: 0;
   width: 15vw;
   height: 100%;
