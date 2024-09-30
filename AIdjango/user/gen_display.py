@@ -5,6 +5,7 @@ import os
 import cv2
 from datetime import datetime
 import sys
+import time
 from django.http import JsonResponse
 from django.shortcuts import render
 import os
@@ -38,6 +39,8 @@ dark_net =None
 params = None
 isrecord = None
 paddledetection_net = None
+starttime = None
+endtime = None
 camera = None
 camId = 0
 save_thread =None
@@ -69,41 +72,41 @@ def initialize():
     global params
     global isrecord
     global RecordCounter
-    # try:
-    #     if haze_net is None:
-    #         haze_net = HazeRemover()
-    #         print("Haze Remover initialized.")
+    try:
+        if haze_net is None:
+            haze_net = HazeRemover()
+            print("Haze Remover initialized.")
 
-    #     if dark_net is None:
-    #         dark_net = VideoEnhancer()
-    #         print("Video Enhancer initialized.")
+        if dark_net is None:
+            dark_net = VideoEnhancer()
+            print("Video Enhancer initialized.")
 
-    #     if paddledetection_net is None:
-    #         paddledetection_net = my_paddledetection()
-    #         print("Vehicle License Detection initialized.")
-    #     if params is None:
-    #         params = {
-    #         'haze_enabled': False,
-    #         'dark_enabled': False,#去雾
-    #         'hdr_enabled': False,#hdr
-    #         "people_detector":False,#行人检测
-    #         "people_tracker":False,#行人追踪
-    #         'people_attr_detector': False,#行人属性检测
-    #         "vehicle_tracker":False,#车辆追踪
-    #         'vehicle_detector': False,#车辆检测
-    #         'vehicle_attr_detector': False,#车辆属性检测
-    #         'vehicleplate_detector': False,#车牌检测
-    #         'vehicle_press_detector': False
-    #     }
-    #     if isrecord is None:
-    #         isrecord = False
-    #     if RecordCounter is None:
-    #         RecordCounter=0
-    # except Exception as e:
-    #     print(f"Error initializing models: {e}")
-    #     return HttpResponse("Error initializing models.", status=500)
+        if paddledetection_net is None:
+            paddledetection_net = my_paddledetection()
+            print("Vehicle License Detection initialized.")
+        if params is None:
+            params = {
+            'haze_enabled': False,
+            'dark_enabled': False,#去雾
+            'hdr_enabled': False,#hdr
+            "people_detector":False,#行人检测
+            "people_tracker":False,#行人追踪
+            'people_attr_detector': False,#行人属性检测
+            "vehicle_tracker":False,#车辆追踪
+            'vehicle_detector': False,#车辆检测
+            'vehicle_attr_detector': False,#车辆属性检测
+            'vehicleplate_detector': False,#车牌检测
+            'vehicle_press_detector': False
+        }
+        if isrecord is None:
+            isrecord = False
+        if RecordCounter is None:
+            RecordCounter=0
+    except Exception as e:
+        print(f"Error initializing models: {e}")
+        return HttpResponse("Error initializing models.", status=500)
 
-    # return HttpResponse("Models initialized and ready.")
+    return HttpResponse("Models initialized and ready.")
 
 def ConfirmParams(request):
     global params
@@ -218,16 +221,23 @@ def gen_display(camera):
 def video_record_on(request):
     global isrecord
     global RecordCounter 
+    global camera
+    global starttime
+  
     if request.method == 'POST':
+        starttime = time.time()
+        if camera is  None:
+            camera = cv2.VideoCapture(camId)  
         isrecord = True
         RecordCounter = 0
         return JsonResponse({'status': 'start record'})
 def video_record_off(request):
     global RecordCounter
     global isrecord
-    global save_thread 
+    global endtime
     if request.method == 'POST':
         isrecord = False
+        endtime = time.time()
         RecordCounter = 0
         save_thread = threading.Thread(target=saverecord)
         save_thread.start()
@@ -273,6 +283,8 @@ def video_record_off(request):
 
 
 def saverecord():
+    global starttime
+    global endtime
     base_dir = 'AIdjango/dist/livedisplay_record'
 
     folders = [f for f in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, f))]
@@ -292,7 +304,15 @@ def saverecord():
     if not image_files:
         print("没有找到任何图像文件。")
         return
+    recording_duration = endtime - starttime  # 以秒为单位
 
+    # 计算帧率
+    frame_count = len(image_files)
+    if recording_duration > 0:
+        fps = frame_count / recording_duration
+    else:
+        fps = 0
+    print(f"录制时长: {recording_duration:.2f}秒，帧率: {fps:.2f} FPS")
     # 获取第一张图像以获取宽高
     first_image_path = os.path.join(save_photo_dir, image_files[0])
     frame = cv2.imread(first_image_path)
@@ -302,8 +322,12 @@ def saverecord():
     save_video_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record2video")
     os.makedirs(save_video_dir, exist_ok=True)  # 确保输出目录存在
     video_name = os.path.join(save_video_dir, latest_folder + '.mp4')
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码方式
-    video_writer = cv2.VideoWriter(video_name, fourcc, 30.0, (width, height))  # 30 FPS
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码方式
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 编码
+    # fourcc = cv2.VideoWriter_fourcc(*'XVID')  # 使用 XVID 编码
+    # fourcc = cv2.VideoWriter_fourcc(*'hevc')
+
+    video_writer = cv2.VideoWriter(video_name, fourcc, fps, (width, height))  
 
     # 读取并写入图像到视频
     for image_file in image_files:
@@ -432,7 +456,8 @@ def video_detection(video_name):
     processed_video_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadvideoProcess', video_name)
 
     # 创建 VideoWriter 对象
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码
+    # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')  # H.264 编码
     out = cv2.VideoWriter(processed_video_path, fourcc, fps, (width, height))
 
     while True:
@@ -593,15 +618,23 @@ def photo_view(request):
 #     return response
 
 def stream_video(request):
-    data = json.loads(request.body)
-    name = data.get("name")
-    style = data.get("style")
-    if style==1:
-        video_path = "AIdjango/dist/livedisplay_record2video/"+name
-    elif style==2:
-        video_path = "AIdjango/dist/UploadvideoProcess/"+name
-    elif style==3:
-        video_path = "AIdjango/dist/UploadvideoSave/"+name
+    name = request.GET.get("name")
+    style = request.GET.get("style")
+    
+    if style is not None:
+        style = int(style)  # 将 style 转换为整数
+    else:
+        return HttpResponse(status=400)  # 错误请求
+
+    if style == 1:
+        video_path = "AIdjango/dist/livedisplay_record2video/" + name
+    elif style == 2:
+        video_path = "AIdjango/dist/UploadvideoProcess/" + name
+    elif style == 3:
+        video_path = "AIdjango/dist/UploadvideoSave/" + name
+    else:
+        return HttpResponse(status=400)  # 不支持的样式
+
     print(video_path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
 
@@ -629,6 +662,7 @@ def stream_video(request):
     response = HttpResponse(wrapper, content_type='video/mp4')
     response['Content-Length'] = os.path.getsize(video_path)
     return response
+
 def parse_range_header(range_header, size):
     if range_header:
         start, end = range_header.replace('bytes=', '').split('-')
@@ -639,22 +673,26 @@ def parse_range_header(range_header, size):
 
 
 def stream_photo(request):
-    data = json.loads(request.body)
-    name = data.get("name")
-    style = data.get("style")
-    if style==1:
-        image_path = "AIdjango/dist/UploadphotoSave/"+name
-    elif style==2:
-        image_path = "AIdjango/dist/UploadphotoProcess/"+name
+    name = request.GET.get("name")
+    style = request.GET.get("style")
+    
+    if style is not None:
+        style = int(style)  # 将 style 转换为整数
+    else:
+        return HttpResponse(status=400)  # 错误请求
+
+    if style == 1:
+        image_path = "AIdjango/dist/UploadphotoSave/" + name
+    elif style == 2:
+        image_path = "AIdjango/dist/UploadphotoProcess/" + name
+    else:
+        return HttpResponse(status=400)  # 不支持的样式
+
     print(image_path)
-    # 定义存储照片的文件夹路径
-    # image_folder = 'AIdjango/dist/livedisplay_record'  # 根据你的实际路径调整
-    # image_path = os.path.join(image_folder, image_name)
-    # 检查文件是否存在
+
     if os.path.exists(image_path):
         frame = cv2.imread(image_path)
         if frame is not None:
-            # 编码为 JPEG 格式
             ret, buffer = cv2.imencode('.jpg', frame)
             return HttpResponse(buffer.tobytes(), content_type='image/jpeg')
     

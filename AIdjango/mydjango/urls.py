@@ -20,7 +20,8 @@ urlpatterns = [
     path('video_record_on', video_record_on),     #开启录制
     path('video_record_off',  video_record_off),    #关闭录制
     path("getAllRecordFile",getAllRecordFile),#得到所有的录制文件
-    path('uploadVideo', upload_video, name='upload_video'),#上传视频
+    path('uploadVideo', upload_video),#上传视频
+    path('uploadPhoto', upload_photo),#上传照片
     path("get_progress",get_progress),#得到视频处理的进度条
     path("stream_record_download",stream_record_download),#下载录制的视频。
     path("stream_photo_download",stream_photo_download),#下载录制的视频。
