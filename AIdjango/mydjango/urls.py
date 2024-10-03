@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from user.gen_display import video,upload_video,upload_photo,ConfirmParams, close_camera, open_camera,getAllRecordFile,get_progress
 from user.gen_display import initialize,getAllPhotoFile,getAllVideoFile,getAllCam, Camchoice,video_record_on,video_record_off,stream_record_download
-from user.gen_display import stream_video_download,stream_photo_download,stream_video,stream_photo
+from user.gen_display import stream_video_download,stream_photo_download,stream_video,stream_photo,start_process_video,start_process_photo
 from django.conf import settings
 from django.urls import path, re_path
 from django.conf import settings
@@ -29,6 +29,8 @@ urlpatterns = [
     path('upload_photo', upload_photo, name='upload_photo'),#上传照片
     path("stream_video",stream_video),
     path("stream_photo",stream_photo),
+    path("start_process_video",start_process_video),
+    path("start_process_photo",start_process_photo),
 
 
 

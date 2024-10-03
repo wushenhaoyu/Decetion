@@ -12,6 +12,10 @@ import os
 from django.conf import settings
 from django.conf import settings
 import os
+import numpy as np
+from PIL import Image
+import cv2
+import urllib.parse
 import mimetypes
 import re
 import threading
@@ -20,6 +24,10 @@ from django.conf import settings
 from django.shortcuts import render
 import subprocess
 from django.core.cache import cache
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 current_directory = os.getcwd()
 
 
@@ -365,6 +373,7 @@ def stream_record_download(request):
 def stream_video_download(request):
         data = json.loads(request.body)
         video_name = data.get('name')
+        video_name = urllib.parse.quote(video_name)
         # video_name = "2024-09-29-21-36-45.avi"
         file_path =  f'AIdjango/dist/UploadvideoProcess/{video_name}'
         response = StreamingHttpResponse(open(file_path, 'rb'))
@@ -375,6 +384,7 @@ def stream_video_download(request):
 def stream_photo_download(request):
         data = json.loads(request.body)
         photo_name = data.get('name')
+        photo_name = urllib.parse.quote(photo_name)
         # photo_name = "6bd979a269cb070014f1a1a71e90e364.png"
         file_path =  f'AIdjango/dist/UploadphotoProcess/{photo_name}'
         response = StreamingHttpResponse(open(file_path, 'rb'))
@@ -407,15 +417,18 @@ def close_camera(request):
 
 def getAllRecordFile(request):
     base_dir = 'AIdjango/dist/livedisplay_record2video'
-    files = [f for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
+    files = [urllib.parse.unquote(f) for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
     return JsonResponse({'files': files})
+
 def getAllVideoFile(request):
     base_dir = 'AIdjango/dist/UploadvideoProcess'
-    files = [f for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
+    files = [urllib.parse.unquote(f) for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
     return JsonResponse({'files': files})
+
 def getAllPhotoFile(request):
+    rename_prediction_files('AIdjango/dist/UploadphotoProcess/')
     base_dir = 'AIdjango/dist/UploadphotoProcess'
-    files = [f for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
+    files = [urllib.parse.unquote(f) for f in os.listdir(base_dir) if os.path.isfile(os.path.join(base_dir, f))]
     return JsonResponse({'files': files})
 
 TARGET_WIDTH = 640
@@ -426,9 +439,10 @@ def upload_video(request):
     if request.method == 'POST':
         if 'video' in request.FILES:
             video = request.FILES['video']
-            name, ext = os.path.splitext(video.name)
-            file_path = f'AIdjango/dist/UploadvideoSave/{video.name}'
-            videoname = video.name
+            Vname = video.name
+            # Vname = urllib.parse.quote(Vname)
+            name, ext = os.path.splitext(Vname)
+            file_path = f'AIdjango/dist/UploadvideoSave/{Vname}'
             counter = 1
             while os.path.exists(file_path):
                 file_path = f'AIdjango/dist/UploadvideoSave/{name}_{counter}{ext}'
@@ -441,19 +455,30 @@ def upload_video(request):
                     for chunk in video.chunks():
                         f.write(chunk)
             
-                threading.Thread(target=video_detection, args=(videoname,)).start()
+                # threading.Thread(target=video_detection, args=(videoname,)).start()
             except Exception as e:
                 return JsonResponse({'message': "Failed to process video", 'error': str(e)}, status=500)
-            return JsonResponse({'message': "upload finish",  "videoname":videoname,'success': 1}, status=200)
+            return JsonResponse({'message': "upload finish",  "videoname":urllib.parse.unquote(videoname),'success': 1}, status=200)
 
         else:
             return JsonResponse({'message': "No video file uploaded.", 'success': 0}, status=400)
 
     return JsonResponse({'message': "please use post",  'success': 0}, status=200)
 
+def start_process_video(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        video_name = data.get("name")
+        print(video_name)
+        threading.Thread(target=video_detection, args=(video_name,)).start()
+        return JsonResponse({'message': "processing",  'success': 0}, status=200)
+    return JsonResponse({'message': "please use post",  'success': 0}, status=200)
+
 def video_detection(video_name):
     current_dir = os.getcwd()
     video_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadvideoSave', video_name)
+    print(video_path)
+    video_name = urllib.parse.quote(video_name)
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print(f"视频总帧数: {total_frames}")
@@ -467,7 +492,7 @@ def video_detection(video_name):
 
     # 创建保存处理后的视频的文件名
     
-    processed_video_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadvideoProcess', video_name)
+    processed_video_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadvideoProcess',video_name )
 
     # 创建 VideoWriter 对象
     # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # 使用 mp4 编码
@@ -493,7 +518,7 @@ def video_detection(video_name):
         out.write(frame)
         current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
         cache.set(video_name+"total",  total_frames)  
-        cache.set(video_name+"current",  total_frames)  
+        cache.set(video_name+"current",  current_frame)  
         cache.set(video_name, current_frame / total_frames * 100)  
     # 释放资源
     cap.release()
@@ -503,6 +528,7 @@ def video_detection(video_name):
 def get_progress(request):
     data = json.loads(request.body)
     video_name = data.get("video_name")
+    video_name = urllib.parse.quote(video_name)
     if(video_name):
         progress = cache.get(video_name, 0)
         current = cache.get(video_name+"current", 0)
@@ -516,8 +542,11 @@ def upload_photo(request):
     if request.method == 'POST':
         if 'photo' in request.FILES:
             photo = request.FILES['photo']
-            file_path = f'AIdjango/dist/UploadphotoSave/{photo.name}'
-            name, ext = os.path.splitext(photo.name)
+            Pname = photo.name
+            # Pname = urllib.parse.quote(Pname)
+            file_path = f'AIdjango/dist/UploadphotoSave/{Pname}'
+            name, ext = os.path.splitext(Pname)
+
             counter = 1
             while os.path.exists(file_path):
                 file_path = f'AIdjango/dist/UploadphotoSave/{name}_{counter}{ext}'
@@ -528,31 +557,48 @@ def upload_photo(request):
                 with open(file_path, 'wb') as f:
                     for chunk in photo.chunks():
                         f.write(chunk)
-                
-                img = cv2.imread(file_path)       
-                cv2.imwrite(file_path, img)
+
                 # 在后台启动照片处理线程（如果需要）
-                threading.Thread(target=photo_processing, args=(photoname,)).start()
+                # threading.Thread(target=photo_processing, args=(photoname,)).start()
             except Exception as e:
                 print(f"Failed to upload photo: {e}")
-            return JsonResponse({'message': "sucess post",  "photoname":photoname,'success': 1}, status=200)
+            return JsonResponse({'message': "sucess post",  "photoname":urllib.parse.unquote(photoname),'success': 1}, status=200)
         else:
             print("No photo file uploaded.")
 
     return JsonResponse({'message': "please use post",  "photoname":'','success': 0}, status=200)
 
+def start_process_photo(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        photo_name = data.get("name")
+        print(photo_name)
+        threading.Thread(target=photo_processing, args=(photo_name,)).start()
+        return JsonResponse({'message': "processing",  'success': 0}, status=200)
+    return JsonResponse({'message': "please use post",  'success': 0}, status=200)
+
+
 def photo_processing(photo_name):
     current_dir = os.getcwd()
     photo_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoSave', photo_name)
     photo_path_Process = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoProcess')
-    photo_path_Process_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoProcess',photo_name)
-    # 读取照片
-    img = cv2.imread(photo_path)
-    if img is None:
-        print(f"Failed to load image {photo_path}")
+    photo_path_Process_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoProcess', urllib.parse.quote(photo_name))
+    
+    # 检查文件是否存在
+    if not os.path.exists(photo_path):
+        print(f"Error: File does not exist at {photo_path}")
         return
-    # 处理照片（假设你有 haze_net 和 paddle_detection_net 处理帧的函数）
-    img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    # 使用 Pillow 读取照片并转换为 NumPy 数组
+    try:
+        pil_img = Image.open(photo_path)
+        img = np.array(pil_img)  # 转换为 NumPy 数组
+        
+        # 将颜色空间从 RGB 转换为 BGR
+        # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    except Exception as e:
+        print(f"Failed to load image with Pillow: {e}")
+        return
     if params["haze_enabled"]:
         
         img = haze_net.haze_frame(img)
@@ -562,20 +608,38 @@ def photo_processing(photo_name):
        # 保存处理后的照片
     
     img = paddledetection_net.predit(img)
-    cv2.imwrite("hdr/"+photo_name, img)
+    cv2.imwrite("hdr/"+urllib.parse.quote(photo_name), img)
     if params["hdr_enabled"]:
         command = [
         "python", "hdr/expand.py",
-        "hdr/"+photo_name,
+        "hdr/"+urllib.parse.quote(photo_name),
         "--tone_map", "reinhard"
     ]
         result=subprocess.run(command, capture_output=True, text=True)
         print(result)
     else:
+        img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.imwrite(photo_path_Process_path, img)
     delete_hdr_files(photo_path_Process)
     delete_photo_files("hdr/")
         
+def rename_prediction_files(base_dir):
+    # 遍历 base_dir 目录下的所有文件和文件夹
+    for root, dirs, files in os.walk(base_dir):
+        for file in files:
+            # 检查文件名是否以 "_prediction_reinhard.jpg" 结尾
+            if file.endswith('_prediction_reinhard.jpg'):
+                old_path = os.path.join(root, file)  # 旧文件的完整路径
+                new_file_name = file.replace('_prediction_reinhard', '')  # 去掉 "_prediction_reinhard"
+                new_path = os.path.join(root, new_file_name)  # 新文件的完整路径
+
+                # 检查新文件名是否已经存在
+                if os.path.exists(new_path):
+                    print(f'Error: The file {new_path} already exists. Skipping rename for {old_path}.')
+                else:
+                    # 重命名文件
+                    os.rename(old_path, new_path)
+                    print(f'Renamed: {old_path} to {new_path}')
 
 def delete_hdr_files(directory):
     # 遍历目录中的所有文件
@@ -605,6 +669,7 @@ def video_view(request):
     if request.body:
         data = json.loads(request.body)
         video_name = data.get("video_name")
+        
     else:
         video_name = None
     
@@ -644,6 +709,7 @@ def stream_video(request):
     if style == 1:
         video_path = "AIdjango/dist/livedisplay_record2video/" + name
     elif style == 2:
+        name = urllib.parse.quote(name)
         video_path = "AIdjango/dist/UploadvideoProcess/" + name
     elif style == 3:
         video_path = "AIdjango/dist/UploadvideoSave/" + name
@@ -687,6 +753,7 @@ def parse_range_header(range_header, size):
     return None, None
 
 
+
 def stream_photo(request):
     name = request.GET.get("name")
     style = request.GET.get("style")
@@ -696,10 +763,11 @@ def stream_photo(request):
         style = int(style)  # 将 style 转换为整数
     else:
         return HttpResponse(status=400)  # 错误请求
-
+    
     if style == 1:
         image_path = "AIdjango/dist/UploadphotoSave/" + name
     elif style == 2:
+        name = urllib.parse.quote(name)
         image_path = "AIdjango/dist/UploadphotoProcess/" + name
     else:
         return HttpResponse(status=400)  # 不支持的样式
@@ -707,9 +775,15 @@ def stream_photo(request):
     print(image_path)
 
     if os.path.exists(image_path):
-        frame = cv2.imread(image_path)
-        if frame is not None:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            return HttpResponse(buffer.tobytes(), content_type='image/jpeg')
+        try:
+            # 使用 Pillow 打开图像
+            with Image.open(image_path) as pil_img:
+                # 创建一个 BytesIO 对象来保存图像
+                img_byte_array = io.BytesIO()
+                pil_img.save(img_byte_array, format='JPEG')  # 将图像保存为 JPEG 格式
+                img_byte_array.seek(0)  # 移动到 BytesIO 的开始位置
+        except Exception as e:
+            print(f"Failed to load image with Pillow: {e}")
+            return HttpResponse(status=500)  # 服务器错误
+    return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
     
-    return HttpResponse(status=404)
