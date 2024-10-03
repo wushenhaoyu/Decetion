@@ -3,5 +3,5 @@
     "python.analysis.extraPaths": [
         "./my_detection/deploy/python"
     ],
-    "cmake.sourceDirectory": "D:/data/data/cloud/code/Decetion/my_detection/deploy/fastdeploy/rockchip/rv1126/cpp"
+    "cmake.sourceDirectory": "D:/c4AI/my_detection/deploy/cpp"
 }

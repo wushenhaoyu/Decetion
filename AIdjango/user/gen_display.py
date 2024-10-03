@@ -39,9 +39,9 @@ from django.http import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
-from haze.test_real import HazeRemover
-from my_detection.paddle_infer import my_paddledetection
-from dark.camera import VideoEnhancer
+# from haze.test_real import HazeRemover
+# from my_detection.paddle_infer import my_paddledetection
+# from dark.camera import VideoEnhancer
 haze_net = None
 dark_net =None
 params = None
@@ -81,17 +81,17 @@ def initialize():
     global isrecord
     global RecordCounter
     try:
-        if haze_net is None:
-            haze_net = HazeRemover()
-            print("Haze Remover initialized.")
+        # if haze_net is None:
+        #     haze_net = HazeRemover()
+        #     print("Haze Remover initialized.")
 
-        if dark_net is None:
-            dark_net = VideoEnhancer()
-            print("Video Enhancer initialized.")
+        # if dark_net is None:
+        #     dark_net = VideoEnhancer()
+        #     print("Video Enhancer initialized.")
 
-        if paddledetection_net is None:
-            paddledetection_net = my_paddledetection()
-            print("Vehicle License Detection initialized.")
+        # if paddledetection_net is None:
+        #     paddledetection_net = my_paddledetection()
+        #     print("Vehicle License Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -149,32 +149,32 @@ def ConfirmParams(request):
         # "vehicle_invasion":data.get("vehicle_invasion")#违停检测
     }
     # 切换行人检测
-    if params['people_detector'] != paddledetection_net.people_detector_isOn:
-        paddledetection_net.turn_people_detector()
-    # 切换行人追踪
-    if params['people_tracker'] != paddledetection_net.people_tracker_isOn:
-        paddledetection_net.turn_people_tracker()
-    # 切换行人属性检测
-    if params['people_attr_detector'] != paddledetection_net.people_attr_detector_isOn:
-        paddledetection_net.turn_people_attr_detector()
+    # if params['people_detector'] != paddledetection_net.people_detector_isOn:
+    #     paddledetection_net.turn_people_detector()
+    # # 切换行人追踪
+    # if params['people_tracker'] != paddledetection_net.people_tracker_isOn:
+    #     paddledetection_net.turn_people_tracker()
+    # # 切换行人属性检测
+    # if params['people_attr_detector'] != paddledetection_net.people_attr_detector_isOn:
+    #     paddledetection_net.turn_people_attr_detector()
 
-    # 切换车辆检测状态
-    if params['vehicle_tracker'] != paddledetection_net.vehicle_tracker_isOn:
-        paddledetection_net.turn_vehicle_tracker()
+    # # 切换车辆检测状态
+    # if params['vehicle_tracker'] != paddledetection_net.vehicle_tracker_isOn:
+    #     paddledetection_net.turn_vehicle_tracker()
 
-    if params['vehicle_detector'] != paddledetection_net.vehicle_detector_isOn:
-        paddledetection_net.turn_vehicle_detector()
-    # 切换车辆属性检测状态
-    if params['vehicle_attr_detector'] != paddledetection_net.vehicle_attr_detector_isOn:
-        paddledetection_net.turn_vehicle_attr_detector()
+    # if params['vehicle_detector'] != paddledetection_net.vehicle_detector_isOn:
+    #     paddledetection_net.turn_vehicle_detector()
+    # # 切换车辆属性检测状态
+    # if params['vehicle_attr_detector'] != paddledetection_net.vehicle_attr_detector_isOn:
+    #     paddledetection_net.turn_vehicle_attr_detector()
 
-    # 切换车牌检测状态
-    if params['vehicleplate_detector'] != paddledetection_net.vehicleplate_detector_isOn:
-        paddledetection_net.turn_vehicleplate_detector()
+    # # 切换车牌检测状态
+    # if params['vehicleplate_detector'] != paddledetection_net.vehicleplate_detector_isOn:
+    #     paddledetection_net.turn_vehicleplate_detector()
 
-    # 切换车辆压线检测状态
-    if params['vehicle_press_detector'] != paddledetection_net.vehicle_press_detector_isOn:
-        paddledetection_net.turn_vehicle_press_detector()
+    # # 切换车辆压线检测状态
+    # if params['vehicle_press_detector'] != paddledetection_net.vehicle_press_detector_isOn:
+    #     paddledetection_net.turn_vehicle_press_detector()
 
 
     return JsonResponse({'message': "success parms", "success": 1}, status=200)
@@ -217,13 +217,13 @@ def gen_display(camera):
             # 将图片进行解码                
             if ret:
                 frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                if params["haze_enabled"]:
-                    frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                if params["dark_enabled"]:
-                    frame = dark_net.process_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                frame = paddledetection_net.predit(frame)#传入RGB，
+                # if params["haze_enabled"]:
+                #     frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
+                # # print(frame.shape)
+                # if params["dark_enabled"]:
+                #     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
+                # # print(frame.shape)
+                # frame = paddledetection_net.predit(frame)#传入RGB，
                 if isrecord:
                     if RecordCounter==0:
                             current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -507,12 +507,12 @@ def video_detection(video_name):
             break
         frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # 处理图像并获取结果
-        if params["haze_enabled"]:
-            frame = haze_net.haze_frame(frame)
+        # if params["haze_enabled"]:
+        #     frame = haze_net.haze_frame(frame)
 
-        if params["dark_enabled"]:
-            frame = dark_net.process_frame(frame)
-        frame = paddledetection_net.predit(frame)
+        # if params["dark_enabled"]:
+        #     frame = dark_net.process_frame(frame)
+        # frame = paddledetection_net.predit(frame)
 
         # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         # 将处理后的帧写入新的视频文件
@@ -600,27 +600,27 @@ def photo_processing(photo_name):
     except Exception as e:
         print(f"Failed to load image with Pillow: {e}")
         return
-    if params["haze_enabled"]:
+    # if params["haze_enabled"]:
         
-        img = haze_net.haze_frame(img)
+    #     img = haze_net.haze_frame(img)
 
-    if params["dark_enabled"]:
-        img = dark_net.process_frame(img)
-       # 保存处理后的照片
+    # if params["dark_enabled"]:
+    #     img = dark_net.process_frame(img)
+    #    # 保存处理后的照片
     
-    img = paddledetection_net.predit(img)
+    # img = paddledetection_net.predit(img)
     cv2.imwrite("hdr/"+urllib.parse.quote(photo_name), img)
-    if params["hdr_enabled"]:
-        command = [
-        "python", "hdr/expand.py",
-        "hdr/"+urllib.parse.quote(photo_name),
-        "--tone_map", "reinhard"
-    ]
-        result=subprocess.run(command, capture_output=True, text=True)
-        print(result)
-    else:
-        img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        cv2.imwrite(photo_path_Process_path, img)
+    # if params["hdr_enabled"]:
+    #     command = [
+    #     "python", "hdr/expand.py",
+    #     "hdr/"+urllib.parse.quote(photo_name),
+    #     "--tone_map", "reinhard"
+    # ]
+    #     result=subprocess.run(command, capture_output=True, text=True)
+    #     print(result)
+    # else:
+    img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    cv2.imwrite(photo_path_Process_path, img)
     delete_hdr_files(photo_path_Process)
     delete_photo_files("hdr/")
         
@@ -716,34 +716,37 @@ def stream_video(request):
         video_path = "AIdjango/dist/UploadvideoSave/" + name
     else:
         return HttpResponse(status=400)  # 不支持的样式
+    try:
+        if os.path.exists(video_path):
+            range_header = request.META.get('HTTP_RANGE', '').strip()
+            
+            if range_header:
+                size = os.path.getsize(video_path)
+                start, end = parse_range_header(range_header, size)
 
-    print(video_path)
-    range_header = request.META.get('HTTP_RANGE', '').strip()
+                if start is None or end is None:
+                    return HttpResponse(status=416)
 
-    if range_header:
-        size = os.path.getsize(video_path)
-        start, end = parse_range_header(range_header, size)
+                if start >= size or end >= size:
+                    return HttpResponse(status=416)
 
-        if start is None or end is None:
-            return HttpResponse(status=416)
+                length = end - start + 1
+                file = open(video_path, 'rb')
+                file.seek(start)
+                wrapper = FileWrapper(file)
+                response = HttpResponse(wrapper, content_type='video/mp4', status=206)
+                response['Content-Disposition'] = 'inline'
+                response['Content-Length'] = str(length)
+                response['Content-Range'] = f'bytes {start}-{end}/{size}'
+                return response
 
-        if start >= size or end >= size:
-            return HttpResponse(status=416)
+            wrapper = FileWrapper(open(video_path, 'rb'))
+            response = HttpResponse(wrapper, content_type='video/mp4')
+            response['Content-Length'] = os.path.getsize(video_path)
+            return response
+    except:
+        return JsonResponse({'message': "no video","success":0})
 
-        length = end - start + 1
-        file = open(video_path, 'rb')
-        file.seek(start)
-        wrapper = FileWrapper(file)
-        response = HttpResponse(wrapper, content_type='video/mp4', status=206)
-        response['Content-Disposition'] = 'inline'
-        response['Content-Length'] = str(length)
-        response['Content-Range'] = f'bytes {start}-{end}/{size}'
-        return response
-
-    wrapper = FileWrapper(open(video_path, 'rb'))
-    response = HttpResponse(wrapper, content_type='video/mp4')
-    response['Content-Length'] = os.path.getsize(video_path)
-    return response
 
 def parse_range_header(range_header, size):
     if range_header:
@@ -785,6 +788,8 @@ def stream_photo(request):
                 img_byte_array.seek(0)  # 移动到 BytesIO 的开始位置
         except Exception as e:
             print(f"Failed to load image with Pillow: {e}")
-            return HttpResponse(status=500)  # 服务器错误
-    return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
-    
+            return JsonResponse({'message': "no photo","success":0})
+        return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
+    else:
+        return JsonResponse({'message': "no photo","success":0})
+
