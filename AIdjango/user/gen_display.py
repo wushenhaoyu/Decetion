@@ -123,7 +123,6 @@ def initialize():
     return HttpResponse("Models initialized and ready.")
 
 def ConfirmParams(request):
-    global paddledetection_net
     global params
     data = json.loads(request.body)
     params = {
@@ -691,6 +690,7 @@ def parse_range_header(range_header, size):
 def stream_photo(request):
     name = request.GET.get("name")
     style = request.GET.get("style")
+    print(name)
     
     if style is not None:
         style = int(style)  # 将 style 转换为整数

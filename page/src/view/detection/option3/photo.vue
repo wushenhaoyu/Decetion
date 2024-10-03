@@ -239,6 +239,7 @@ export default {
       uploadUrl: "http://localhost:8000/uploadPhoto",
       showProgress: false,
       progressPercentage: 0,
+      photeName:""
     };
   },
   computed: {
@@ -308,15 +309,8 @@ export default {
       this.isShowVideo = false;
     },
     getPhoto() {
-      this.isShowPhoto = True;
-      this.$axios
-        .post("http://localhost:8000/getphoto/")
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      this.isShowPhoto = true;
+      this.photo_url = 'http://localhost:8000/stream_photo?name=' + this.photeName + '&' + 'style=2'
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
@@ -330,7 +324,6 @@ export default {
       // 检查文件大小
       const maxSize = 100 * 1024 * 1024; // 100 MB
       const isSizeValid = file.size <= maxSize;
-
       if (isSupportedFormat && isSizeValid) {
         // 弹出确认框
         this.showConfirmDialog(file);
@@ -380,6 +373,8 @@ export default {
             message: '上传成功!'
           });
       // 处理成功逻辑
+      this.photeName = response.data.photoname
+      this.getPhoto()
     },
     handleError(error, file) {
       console.error('上传失败:', error);

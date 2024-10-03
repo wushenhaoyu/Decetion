@@ -83,6 +83,18 @@ ipcMain.handle('bat-run', async () => {
     return { success: true };
 });
 
+ipcMain.handle('get-conda-envs', async () => {
+    return new Promise((resolve, reject) => {
+        exec('conda info --envs', (error, stdout, stderr) => {
+            if (error) {
+                reject(`Error: ${stderr}`);
+            } else {
+                resolve(stdout);
+            }
+        });
+    });
+});
+
 // 当应用准备好时创建窗口
 app.whenReady().then(() => {
     createWindow();

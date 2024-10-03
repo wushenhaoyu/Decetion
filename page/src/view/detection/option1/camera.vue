@@ -159,6 +159,35 @@
       <div style="height: 100%; width: 30%">
         <div class="right-log">
           <div class="right-log-head">检测日志</div>
+          <el-table
+            ref="multipleTable"
+            :data="tableData"
+            tooltip-effect="dark"
+            style="width: 100%"
+            @selection-change="handleSelectionChange"
+          >
+          
+            <el-table-column  width="55"> </el-table-column>
+            <el-table-column prop="size" label="宽高" width="70">
+              <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
+            </el-table-column>
+            <el-table-column prop="id" label="id" width="80">
+            </el-table-column>
+            <el-table-column prop="image" label="图片" show-overflow-tooltip>
+            </el-table-column>
+          </el-table>
+          <div style="padding: 5px; text-align: left">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="pageNum"
+              :page-sizes="[10, 20, 50]"
+              :page-size="pageSize"
+              layout="total, prev, pager, next, jumper"
+              :total="total"
+            >
+            </el-pagination>
+          </div>
         </div>
       </div>
     </div>
@@ -173,7 +202,13 @@ export default {
     myvideo,
   },
   data() {
+    const item = {
+      size: "50,50",
+      id: "1234567",
+      image: "上海市普陀区金沙江路 1518 弄",
+    };
     return {
+      tableData: Array(10).fill(item),
       haze: false,
       dark: false,
       people_detector_enable: false, // 行人监测
