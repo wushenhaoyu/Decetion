@@ -170,14 +170,23 @@
           </el-upload>
           <!-- 上传图片  -->
           <!-- 显示图片  -->
-          <img
-            v-if="isShowPhoto"
+           <div  v-if="isShowPhoto" style="background-color: #000;width: 100%;height: 100%;  display: flex;justify-content: center; align-items: center;" v-images-loaded:on.progress="imageProgress">
+            <img v-if="isShowLocalPhoto"
             id="example"
             class="vjs-default-skin vjs-big-play-centered"
-            :src="photo_url"
+            :src="photoUrl_"
             alt="Image"
-            style="background: #000"
+            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
           />
+          <img v-if="!isShowLocalPhoto"
+            id="example"
+            class="vjs-default-skin vjs-big-play-centered"
+            :src="photoUrl"
+            :key="photoName"
+            alt="Image"
+            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
+          />
+           </div>
 
           <!-- 显示图片  -->
         </div>
@@ -191,11 +200,9 @@
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button">开始检测</el-button>
-            <el-button type="primary" class="bottom-button">导出图片</el-button>
-            <el-button type="primary" class="bottom-button" @click="resetPhoto"
-              >重置图片</el-button
-            >
+            <el-button type="primary" class="bottom-button" @click="dealwithPhoto">开始检测</el-button>
+            <el-button type="primary" class="bottom-button" @click="savePhoto">导出图片</el-button>
+            <el-button type="primary" class="bottom-button" @click="resetPhoto">重置图片</el-button>
             <el-button type="primary" class="bottom-button" disabled>开发ing</el-button>
           </div>
         </div>
@@ -213,33 +220,35 @@
 </template>
 
 <script>
-import myvideo from "../../video/myvideo.vue";
+import { saveAs } from 'file-saver' 
+import imagesLoaded from 'vue-images-loaded'
 export default {
-  components: {
-    myvideo,
-  },
+  directives: {
+        imagesLoaded
+    },
   data() {
     return {
       haze: false,
       dark: false,
-      hdr:false,
-      people_detector_enable: false, // 行人监测
+      hdr: false,
+      people_detector_enable: false,
       people_tracker_enable: false,
       people_attribute_enable: false,
-      vehicle_detector_enable: false,//车辆监测
-      vehicle_tracker_enable:false,
+      vehicle_detector_enable: false,
+      vehicle_tracker_enable: false,
       vehicle_press_detector_enable: false,
       vehicle_license_enable: false,
       vehicle_attribute_enable: false,
-      vehicle_invasion_enable:false,
+      vehicle_invasion_enable: false,
       isShowPhoto: false,
       drawerVisible: false,
-      activeIndex: "4", // 更新为菜单项的实际索引
-      videoUrl: "http://vjs.zencdn.net/v/oceans.mp4",
-      uploadUrl: "http://localhost:8000/uploadPhoto",
+      activeIndex: "4",
       showProgress: false,
       progressPercentage: 0,
-      photeName:""
+      photoName: "",
+      photoUrl_: "",//本地图片路径,
+      isShowLocalPhoto: true,
+      uploadUrl: "http://localhost:8000/upload_photo",
     };
   },
   computed: {
@@ -252,15 +261,56 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
+    photoUrl() {
+      return `http://localhost:8000/stream_photo?name=${this.photoName}&style=2`;
+    }
   },
   methods: {
+    savePhoto() {
+        if (!this.photoName)
+      {
+        this.$message({
+            type: 'error',
+            message: '未上传图片'
+          });
+      }else{
+        fetch(this.photoUrl)
+        .then(response => response.blob()) // 将响应转换为 Blob
+        .then(blob => {
+          // 创建一个临时 URL
+          const url = URL.createObjectURL(blob);
+          
+          // 创建一个隐藏的 <a> 元素用于下载
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = 'downloaded-image.jpg'; // 下载时的文件名
+          
+          // 将 <a> 元素添加到 DOM 中并触发点击事件
+          document.body.appendChild(a);
+          a.click();
 
+          // 释放 URL 对象并移除 <a> 元素
+          URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: '未进行预测'
+          });
+        });
+      }
+    },
+    imageProgress(instance, image ) {
+        const result = image.isLoaded ? 'loaded' : 'broken';
+    },
     sendParameters(value) {
-      this.checkParameter(value)
+      this.checkParameter(value);
       let data = {
         haze: this.haze,
         dark: this.dark,
-        hdr:  this.hdr,
+        hdr: this.hdr,
         people_detector: this.people_detector_enable,
         people_tracker: this.people_tracker_enable,
         people_attr_detector: this.people_attribute_enable,
@@ -269,63 +319,72 @@ export default {
         vehicle_attr_detector: this.vehicle_attribute_enable,
         vehicleplate_detector: this.vehicle_license_enable,
         vehicle_press_detector: this.vehicle_press_detector_enable,
-        vehicle_invasion:this.vehicle_invasion_enable
-      }
+        vehicle_invasion: this.vehicle_invasion_enable
+      };
       this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
-        console.log(res)
-      })
+
+      });
     },
-    checkParameter(value){
-      var that = this
-      if (value){ //有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
-        console.log(that.people_attribute_enable)
-        const people_list = [that.people_attribute_enable]
+    checkParameter(value) {
+      var that = this;
+      if (value) { // 有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
+        const people_list = [that.people_attribute_enable];
         for (let i = 0; i < people_list.length; i++) {
-          if(people_list[i]){
-            that.people_tracker_enable = true
+          if (people_list[i]) {
+            that.people_tracker_enable = true;
           }
         }
-        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable,that.vehicle_invasion_enable]
+        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable, that.vehicle_invasion_enable];
         for (let i = 0; i < vehicle_list.length; i++) {
-          if(vehicle_list[i]){
-            that.vehicle_tracker_enable = true
+          if (vehicle_list[i]) {
+            that.vehicle_tracker_enable = true;
           }
         }
-      }else{ //检测关闭，额外功能也要关闭
-        if (!(that.people_detector_enable && that.people_tracker_enable))
-        {
-            that.people_attribute_enable = false
+      } else { // 检测关闭，额外功能也要关闭
+        if (!(that.people_detector_enable && that.people_tracker_enable)) {
+          that.people_attribute_enable = false;
         }
-        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable))
-        {
-            that.vehicle_attribute_enable = false
-            that.vehicle_license_enable = false
-            that.vehicle_press_detector_enable = false
-            that.vehicle_invasion_enable = false
+        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable)) {
+          that.vehicle_attribute_enable = false;
+          that.vehicle_license_enable = false;
+          that.vehicle_press_detector_enable = false;
+          that.vehicle_invasion_enable = false;
         }
       }
+    },
+    dealwithPhoto() {
+      let data = {
+        name: this.photoName
+      };
+      console.log(data);
+      this.$axios.post('http://localhost:8000/start_process_photo', data).then(res => {
+        this.getPhoto();
+      });
     },
     resetPhoto() {
-      this.isShowVideo = false;
+      this.isShowPhoto = false;
+      this.isShowLocalPhoto = true;
+      this.photoName = "";
+      this.photoUrl_ = ""
     },
     getPhoto() {
-      this.isShowPhoto = true;
-      this.photo_url = 'http://localhost:8000/stream_photo?name=' + this.photeName + '&' + 'style=2'
+      this.isShowLocalPhoto = false;
+      this.$nextTick(() => {
+        this.isShowPhoto = true;
+      });
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
     },
     handleBeforeUpload(file) {
-      // 检查图片格式
       const supportedFormats = ["jpg", "jpeg", "png", "gif"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isSupportedFormat = supportedFormats.includes(fileExtension);
 
-      // 检查文件大小
       const maxSize = 100 * 1024 * 1024; // 100 MB
       const isSizeValid = file.size <= maxSize;
+
       if (isSupportedFormat && isSizeValid) {
-        // 弹出确认框
         this.showConfirmDialog(file);
         return false; // 阻止自动上传
       } else {
@@ -346,10 +405,8 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 用户点击确定按钮，允许上传
         this.uploadFile(file);
       }).catch(() => {
-        // 用户点击取消按钮，取消上传
         this.$message({
           type: 'info',
           message: '已取消上传'
@@ -357,34 +414,48 @@ export default {
       });
     },
     uploadFile(file) {
-      // 手动触发上传
-      console.log('upload')
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.isShowPhoto = true;
+        this.isShowLocalPhoto = true;
+        this.photoUrl_ = e.target.result; // 将图片的 data URL 设置为 photoUrl
+      };
+      reader.readAsDataURL(file);
+
       const formData = new FormData();
       formData.append('photo', file);
-      this.$axios.post(this.uploadUrl, formData).then(response => {
-        this.handleSuccess(response, file);
-      }).catch(error => {
-        this.handleError(error, file);
-      });
+
+      this.$axios.post(this.uploadUrl, formData)
+        .then(response => {
+          this.handleSuccess(response, file);
+        })
+        .catch(error => {
+          this.handleError(error, file);
+        });
     },
     handleSuccess(response, file) {
       this.$message({
-            type: 'success',
-            message: '上传成功!'
-          });
-      // 处理成功逻辑
-      this.photeName = response.data.photoname
-      this.getPhoto()
+        type: 'success',
+        message: '上传成功!'
+      });
+      this.photoName = response.data.photoname;
     },
     handleError(error, file) {
-      console.error('上传失败:', error);
-      // 处理失败逻辑
+      this.$message({
+        type: 'error',
+        message:"上传失败"
+      })
     },
     handleProgress(event, file) {
       console.log('上传进度:', event.percent);
-      // 显示上传进度
+    },
+    onImageLoad() {
+      console.log('图片加载成功');
+    },
+    onImageError() {
+      console.error('图片加载失败');
     }
-  },
+  }
 };
 </script>
 

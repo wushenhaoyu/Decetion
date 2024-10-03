@@ -15,7 +15,9 @@
   "dependencies": {
     "axios": "^0.21.1",
     "element-ui": "^2.15.14",
+    "file-saver": "^2.0.5",
     "vue": "^2.5.2",
+    "vue-images-loaded": "^1.1.2",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
