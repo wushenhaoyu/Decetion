@@ -441,10 +441,8 @@ export default {
       this.photoName = response.data.photoname;
     },
     handleError(error, file) {
-      this.$message({
-        type: 'error',
-        message:"上传失败"
-      })
+      
+      console.error('上传失败:', error);
     },
     handleProgress(event, file) {
       console.log('上传进度:', event.percent);
