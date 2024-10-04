@@ -558,8 +558,8 @@ def video_detection(video_name):
         if params["dark_enabled"]:
             frame = dark_net.process_frame(frame)
         frame = paddledetection_net.predit(frame)
-
         # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         # 将处理后的帧写入新的视频文件
         out.write(frame)
         current_frame = int(cap.get(cv2.CAP_PROP_POS_FRAMES))

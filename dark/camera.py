@@ -1,4 +1,5 @@
 import os
+import time
 import numpy as np
 import paddle
 from paddle.vision.transforms import Normalize
@@ -99,7 +100,9 @@ class VideoEnhancer:
             cv2.imshow('Original Video', frame)
 
             # 处理帧并显示增强后的视频帧
+            t = time.time()
             enhanced_frame = self.process_frame(frame)
+            print(time.time() - t)
             cv2.imshow('Enhanced Video', enhanced_frame)
 
             # 按 'q' 键退出
