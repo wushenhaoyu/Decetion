@@ -223,7 +223,7 @@ def gen_display(camera):
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
-                frame = paddledetection_net.predit(frame)#传入RGB，
+                # frame = paddledetection_net.predit(frame)#传入RGB，
                 if isrecord:
                     if RecordCounter==0:
                             current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -719,31 +719,33 @@ def stream_video(request):
 
     print(video_path)
     range_header = request.META.get('HTTP_RANGE', '').strip()
+    if os.path.exists(video_path):
+        if range_header:
+            size = os.path.getsize(video_path)
+            start, end = parse_range_header(range_header, size)
 
-    if range_header:
-        size = os.path.getsize(video_path)
-        start, end = parse_range_header(range_header, size)
+            if start is None or end is None:
+                return HttpResponse(status=416)
 
-        if start is None or end is None:
-            return HttpResponse(status=416)
+            if start >= size or end >= size:
+                return HttpResponse(status=416)
 
-        if start >= size or end >= size:
-            return HttpResponse(status=416)
+            length = end - start + 1
+            file = open(video_path, 'rb')
+            file.seek(start)
+            wrapper = FileWrapper(file)
+            response = HttpResponse(wrapper, content_type='video/mp4', status=206)
+            response['Content-Disposition'] = 'inline'
+            response['Content-Length'] = str(length)
+            response['Content-Range'] = f'bytes {start}-{end}/{size}'
+            return response
 
-        length = end - start + 1
-        file = open(video_path, 'rb')
-        file.seek(start)
-        wrapper = FileWrapper(file)
-        response = HttpResponse(wrapper, content_type='video/mp4', status=206)
-        response['Content-Disposition'] = 'inline'
-        response['Content-Length'] = str(length)
-        response['Content-Range'] = f'bytes {start}-{end}/{size}'
+        wrapper = FileWrapper(open(video_path, 'rb'))
+        response = HttpResponse(wrapper, content_type='video/mp4')
+        response['Content-Length'] = os.path.getsize(video_path)
         return response
-
-    wrapper = FileWrapper(open(video_path, 'rb'))
-    response = HttpResponse(wrapper, content_type='video/mp4')
-    response['Content-Length'] = os.path.getsize(video_path)
-    return response
+    else:
+        return JsonResponse({'message': "filepath is not exist",  'success': 0}, status=200)
 
 def parse_range_header(range_header, size):
     if range_header:
@@ -783,8 +785,10 @@ def stream_photo(request):
                 img_byte_array = io.BytesIO()
                 pil_img.save(img_byte_array, format='JPEG')  # 将图像保存为 JPEG 格式
                 img_byte_array.seek(0)  # 移动到 BytesIO 的开始位置
+                return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
         except Exception as e:
             print(f"Failed to load image with Pillow: {e}")
             return HttpResponse(status=500)  # 服务器错误
-    return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
+    else:
+        return JsonResponse({'message': "filepath is not exist",  'success': 0}, status=200)
     
