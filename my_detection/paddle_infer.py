@@ -56,6 +56,7 @@ class FixedLengthQueue:
 current_dir = current_directory = os.getcwd()
 
 
+
 def extract_crops(image, tlwhs_dict, obj_ids_dict, scores_dict):
     crops = []
     for cls_id in range(len(tlwhs_dict)):
@@ -361,10 +362,13 @@ class my_paddledetection:
         self.vehicleplate_res = None
         self.vehiclepress_res = None
         self.lanes_res = None
-        self.people_log={}
-        self.vehicle_log = {}
+        updated_ids = {}
+
+
+
     def predit(self,input):
         self.clear()
+
         reuse_det_result = self.frame != 0 
 
         if self.people_detector_isOn:#行人检测
@@ -821,41 +825,37 @@ class my_paddledetection:
 
 
 
-def background_processing():
-    while True:
-        my_detection.people_dealwith_queue()
-        time.sleep(1)
+
     # 启动后台线程
 
 
-if __name__ == "__main__":
-    my_detection = my_paddledetection()
-    # my_detection.turn_people_tracker()
-    my_detection.turn_people_detector()
-    # my_detection.turn_people_attr_detector()
-    my_detection.turn_vehicle_detector()
-    # my_detection.turn_vehicle_attr_detector()
-    # my_detection.turn_vehicle_press_detector()
-    background_thread = threading.Thread(target=background_processing, daemon=True)
-    background_thread.start()
-    cap = cv2.VideoCapture(0)
-    while True:
-        # 读取一帧图像
-        _, frame = cap.read()
-        input =  cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        
-        img = my_detection.predit(input)
-        # 显示图像
-        img =  cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.imshow('Mask Detection', img)
-        
-        # 按 'q' 键退出
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+# if __name__ == "__main__":
+#     my_detection = my_paddledetection()
+#     my_detection.turn_people_tracker()
+#     # my_detection.turn_people_detector()
+#     # my_detection.turn_people_attr_detector()
+#     # my_detection.turn_vehicle_detector()
+#     # my_detection.turn_vehicle_attr_detector()
+#     # my_detection.turn_vehicle_press_detector()
 
-    # 释放资源
-    cap.release()
-    cv2.destroyAllWindows()
+#     cap = cv2.VideoCapture(0)
+#     while True:
+#         # 读取一帧图像
+#         _, frame = cap.read()
+#         input =  cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
+#         img = my_detection.predit(input)
+#         # 显示图像
+#         img =  cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+#         cv2.imshow('Mask Detection', img)
+        
+#         # 按 'q' 键退出
+#         if cv2.waitKey(1) & 0xFF == ord('q'):
+#             break
+
+#     # 释放资源
+#     cap.release()
+#     cv2.destroyAllWindows()
 
 """if __name__ == "__main__":
     detector = people_detector_init()
