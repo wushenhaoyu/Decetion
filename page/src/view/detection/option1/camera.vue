@@ -188,7 +188,7 @@
           >
           
             <el-table-column  width="55"> </el-table-column>
-            <el-table-column prop="size" label="宽高" width="70">
+            <el-table-column prop="size" label="宽高" width="70" >
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
             <el-table-column prop="id" label="id" width="80">

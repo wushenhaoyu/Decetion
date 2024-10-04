@@ -724,15 +724,15 @@ class my_paddledetection:
     #                 cv2.imwrite(os.path.join(save_dir, file_name), crop)
     def people_dealwith_queue(self):
             if self.people_waitting_dealwith_flag:
-                print(11111111111111111111)
+                #print(11111111111111111111)
                 save_dir = 'AIdjango/dist/livedisplay/people'
                 for i in self.people_waitting_dealwith_queue:
-                    print(11111111111111111111222222222222)
+                    #print(11111111111111111111222222222222)
                     crop = i['crop']
                     obj_id = i['object_id']
                     score = i['score']
                     crop_box = i['crop_box']
-                    print("obj",obj_id)
+                    #print("obj",obj_id)
                     # 检查对象是否第一次监测或以 0.1 概率更新
                     if obj_id not in self.updated_ids:
                         self.updated_ids[obj_id] = True  # 标记为已更新
@@ -751,18 +751,18 @@ class my_paddledetection:
             # self.people_waitting_dealwith_queue = []
 
     def vehicle_dealwith_queue(self):
-        print(11111111111111111111)
+        #print(11111111111111111111)
         if self.vehicle_waitting_dealwith_flag:
-            print(1111111111111)
+            #print(1111111111111)
             #写入车辆处理逻辑
             save_dir = 'AIdjango/dist/livedisplay/vehicle'
             for i in self.vehicle_waitting_dealwith_queue:
-                    print(111)
+                    #print(111)
                     crop = i['crop']
                     obj_id = i['object_id']
                     score = i['score']
                     crop_box = i['crop_box']
-                    print("obj",obj_id)
+                    #print("obj",obj_id)
                     # 检查对象是否第一次监测或以 0.1 概率更新
                     if obj_id not in self.updated_ids:
                         self.updated_ids[obj_id] = True  # 标记为已更新

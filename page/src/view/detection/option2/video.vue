@@ -259,7 +259,6 @@ export default {
   },
   data() {
     return {
-      fullscreenLoading: false,
       haze: false,
       dark: false,
       people_detector_enable: false, // 行人监测
