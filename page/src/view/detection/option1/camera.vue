@@ -3,7 +3,7 @@
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 15vw">
       <div class="drawer-content" >
-        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 3  ;height: 6vh;">处理中心</div>
+        <div class="right-log-head" style="line-height: 6vh;position: absolute;z-index: 3  ;height: 6vh;">处理中心</div>
         <div style="height: 3vh;"></div>
         <el-divider></el-divider>
         <div style="user-select:none;">
@@ -105,13 +105,14 @@
     </div>
     
     <div v-if="isShowCameraSelectList" style="position: absolute;height: 90%;width: 90%;z-index: 4" @click="closeSelectCamera"></div>
+    <div v-if="isShowRecordList" style="position: absolute;height: 90%;width: 90%;z-index: 4" @click="controlRecordList"></div>
     <!-- 以下为主内容 -->
     <div style="height: 5%"></div>
     <div class="main">
       <div style="height: 100%; width: 70%">
         <div style="height: 80%; width: 100%;position: relative;" class="upload">
           <!-- 显示视频  -->
-          <div  align="center"><img  :src="cameraUrl" id="video" style="height:100%;">
+          <div align="center"><img  :src="cameraUrl" id="video" style="height:100%;">
           </div>
           <!-- 显示视频  -->
            
@@ -129,10 +130,30 @@
                 </div>
             </div>
             <div v-else style="text-align: center;line-height: 40vh;font-size: 3vw;color: gray;font-weight: 900;">
-              暂无摄像头
+              暂无摄像头设备
             </div>
             
           </div>
+          <!--提示部分-->
+          <!--获取录制视频界面-->
+          <div v-if="isShowRecordList" style="height: 80%;width: 60%;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);z-index: 8;background-color: white;border-radius: 0.5vw;">
+            <div style="width: 100%; height: 7vh;border-top-left-radius: 0.5vw;border-top-right-radius: 0.5vw;background-color: rgb(66,159,255);text-align: center;line-height: 7vh;;font-size: 2vw;color: white;font-weight: 900;">录制视频资源</div>
+            <div v-if="recordList.length>0" style="overflow-y: scroll;height: 40vh">
+                <div
+                  v-for="(item, index) in recordList"
+                  :key="index"
+                  style="height: 10vh;line-height: 10vh;text-align: center;font-size: 2vw;display: flex;justify-content: space-between;"
+                >
+                  <div style="width: 70%;">{{ item }}</div>
+                  <div style="width: 30%;"><el-button type="primary" style="font-size: 2vw;" @click="selectRecord(item)">导出</el-button></div>
+                </div>
+            </div>
+            <div v-else style="text-align: center;line-height: 40vh;font-size: 3vw;color: gray;font-weight: 900;">
+              暂无录制视频资源
+            </div>
+            
+          </div>
+          <!--获取录制视频界面-->
         </div>
         <div style="height: 5%"></div>
         <!-- 视频下方操作按钮-->
@@ -147,9 +168,9 @@
               @click="getCamera"
               >{{ isShowCamera ? "关闭摄像头" : "开启摄像头" }}</el-button
             >
-            <el-button type="primary" class="bottom-button">开启录制</el-button>
-            <el-button type="primary" class="bottom-button">执行检测</el-button>
-            <el-button type="primary" class="bottom-button">导出视频</el-button
+            <el-button type="primary" class="bottom-button" @click="controlRecord">{{ isStartRecord ? "关闭录制" :"开启录制" }}</el-button>
+            <el-button type="primary" class="bottom-button" >执行检测</el-button>
+            <el-button type="primary" class="bottom-button" @click="controlRecordList">导出视频</el-button
             >
           </div>
         </div>
@@ -228,7 +249,10 @@ export default {
       showProgress: false,
       progressPercentage: 0,
       cameraList :[],
-      isShowCameraSelectList:false
+      isShowCameraSelectList:false,
+      isStartRecord:false,
+      isShowRecordList:false,
+      recordList:[],
     };
   },
   computed: {
@@ -311,6 +335,88 @@ export default {
     },
     closeSelectCamera(){
       this.isShowCameraSelectList = false
+    },
+    controlRecordList(){
+        if (this.isShowRecordList){
+          this.hideRecordList()
+        }else{
+          this.showRecordList()
+        }
+    },
+    getRecordList(){
+      this.$axios.get("http://localhost:8000/getAllRecordFile").then((response) => {
+          this.recordList = response.data.files
+        })
+    },
+    showRecordList(){
+      this.isShowRecordList = true
+      this.getRecordList()
+    },
+    hideRecordList(){
+      this.isShowRecordList = false
+    },
+    controlRecord(){
+      if(this.isStartRecord){
+        this.closeRecord()
+      }else{
+        this.startRecord()
+      }
+    },
+    startRecord(){
+      this.$axios.post("http://localhost:8000/video_record_on").then((response) => {
+          if(response.data.status){
+            this.$message({
+            type: 'success',
+            message: '开始录制'
+          });
+          this.isStartRecord = true;
+          }else{
+            this.$message({
+            type: 'error',
+            message: '开始录制失败，请检查摄像头'
+          });
+          this.isStartRecord = false;
+          }
+        })
+    },
+    closeRecord(){
+      this.$axios.post("http://localhost:8000/video_record_off").then((response) => {
+          if(response.data.status){
+            this.$message({
+            type: 'success',
+            message: '关闭录制'
+          });
+          this.isStartRecord = false;
+          }else{
+            this.$message({
+            type: 'error',
+            message: '关闭录制失败，请检查摄像头'
+            })
+          }
+      })
+    },
+    async selectRecord(value) {
+      let data = {
+        name: value
+      };
+
+      try {
+        const response = await this.$axios.get('http://localhost:8000/stream_record_download', {
+          params: data,
+          responseType: 'blob' // 以 Blob 形式接收响应
+        });
+
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'record_file'); // 设置下载文件名
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link); // 清理临时元素
+        window.URL.revokeObjectURL(url); // 释放 URL 对象
+      } catch (error) {
+        console.error('Error downloading file:', error);
+      }
     },
     getCamera(){
       if (this.isShowCamera)
