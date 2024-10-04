@@ -135,7 +135,7 @@ WSGI_APPLICATION = 'mydjango.wsgi.application'
 
 # CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8080']
 APPEND_SLASH = False
-DATABASES = {
+"""DATABASES = {
 
     'default': {
 
@@ -153,7 +153,7 @@ DATABASES = {
 
     }
 
-}
+}"""
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

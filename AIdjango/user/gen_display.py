@@ -223,7 +223,7 @@ def gen_display(camera):
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
-                # frame = paddledetection_net.predit(frame)#传入RGB，
+                frame = paddledetection_net.predit(frame)#传入RGB，
                 if isrecord:
                     if RecordCounter==0:
                             current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -778,17 +778,9 @@ def stream_photo(request):
     print(image_path)
 
     if os.path.exists(image_path):
-        try:
-            # 使用 Pillow 打开图像
-            with Image.open(image_path) as pil_img:
-                # 创建一个 BytesIO 对象来保存图像
-                img_byte_array = io.BytesIO()
-                pil_img.save(img_byte_array, format='JPEG')  # 将图像保存为 JPEG 格式
-                img_byte_array.seek(0)  # 移动到 BytesIO 的开始位置
-                return HttpResponse(img_byte_array.getvalue(), content_type='image/jpeg')
-        except Exception as e:
-            print(f"Failed to load image with Pillow: {e}")
-            return HttpResponse(status=500)  # 服务器错误
-    else:
-        return JsonResponse({'message': "filepath is not exist",  'success': 0}, status=200)
+        frame = cv2.imread(image_path)
+        if frame is not None:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            return HttpResponse(buffer.tobytes(), content_type='image/jpeg')
     
+    return HttpResponse(status=404)
