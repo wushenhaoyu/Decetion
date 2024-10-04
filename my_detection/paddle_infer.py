@@ -82,6 +82,21 @@ def extract_crops(image, tlwhs_dict, obj_ids_dict, scores_dict):
             })
 
     return crops
+
+def my_extract_crops_detector(image,boxes):
+    crops = []
+    for index , box in enumerate(boxes):
+        ob , score , x , y , w ,h = box
+        x1, y1, x2, y2 = x, y, x+w, y+h
+        crop = image[int(y1):int(y2), int(x1):int(x2)]
+        crops.append({
+            'crop': crop,
+            'class_id': ob,
+            'object_id': index,
+            'score': score,
+            'crop_box': box[2:],
+        })
+    return crops
 def people_detector_init():
     #初始化行人检测器
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_pipeline')
@@ -359,6 +374,12 @@ class my_paddledetection:
         self.vehicleplate_res = None
         self.vehiclepress_res = None
         self.lanes_res = None
+    def newStart(self):#进行新的检测
+        self.clear()
+        self.people_queue = FixedLengthQueue(maxlen=40)
+        self.vehicle_queue = FixedLengthQueue(maxlen=40)
+        self.people_waitting_dealwith_flag = False
+        self.vehicle_waitting_dealwith_flag = False
     def predit(self,input):
         self.clear()
         reuse_det_result = self.frame != 0 
@@ -534,6 +555,7 @@ class my_paddledetection:
                         entrance=self.entrance,
                         center_traj=[{}]
                     )
+                self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
                 selected_ids = []
                 selected_ids_ = []
                 # 遍历在线 ID
@@ -635,9 +657,17 @@ class my_paddledetection:
                         self.people_waitting_dealwith_flag = True
 
         if self.people_res is not None and self.people_detector_isOn:
+            res = my_extract_crops_detector(self.im, self.people_res['boxes'])
+            self.people_waitting_dealwith_queue.extend(res)
+            if self.people_waitting_dealwith_queue:
+                self.people_waitting_dealwith_flag = True
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
             
         if self.vehicle_res is not None and self.vehicle_detector_isOn:
+            res = my_extract_crops_detector(self.im, self.vehicle_res['boxes'])
+            self.people_waitting_dealwith_queue.extend(res)
+            if self.vehicle_waitting_dealwith_queue:
+                self.vehicle_waitting_dealwith_flag = True
             self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
         self.im = np.ascontiguousarray(np.copy(self.im))
 
@@ -799,7 +829,7 @@ def background_processing():
 
 if __name__ == "__main__":
     my_detection = my_paddledetection()
-    my_detection.turn_people_tracker()
+    my_detection.turn_people_detector()
     # my_detection.turn_people_detector()
     # my_detection.turn_people_attr_detector()
     # my_detection.turn_vehicle_detector()
