@@ -135,25 +135,31 @@ WSGI_APPLICATION = 'mydjango.wsgi.application'
 
 # CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8080']
 APPEND_SLASH = False
-"""DATABASES = {
-
+DATABASES = {
     'default': {
-
-        'ENGINE': 'django.db.backends.mysql',  # 默认
-
-        'NAME': 'AI',  # 连接的数据库  #一定要存在的数据库名
-
-        'HOST': '1.13.156.137', # mysql的ip地址
-
-        'PORT': 3306,  # mysql的端口
-
-        'USER': 'eye',  # mysql的用户名
-
-        'PASSWORD': 'Bravo2021.'  # mysql的密码
-
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+}
+# DATABASES = {
 
-}"""
+#     'default': {
+
+#         'ENGINE': 'django.db.backends.mysql',  # 默认
+
+#         'NAME': 'AI',  # 连接的数据库  #一定要存在的数据库名
+
+#         'HOST': '1.13.156.137', # mysql的ip地址
+
+#         'PORT': 3306,  # mysql的端口
+
+#         'USER': 'eye',  # mysql的用户名
+
+#         'PASSWORD': 'Bravo2021.'  # mysql的密码
+
+#     }
+
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -3,7 +3,7 @@
     <el-header style="padding: 0;"><Head></Head></el-header>
   <el-container>
      <Aside></Aside>
-    <el-main><router-view></router-view></el-main>
+    <el-main><keep-alive><router-view></router-view></keep-alive></el-main>
   </el-container>
 </el-container>
 </template>
