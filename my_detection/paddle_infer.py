@@ -598,6 +598,7 @@ class my_paddledetection:
                     entrance=None,
                     center_traj=[{}]
                 )
+                self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
                 selected_ids = []
                 selected_ids_ = []
                 # 遍历在线 ID
