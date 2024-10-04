@@ -223,7 +223,7 @@ def gen_display(camera):
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
-                # frame = paddledetection_net.predit(frame)#传入RGB，
+                frame = paddledetection_net.predit(frame)#传入RGB，
                 if isrecord:
                     if RecordCounter==0:
                             current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")

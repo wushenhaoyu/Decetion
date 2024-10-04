@@ -192,7 +192,7 @@
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button" @click="getVideo" 
+            <el-button type="primary" class="bottom-button" @click="dealWithVideo" 
               >开始检测</el-button
             >
             <el-button type="primary" class="bottom-button" @click="saveVideo"
@@ -428,9 +428,9 @@ export default {
       // 处理成功逻辑
     },
     handleProgress(event, file, fileList) {
-      this.progressPercentage = event.percent;
-      this.showProgress = true;
-      console.log('上传进度:', event.percent);
+      // this.progressPercentage = event.percent;
+      // this.showProgress = true;
+      // console.log('上传进度:', event.percent);
     },
     uploadFile(file) {
 
@@ -448,7 +448,8 @@ export default {
           this.showProgress = true;
         }*/
       }; 
-      this.startProgressPolling();
+      // this.startProgressPolling();
+      console.log("123")
       this.$axios.post(this.uploadUrl, formData, config).then(response => {
         this.handleSuccess(response, file);
         this.videoName = response.data.videoname;

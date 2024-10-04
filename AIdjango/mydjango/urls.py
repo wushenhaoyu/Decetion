@@ -33,7 +33,6 @@ urlpatterns = [
     path("start_process_photo",start_process_photo),
 
 
-
     path("getAllPhotoFile",getAllPhotoFile),#得到所有的照片文件
     path("getAllVideoFile",getAllVideoFile),#得到所有的视频文件
 
