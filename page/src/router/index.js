@@ -11,22 +11,35 @@ export default new Router({
     {
       path:'/',
       name:'hello',
-      component: Hello
+      component: Hello,
+      meta: {
+        keepAlive: true // 需要被缓存
+      }
     },
     {
       path:'/detection/option1',
       name:'camera',
-      component: camera
+      component: camera,
+      meta: {
+        keepAlive: true // 需要被缓存
+      }
+
     },
     {
       path:'/detection/option2',
       name:'video',
-      component: video
+      component: video,
+      meta: {
+        keepAlive: true // 需要被缓存
+      }
     },
     {
       path:'/detection/option3',
       name:'photo',
-      component: photo
+      component: photo,
+      meta: {
+        keepAlive: true // 需要被缓存
+      }
     },
     
     
