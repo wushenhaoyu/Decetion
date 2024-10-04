@@ -1,102 +1,133 @@
 <template>
+  
   <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 15vw">
-      <div class="drawer-content" >
-        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
-        <div style="height: 3vh;"></div>
+      <div class="drawer-content">
+        <div
+          class="right-log-head"
+          style="line-height: 6vh; position: absolute; z-index: 5; height: 6vh"
+        >
+          处理中心
+        </div>
+        <div style="height: 3vh"></div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">散射增强</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            散射增强
+          </div>
           <el-switch
             v-model="haze"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
+            @change="checkParameter"
           >
           </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">弱光增强</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            弱光增强
+          </div>
           <el-switch
             v-model="dark"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人跟踪</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            行人跟踪
+          </div>
           <el-switch
             v-model="people_tracker_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人属性检测</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            行人属性检测
+          </div>
           <el-switch
             v-model="people_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆跟踪</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车辆跟踪
+          </div>
           <el-switch
             v-model="vehicle_tracker_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆属性检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车辆属性检测
+          </div>
           <el-switch
             v-model="vehicle_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">车牌检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车牌检测
+          </div>
           <el-switch
             v-model="vehicle_license_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违章检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            违章检测
+          </div>
           <el-switch
             v-model="vehicle_press_detector_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
-      </div>
-      <el-divider></el-divider>
+            @change="checkParameter"
+          >
+          </el-switch>
+        </div>
+        <el-divider></el-divider>
         <div>
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违停检测 </div>
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            违停检测
+          </div>
           <el-switch
             v-model="vehicle_invasion_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
-
       </div>
       <div class="drawer-button-bar" @click="toggleDrawer">
         <!-- 小拉手按钮，点击它会调用 toggleDrawer 方法 -->
@@ -140,45 +171,45 @@
                 将视频拖到此处，或<em>点击上传</em>
               </div>
             </div>
-            <div
-              v-if="showProgress"
-              style="
-                position: relative;
-                top: 50%;
-                left: 50%;
-                transform: translate3d(-50%, -50%, 0);
-                width: auto;
-                height: auto;
-              "
-            >
-              <el-progress
-                v-if="showProgress"
-                :percentage="progressPercentage"
-                status="active"
-              ></el-progress>
-            </div>
+            
           </el-upload>
           <!-- 上传视频  -->
           <!-- 显示视频  -->
-          <div v-if="isShowVideo" style="background-color: #000;width: 100%;height: 100%;">
-            <video
+          <!-- <div v-if="isLoading">
+      <el-loading :text="`当前进度: ${progressPercentage}%`" lock fullscreen z-index="9999">
+      </el-loading>
+    </div> -->
+          <div
             v-if="isShowVideo"
-            controls
-            preload="auto"
-            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
-            :src="VideoUrl_"
-            type = "video/mp4"
+            style="background-color: #000; width: 100%; height: 100%"
           >
-          </video>
-          <video
-            v-if="!isShowVideo"
-            id="example"
-            controls
-            preload="auto"
-            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
-            :src="VideoUrl" type="video/mp4" 
-          >
-          </video>
+            <video
+              v-if="isShowLocalVideo"
+              controls
+              preload="auto"
+              style="
+                background: #000;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+              "
+              :src="VideoUrl_"
+              type="video/mp4"
+            ></video>
+            <video
+              v-if="!isShowLocalVideo"
+              id="example"
+              controls
+              preload="auto"
+              style="
+                background: #000;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+              "
+              :src="videoUrl"
+              type="video/mp4"
+            ></video>
           </div>
           <!-- 显示视频  -->
         </div>
@@ -192,19 +223,19 @@
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button" @click="dealWithVideo" 
+            <el-button
+              type="primary"
+              class="bottom-button"
+              @click="dealWithVideo"
               >开始检测</el-button
             >
             <el-button type="primary" class="bottom-button" @click="saveVideo"
               >导出视频</el-button
             >
-            <el-button type="primary" class="bottom-button" 
-              >截取图片</el-button
-            >
-            <el-button type="primary" class="bottom-button" @click="resetVideo"
+            <el-button type="primary" class="bottom-button">截取图片</el-button>
+            <el-button type="primary" class="bottom-button" @click="resetVideo"  v-loading.fullscreen.lock="fullscreenLoading"
               >重置视频</el-button
             >
-
           </div>
         </div>
         <!-- 视频下方操作按钮-->
@@ -228,17 +259,18 @@ export default {
   },
   data() {
     return {
+      fullscreenLoading: false,
       haze: false,
       dark: false,
       people_detector_enable: false, // 行人监测
       people_tracker_enable: false,
       people_attribute_enable: false,
-      vehicle_detector_enable: false,//车辆监测
-      vehicle_tracker_enable:false,
+      vehicle_detector_enable: false, //车辆监测
+      vehicle_tracker_enable: false,
       vehicle_press_detector_enable: false,
       vehicle_license_enable: false,
       vehicle_attribute_enable: false,
-      vehicle_invasion_enable:false,
+      vehicle_invasion_enable: false,
       isShowVideo: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
@@ -247,7 +279,7 @@ export default {
       showProgress: false,
       progressPercentage: 0,
       isShowLocalVideo: true,
-      VideoUrl_:""
+      VideoUrl_: "",
     };
   },
   computed: {
@@ -260,53 +292,49 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
-    VideoUrl() {
-      return `http://localhost:8000/stream_photo?name=${this.VideoName}&style=2`;
-    },
+    
   },
   methods: {
     saveVideo() {
-        if (!this.VideoName)
-      {
+      if (!this.VideoName) {
         this.$message({
-            type: 'error',
-            message: '未上传视频'
-          });
-      }else{
-        fetch(this.VideoUrl)
-        .then(response => response.blob()) // 将响应转换为 Blob
-        .then(blob => {
-          // 创建一个临时 URL
-          const url = URL.createObjectURL(blob);
-          
-          // 创建一个隐藏的 <a> 元素用于下载
-          const a = document.createElement('a');
-          a.style.display = 'none';
-          a.href = url;
-          a.download = 'downloaded-video.mp4'; // 下载时的文件名
-          
-          // 将 <a> 元素添加到 DOM 中并触发点击事件
-          document.body.appendChild(a);
-          a.click();
-
-          // 释放 URL 对象并移除 <a> 元素
-          URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-        })
-        .catch(error => {
-          this.$message({
-            type: 'error',
-            message: '未进行预测'
-          });
+          type: "error",
+          message: "未上传视频",
         });
+      } else {
+        fetch(this.VideoUrl)
+          .then((response) => response.blob()) // 将响应转换为 Blob
+          .then((blob) => {
+            // 创建一个临时 URL
+            const url = URL.createObjectURL(blob);
+
+            // 创建一个隐藏的 <a> 元素用于下载
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = "downloaded-video.mp4"; // 下载时的文件名
+
+            // 将 <a> 元素添加到 DOM 中并触发点击事件
+            document.body.appendChild(a);
+            a.click();
+
+            // 释放 URL 对象并移除 <a> 元素
+            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          })
+          .catch((error) => {
+            this.$message({
+              type: "error",
+              message: "未进行预测",
+            });
+          });
       }
     },
-    sendParameters(value) {
-      this.checkParameter(value)
+    sendParameters() {
       let data = {
         haze: this.haze,
         dark: this.dark,
-        hdr:  false,
+        hdr: false,
         people_detector: this.people_detector_enable,
         people_tracker: this.people_tracker_enable,
         people_attr_detector: this.people_attribute_enable,
@@ -315,27 +343,35 @@ export default {
         vehicle_attr_detector: this.vehicle_attribute_enable,
         vehicleplate_detector: this.vehicle_license_enable,
         vehicle_press_detector: this.vehicle_press_detector_enable,
-        vehicle_invasion:this.vehicle_invasion_enable
-      }
-      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
-      })
+        vehicle_invasion: this.vehicle_invasion_enable,
+      };
+      return this.$axios
+        .post("http://localhost:8000/ConfirmParams", data)
+        .then((res) => {});
     },
     checkParameter(value) {
       var that = this;
-      if (value) { // 有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
+      if (value) {
+        // 有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
         const people_list = [that.people_attribute_enable];
         for (let i = 0; i < people_list.length; i++) {
           if (people_list[i]) {
             that.people_tracker_enable = true;
           }
         }
-        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable, that.vehicle_invasion_enable];
+        const vehicle_list = [
+          that.vehicle_attribute_enable,
+          that.vehicle_license_enable,
+          that.vehicle_press_detector_enable,
+          that.vehicle_invasion_enable,
+        ];
         for (let i = 0; i < vehicle_list.length; i++) {
           if (vehicle_list[i]) {
             that.vehicle_tracker_enable = true;
           }
         }
-      } else { // 检测关闭，额外功能也要关闭
+      } else {
+        // 检测关闭，额外功能也要关闭
         if (!(that.people_detector_enable && that.people_tracker_enable)) {
           that.people_attribute_enable = false;
         }
@@ -353,20 +389,114 @@ export default {
       this.videoName = "";
       this.videoUrl_ = "";
     },
-    dealWithVideo()
-    {
-        data = {
-          name: this.videoName
+    // dealWithVideo() {
+    //   this.sendParameters()
+    //     .then(() => {
+    //       let data = {
+    //         name: this.videoName,
+    //       };
+    //       console.log(data);
+    //       return this.$axios.post(
+    //         "http://localhost:8000/start_process_video",
+    //         data
+    //       );
+    //     })
+    //     .then(() => {
+    //       this.getVideo();
+    //     })
+    //     .catch((error) => {
+    //       console.error("处理过程出错:", error);
+    //     });
+    // },
+    async dealWithVideo() {
+  try {
+    // 发送处理参数
+    await this.sendParameters();
+
+    let data = {
+      name: this.videoName,
+    };
+    console.log(data);
+
+    // 开始处理视频
+    await this.$axios.post("http://localhost:8000/start_process_video", data);
+    
+    // 显示 loading
+    const loadingInstance = this.$loading({
+        lock: true,
+        text: `加载中...${this.progressPercentage}%`,
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+      });
+    
+    // 调用函数轮询进度
+    await this.checkProgress();
+
+    // 进度达到100%后获取视频
+    await this.getVideo();
+
+    // 停止 loading
+    loadingInstance.close();
+  } catch (error) {
+    console.error("处理过程出错:", error);
+    loadingInstance.close(); // 停止 loading
+  }
+},
+
+// 轮询进度检查函数
+async checkProgress() {
+ let progress = 0;
+      while (progress < 100) {
+        
+        try {
+          let data = {
+            video_name: this.videoName,
+         };
+         console.log(data);
+         
+          const response = await this.$axios.post('http://127.0.0.1:8000/get_progress', data);
+
+          if (response.status === 200 && response.data.progress !== undefined) {
+            progress = response.data.progress; // 假设后端返回的进度在 `progress` 字段
+            console.log(`当前进度: ${progress}%`);
+            this.progressPercentage = progress; // 更新进度显示
+          } else {
+            console.warn('Invalid response format');
+          }
+        } catch (error) {
+          console.error('There was a problem with the fetch operation:', error);
         }
-         this.$axios.post("http://localhost:8000/start_process_video",data).then(res => {
-        this.getVideo();
-      });
+        // 等待一段时间再检查进度
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
     },
-    getVideo() {
-      this.isShowLocalVideo = false;
-      this.$nextTick(() => {
-        this.isShowVideo = true;
-      });
+
+
+// 自定义 sleep 函数，用于轮询间隔
+sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+},
+    async getVideo() {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/stream_video?name=${this.videoName}&style=2`
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+
+        console.log(response.url);
+        
+        this.videoUrl = response.url; // 将这个 URL 赋值给视频的 src
+
+        console.log(this.videoUrl);
+        this.isShowLocalVideo = false;
+        this.isShowVideo = true; // 控制视频显示的变量
+      } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+      }
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
@@ -395,34 +525,36 @@ export default {
       }
     },
     showConfirmDialog(file) {
-      this.$confirm('确认上传此文件？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // 用户点击确定按钮，允许上传
-        this.uploadFile(file);
-      }).catch(() => {
-        // 用户点击取消按钮，取消上传
-        this.$message({
-          type: 'info',
-          message: '已取消上传'
+      this.$confirm("确认上传此文件？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          // 用户点击确定按钮，允许上传
+          this.uploadFile(file);
+        })
+        .catch(() => {
+          // 用户点击取消按钮，取消上传
+          this.$message({
+            type: "info",
+            message: "已取消上传",
+          });
         });
-      });
     },
     handleError(error, file) {
-      console.error('上传失败:', error);
+      console.error("上传失败:", error);
       this.$message.error("上传失败");
     },
     handleSuccess(response, file) {
       this.$message({
-        type: 'success',
-        message: '上传成功!'
+        type: "success",
+        message: "上传成功!",
       });
       const reader = new FileReader();
       reader.onload = (e) => {
         this.VideoUrl_ = e.target.result;
-        this.isShowVideo = true
+        this.isShowVideo = true;
       };
       reader.readAsDataURL(file);
       // 处理成功逻辑
@@ -433,29 +565,29 @@ export default {
       // console.log('上传进度:', event.percent);
     },
     uploadFile(file) {
-
       const formData = new FormData();
-      formData.append('video', file);
-    
+      formData.append("video", file);
 
       const config = {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          "Content-Type": "multipart/form-data",
         },
         /*onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           this.progressPercentage = percentCompleted;
           this.showProgress = true;
         }*/
-      }; 
+      };
       // this.startProgressPolling();
-      console.log("123")
-      this.$axios.post(this.uploadUrl, formData, config).then(response => {
-        this.handleSuccess(response, file);
-        this.videoName = response.data.videoname;
-      }).catch(error => {
-        this.handleError(error, file);
-      });
+      this.$axios
+        .post(this.uploadUrl, formData, config)
+        .then((response) => {
+          this.handleSuccess(response, file);
+          this.videoName = response.data.videoname;
+        })
+        .catch((error) => {
+          this.handleError(error, file);
+        });
       /*this.$axios.post(this.uploadUrl, formData, config).then(response => {
         this.videoName = response.data.videoname; // 假设服务器返回的数据结构为 { video_name: 'some-video-name' }
         console.log('Video name:', this.videoName);
@@ -467,20 +599,22 @@ export default {
     },
     startProgressPolling() {
       data = {
-          name: this.videoName
-      }
-      this.$axios.post("http://127.0.0.1:8000/get_progress",data).then(res => {
-        this.progress = res.progress;
-      });
-      const loading = this.$loading({
-          lock: true,
-          text: thisprogress,
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)'
+        name: this.videoName,
+      };
+      this.$axios
+        .post("http://127.0.0.1:8000/get_progress", data)
+        .then((res) => {
+          this.progress = res.progress;
         });
-        setTimeout(() => {
-          loading.close();
-        }, 2000);
+      const loading = this.$loading({
+        lock: true,
+        text: thisprogress,
+        spinner: "el-icon-loading",
+        background: "rgba(0, 0, 0, 0.7)",
+      });
+      setTimeout(() => {
+        loading.close();
+      }, 2000);
     },
   },
 };
@@ -578,7 +712,7 @@ export default {
   transition: transform 0.3s ease;
   border-top-right-radius: 8px; /* 可选: 让边角变圆 */
   border-top-left-radius: 8px;
-  user-select:none;
+  user-select: none;
 }
 
 .drawer-close {
@@ -594,7 +728,7 @@ export default {
   transition: transform 0.3s ease;
   border-top-right-radius: 8px; /* 可选: 让边角变圆 */
   border-top-left-radius: 8px;
-  user-select:none;
+  user-select: none;
 }
 
 .drawer-content {

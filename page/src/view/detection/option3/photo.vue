@@ -279,6 +279,34 @@
       <div style="height: 100%; width: 30%">
         <div class="right-log">
           <div class="right-log-head">检测日志</div>
+          <el-table
+            ref="multipleTable"
+            :data="paginatedData"
+            tooltip-effect="dark"
+            style="width: 100%"
+          >
+          
+            <el-table-column  width="55"> </el-table-column>
+            <el-table-column prop="location" label="坐标" width="70">
+              <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
+            </el-table-column>
+            <el-table-column prop="id" label="编号" width="80">
+            </el-table-column>
+            <el-table-column prop="score" label="得分" show-overflow-tooltip>
+            </el-table-column>
+          </el-table>
+          <div style="padding: 5px; text-align: left">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="pageNum"
+              :page-sizes="[10, 20, 50]"
+              :page-size="pageSize"
+              layout="total, prev, pager, next"
+              :total="total"
+            >
+            </el-pagination>
+          </div>
         </div>
       </div>
     </div>
@@ -294,7 +322,18 @@ export default {
     imagesLoaded,
   },
   data() {
+    const item = {
+      location: "50,50",
+      id: "1234567",
+      score: "100",
+    };
     return {
+      currentPage:1,
+      pageNum:2,
+      pageSize: 10,
+      total: 20,
+      tableData: Array(10).fill(item),
+      total :10,
       haze: false,
       dark: false,
       hdr: false,
@@ -320,6 +359,11 @@ export default {
     };
   },
   computed: {
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = this.currentPage * this.pageSize;
+      return this.tableData.slice(start, end);
+    },
     drawer_class_ctrl() {
       return this.drawerVisible ? "drawer-open" : "drawer-close";
     },
@@ -333,7 +377,16 @@ export default {
     //   return `http://localhost:8000/stream_photo?name=${this.photoName}&style=2`;
     // }
   },
+  mounted() {
+    this.total = this.tableData.length; // 设置总数据条目数
+  },
   methods: {
+    handleSizeChange(){
+      
+    },
+    handleCurrentChange(){
+
+    },
     savePhoto() {
       if (!this.photoName) {
         this.$message({
@@ -456,13 +509,15 @@ export default {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-
-        const blob = await response.blob(); // 将响应转换为 Blob（二进制大对象）
-        const imageUrl = URL.createObjectURL(blob); // 使用 URL.createObjectURL() 将 Blob 转换为一个 URL
-        this.photoUrl = imageUrl; // 将这个 URL 赋值给图片的 src
+        console.log(response);
+        
+        // const blob = await response.blob(); // 将响应转换为 Blob（二进制大对象）
+        // const imageUrl = URL.createObjectURL(blob); // 使用 URL.createObjectURL() 将 Blob 转换为一个 URL
+        this.photoUrl = response.url; // 将这个 URL 赋值给图片的 src
         
         console.log(this.photoUrl);
         this.isShowPhoto = true;
+        this.isShowLocalPhoto = false;
       } catch (error) {
         console.error("There was a problem with the fetch operation:", error);
       }

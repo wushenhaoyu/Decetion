@@ -529,6 +529,7 @@ def video_detection(video_name):
 
 
 def get_progress(request):
+    print(request)
     data = json.loads(request.body)
     video_name = data.get("video_name")
     video_name = urllib.parse.quote(video_name)

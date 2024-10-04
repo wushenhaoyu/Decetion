@@ -182,10 +182,9 @@
           <div class="right-log-head">检测日志</div>
           <el-table
             ref="multipleTable"
-            :data="tableData"
+            :data="paginatedData"
             tooltip-effect="dark"
             style="width: 100%"
-            @selection-change="handleSelectionChange"
           >
           
             <el-table-column  width="55"> </el-table-column>
@@ -199,13 +198,11 @@
           </el-table>
           <div style="padding: 5px; text-align: left">
             <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="pageNum"
-              :page-sizes="[10, 20, 50]"
+              :current-page="currentPage"
               :page-size="pageSize"
-              layout="total, prev, pager, next, jumper"
+              layout="total, prev, pager, next"
               :total="total"
+               @current-change="handleCurrentChange"
             >
             </el-pagination>
           </div>
@@ -229,7 +226,11 @@ export default {
       image: "上海市普陀区金沙江路 1518 弄",
     };
     return {
-      tableData: Array(10).fill(item),
+      currentPage:1,
+      pageNum:2,
+      pageSize: 10,
+      total: 20,
+      tableData: Array(20).fill(item),
       haze: false,
       dark: false,
       people_detector_enable: false, // 行人监测
@@ -256,6 +257,11 @@ export default {
     };
   },
   computed: {
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = this.currentPage * this.pageSize;
+      return this.tableData.slice(start, end);
+    },
     drawer_class_ctrl() {
       return this.drawerVisible ? "drawer-open" : "drawer-close";
     },
@@ -266,11 +272,20 @@ export default {
       ];
     },
   },
+  mounted() {
+    this.total = this.tableData.length; // 设置总数据条目数
+  },
   methods: {
+    
+    handleCurrentChange(page) {
+      this.currentPage = page;
+    },
+    
     startRecordVideo(){
       this.$axios.post('http://127.0.0.1:8000/livedisplayRecord').then(res => {
       })
     },
+    
     sendParameters(value) {
       this.checkParameter(value)
       let data = {
