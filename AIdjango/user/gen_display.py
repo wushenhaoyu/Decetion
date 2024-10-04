@@ -75,6 +75,7 @@ def Camchoice(request):
         return JsonResponse({ "success": 0}, status=200)
 
 
+
 def initialize():
     global haze_net
     global dark_net
@@ -199,13 +200,13 @@ def get_camera_frame_size(camera):
 
 def background_processing():
     global queueISdeal
-    while True:
-        if queueISdeal:
+    global paddledetection_net
+    print(111111223124235)
+    while queueISdeal:
+            print("weweret")
             paddledetection_net.people_dealwith_queue()
             paddledetection_net.vehicle_dealwith_queue()
-            time.sleep(1)
-        else:
-            print("is waiting")
+
 
 def open_camera(request):
     """
@@ -214,6 +215,7 @@ def open_camera(request):
     global camera
     global queueISdeal
     queueISdeal = False
+    changestyle()
     if camera is  None:
         camera = cv2.VideoCapture(camId)  
     return JsonResponse({'status': 'Camera open'})
@@ -222,26 +224,37 @@ def close_camera(request):
     关闭摄像头路由。
     """
     global camera
+    global queueISdeal
+    queueISdeal =  False
     if camera is not None:
         camera.release()  # 释放摄像头资源
         cv2.destroyAllWindows()
         camera = None  # 清空摄像头对象
     return JsonResponse({'status': 'Camera closed'})
 
+def changestyle():
+    global paddledetection_net
+    global queueISdeal
+    paddledetection_net.vehicle_waitting_dealwith_queue=[]
+    paddledetection_net.people_waitting_dealwith_queue=[]
+    paddledetection_net.newStart()
+    clear_directory('AIdjango/dist/livedisplay/vehicle')
+    clear_directory('AIdjango/dist/livedisplay/people')
+    queueISdeal  = True
+
 def gen_display(camera):
     global RecordCounter
     global queueISdeal 
-    paddledetection_net.people_log={}
-    paddledetection_net.vehicle_log = {}
+    
     target_size = get_camera_frame_size(camera)
     RecordCounter=0
     target_dir = os.path.join(os.getcwd(), "AIdjango", "dist", "livedisplay_record")
     items = os.listdir(target_dir)
     folders = [item for item in items if os.path.isdir(os.path.join(target_dir, item))]
     folder_count = len(folders)
-    clear_directory('AIdjango/dist/livedisplay/vehicle')
-    clear_directory('AIdjango/dist/livedisplay/people')
-    queueISdeal  = True
+    
+    background_thread = threading.Thread(target=background_processing, daemon=True)
+    background_thread.start()
     while True:
         # 读取图片
         if camera is None:
@@ -504,11 +517,10 @@ def start_process_video(request):
     return JsonResponse({'message': "please use post",  'success': 0}, status=200)
 
 def video_detection(video_name):
-    global background_thread
+    global queueISdeal
+    changestyle()
     background_thread = threading.Thread(target=background_processing, daemon=True)
     background_thread.start()
-    clear_directory('AIdjango/dist/livedisplay/vehicle')
-    clear_directory('AIdjango/dist/livedisplay/people')
     current_dir = os.getcwd()
     video_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadvideoSave', video_name)
     print(video_path)
@@ -557,6 +569,8 @@ def video_detection(video_name):
     # 释放资源
     cap.release()
     out.release()
+    queueISdeal = False
+    
 
 
 def get_progress(request):
@@ -613,8 +627,13 @@ def start_process_photo(request):
 
 
 def photo_processing(photo_name):
-    clear_directory('AIdjango/dist/livedisplay/vehicle')
-    clear_directory('AIdjango/dist/livedisplay/people')
+    global queueISdeal
+    global paddledetection_net
+    global queueISdeal
+    changestyle()
+    
+    background_thread = threading.Thread(target=background_processing, daemon=True)
+    background_thread.start()
     current_dir = os.getcwd()
     photo_path = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoSave', photo_name)
     photo_path_Process = os.path.join(current_dir, 'AIdjango', 'dist', 'UploadphotoProcess')
@@ -658,6 +677,7 @@ def photo_processing(photo_name):
         cv2.imwrite(photo_path_Process_path, img)
     delete_hdr_files(photo_path_Process)
     delete_photo_files("hdr/")
+    queueISdeal =  False
         
 def rename_prediction_files(base_dir):
     # 遍历 base_dir 目录下的所有文件和文件夹
@@ -807,6 +827,12 @@ def stream_photo(request):
     elif style == 2:
         name = urllib.parse.quote(name)
         image_path = "AIdjango/dist/UploadphotoProcess/" + name
+    elif style == 3:
+        name = urllib.parse.quote(name)
+        image_path = "AIdjango/dist/livedisplay/people/" + name
+    elif style == 4:
+        name = urllib.parse.quote(name)
+        image_path = "AIdjango/dist/livedisplay/vehicle" + name
     else:
         return HttpResponse(status=400)  # 不支持的样式
 
@@ -849,7 +875,9 @@ def convert_to_serializable(data):
     elif isinstance(data, list):
         return [convert_to_serializable(item) for item in data]
     elif isinstance(data, dict):
-        return {key: convert_to_serializable(value) for key, value in data.items()}
+        return [convert_to_serializable(value) for value in data.values()]  # 只保留值，形成数组
+    elif isinstance(data, np.float32):
+        return float(data)  # 转换 float32 为 float
     return data
 
 def log(request):
@@ -860,6 +888,7 @@ def log(request):
     serializable_people_log = convert_to_serializable(people_log)
     serializable_vehicle_log = convert_to_serializable(vehicle_log)
 
+    print(serializable_people_log, serializable_vehicle_log)
     return JsonResponse({
         'people_log': serializable_people_log,
         'vehicle_log': serializable_vehicle_log,

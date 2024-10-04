@@ -83,6 +83,21 @@ def extract_crops(image, tlwhs_dict, obj_ids_dict, scores_dict):
             })
 
     return crops
+
+def my_extract_crops_detector(image,boxes):
+    crops = []
+    for index , box in enumerate(boxes):
+        ob , score , x , y , w ,h = box
+        x1, y1, x2, y2 = x, y, x+w, y+h
+        crop = image[int(y1):int(y2), int(x1):int(x2)]
+        crops.append({
+            'crop': crop,
+            'class_id': ob,
+            'object_id': index,
+            'score': score,
+            'crop_box': box[2:],
+        })
+    return crops
 def people_detector_init():
     #初始化行人检测器
     model_dir = os.path.join(current_dir,'my_detection', 'output_inference' , 'mot_ppyoloe_s_36e_pipeline')
@@ -366,6 +381,15 @@ class my_paddledetection:
 
 
 
+    def newStart(self):#进行新的检测
+        self.clear()
+        self.people_queue = FixedLengthQueue(maxlen=40)
+        self.vehicle_queue = FixedLengthQueue(maxlen=40)
+        self.people_waitting_dealwith_flag = False
+        self.vehicle_waitting_dealwith_flag = False
+        self.people_log={}
+        self.vehicle_log = {}
+        self.updated_ids={}
     def predit(self,input):
         self.clear()
 
@@ -542,6 +566,7 @@ class my_paddledetection:
                         entrance=self.entrance,
                         center_traj=[{}]
                     )
+                self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
                 selected_ids = []
                 selected_ids_ = []
                 # 遍历在线 ID
@@ -643,9 +668,17 @@ class my_paddledetection:
                         self.people_waitting_dealwith_flag = True
 
         if self.people_res is not None and self.people_detector_isOn:
+            res = my_extract_crops_detector(self.im, self.people_res['boxes'])
+            self.people_waitting_dealwith_queue.extend(res)
+            if self.people_waitting_dealwith_queue:
+                self.people_waitting_dealwith_flag = True
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
             
         if self.vehicle_res is not None and self.vehicle_detector_isOn:
+            res = my_extract_crops_detector(self.im, self.vehicle_res['boxes'])
+            self.people_waitting_dealwith_queue.extend(res)
+            if self.vehicle_waitting_dealwith_queue:
+                self.vehicle_waitting_dealwith_flag = True
             self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
         self.im = np.ascontiguousarray(np.copy(self.im))
 
@@ -691,8 +724,10 @@ class my_paddledetection:
     #                 cv2.imwrite(os.path.join(save_dir, file_name), crop)
     def people_dealwith_queue(self):
             if self.people_waitting_dealwith_flag:
+                print(11111111111111111111)
                 save_dir = 'AIdjango/dist/livedisplay/people'
                 for i in self.people_waitting_dealwith_queue:
+                    print(11111111111111111111222222222222)
                     crop = i['crop']
                     obj_id = i['object_id']
                     score = i['score']
@@ -703,22 +738,26 @@ class my_paddledetection:
                         self.updated_ids[obj_id] = True  # 标记为已更新
                         should_update = True
                     else:
-                        should_update = random.random() < 0.05  # 0.1 的概率
+                        should_update = random.random() < 0.02  # 0.1 的概率
                     if crop is not None and crop.size > 0 and should_update:
                         file_name = f"{obj_id}.png"
                         crop = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
                         cv2.imwrite(os.path.join(save_dir, file_name), crop)
                         self.people_log[obj_id] = {
                         'score': score,
-                        'crop_box': crop_box
+                        'crop_box': crop_box,
+                        "name":file_name
                     }
-            self.people_waitting_dealwith_queue = []
+            # self.people_waitting_dealwith_queue = []
 
     def vehicle_dealwith_queue(self):
+        print(11111111111111111111)
         if self.vehicle_waitting_dealwith_flag:
+            print(1111111111111)
             #写入车辆处理逻辑
             save_dir = 'AIdjango/dist/livedisplay/vehicle'
             for i in self.vehicle_waitting_dealwith_queue:
+                    print(111)
                     crop = i['crop']
                     obj_id = i['object_id']
                     score = i['score']
@@ -729,16 +768,17 @@ class my_paddledetection:
                         self.updated_ids[obj_id] = True  # 标记为已更新
                         should_update = True
                     else:
-                        should_update = random.random() < 0.05  # 0.1 的概率
+                        should_update = random.random() < 0.02  # 0.1 的概率
                     if crop is not None and crop.size > 0 and should_update:
                         file_name = f"{obj_id}.png"
                         crop = cv2.cvtColor(crop, cv2.COLOR_RGB2BGR)
                         cv2.imwrite(os.path.join(save_dir, file_name), crop)
                         self.vehicle_log[obj_id] = {
                         'score': score,
-                        'crop_box': crop_box
+                        'crop_box': crop_box,
+                        "name":file_name
                     }
-            self.vehicle_waitting_dealwith_queue = []
+            # self.vehicle_waitting_dealwith_queue = []
             
             
 
@@ -837,6 +877,30 @@ class my_paddledetection:
 #     # my_detection.turn_vehicle_detector()
 #     # my_detection.turn_vehicle_attr_detector()
 #     # my_detection.turn_vehicle_press_detector()
+if __name__ == "__main__":
+    my_detection = my_paddledetection()
+    my_detection.turn_people_detector()
+    # my_detection.turn_people_detector()
+    # my_detection.turn_people_attr_detector()
+    # my_detection.turn_vehicle_detector()
+    # my_detection.turn_vehicle_attr_detector()
+    # my_detection.turn_vehicle_press_detector()
+    # background_thread = threading.Thread(target=background_processing, daemon=True)
+    # background_thread.start()
+    cap = cv2.VideoCapture(0)
+    while True:
+        # 读取一帧图像
+        _, frame = cap.read()
+        input =  cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        
+        img = my_detection.predit(input)
+        # 显示图像
+        img =  cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+        cv2.imshow('Mask Detection', img)
+        
+        # 按 'q' 键退出
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 #     cap = cv2.VideoCapture(0)
 #     while True:
