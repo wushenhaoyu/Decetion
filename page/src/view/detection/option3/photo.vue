@@ -287,13 +287,21 @@
           >
           
             <el-table-column  width="55"> </el-table-column>
-            <el-table-column prop="location" label="坐标" width="70">
+            <el-table-column prop="score" label="得分" width="70">
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
-            <el-table-column prop="id" label="编号" width="80">
+            <el-table-column prop="location" label="坐标" width="80">
             </el-table-column>
-            <el-table-column prop="score" label="得分" show-overflow-tooltip>
-            </el-table-column>
+            <el-table-column label="操作" width="100">
+      <template slot-scope="scope">
+        <el-button
+          type="primary"
+          @click="handleButtonClick(scope.row)"
+        >
+          查看图片
+        </el-button>
+      </template>
+    </el-table-column>
           </el-table>
           <div style="padding: 5px; text-align: left">
             <el-pagination
@@ -302,7 +310,7 @@
               :current-page="pageNum"
               :page-sizes="[10, 20, 50]"
               :page-size="pageSize"
-              layout="total, prev, pager, next"
+              layout="total, prev, pager, next, jumper"
               :total="total"
             >
             </el-pagination>
@@ -359,6 +367,7 @@ export default {
     };
   },
   computed: {
+    
     paginatedData() {
       const start = (this.currentPage - 1) * this.pageSize;
       const end = this.currentPage * this.pageSize;
@@ -381,6 +390,11 @@ export default {
     this.total = this.tableData.length; // 设置总数据条目数
   },
   methods: {
+    handleButtonClick(row) {
+      // 处理按钮点击事件，例如打开图片等
+      console.log('查看图片:', row.imageUrl);
+      // 这里可以添加逻辑，比如打开一个对话框显示图片
+    },
     handleSizeChange(){
       
     },
