@@ -2,111 +2,144 @@
   <div style="width: 100%; height: 100%">
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 15vw">
-      <div class="drawer-content" >
-        <div class="right-log-head"style="line-height: 6vh;position: absolute;z-index: 5  ;height: 6vh;">处理中心</div>
-        <div style="height: 3vh;"></div>
+      <div class="drawer-content">
+        <div
+          class="right-log-head"
+          style="line-height: 6vh; position: absolute; z-index: 5; height: 6vh"
+        >
+          处理中心
+        </div>
+        <div style="height: 3vh"></div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">散射增强</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            散射增强
+          </div>
           <el-switch
             v-model="haze"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
+            @change="checkParameter"
           >
           </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">弱光增强</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            弱光增强
+          </div>
           <el-switch
             v-model="dark"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">高动态范围修复</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            高动态范围修复
+          </div>
           <el-switch
             v-model="hdr"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人检测</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            行人检测
+          </div>
           <el-switch
             v-model="people_detector_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">行人属性检测</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            行人属性检测
+          </div>
           <el-switch
             v-model="people_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆检测</div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车辆检测
+          </div>
           <el-switch
             v-model="vehicle_detector_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-          <div style="height: 4vh;line-height: 4vh;  user-select:none;">车辆属性检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车辆属性检测
+          </div>
           <el-switch
             v-model="vehicle_attribute_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">车牌检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            车牌检测
+          </div>
           <el-switch
             v-model="vehicle_license_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
         <el-divider></el-divider>
-        <div style="user-select:none;">
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违章检测 </div>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            违章检测
+          </div>
           <el-switch
             v-model="vehicle_press_detector_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
-      </div>
-      <el-divider></el-divider>
+            @change="checkParameter"
+          >
+          </el-switch>
+        </div>
+        <el-divider></el-divider>
         <div>
-        <div style="height: 4vh;line-height: 4vh;  user-select:none;">违停检测 </div>
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
+            违停检测
+          </div>
           <el-switch
             v-model="vehicle_invasion_enable"
             active-text="开启"
             inactive-text="关闭"
-            @change="sendParameters"
-          > </el-switch>
+            @change="checkParameter"
+          >
+          </el-switch>
         </div>
-
       </div>
       <div class="drawer-button-bar" @click="toggleDrawer">
         <!-- 小拉手按钮，点击它会调用 toggleDrawer 方法 -->
@@ -170,14 +203,46 @@
           </el-upload>
           <!-- 上传图片  -->
           <!-- 显示图片  -->
-          <img
+          <div
             v-if="isShowPhoto"
-            id="example"
-            class="vjs-default-skin vjs-big-play-centered"
-            :src="photo_url"
-            alt="Image"
-            style="background: #000"
-          />
+            style="
+              background-color: #000;
+              width: 100%;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+            v-images-loaded:on.progress="imageProgress"
+          >
+            <img
+              v-if="isShowLocalPhoto"
+              id="example"
+              class="vjs-default-skin vjs-big-play-centered"
+              :src="photoUrl_"
+              alt="Image"
+              style="
+                background: #000;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+              "
+            />
+            <img
+              v-if="!isShowLocalPhoto"
+              id="example"
+              class="vjs-default-skin vjs-big-play-centered"
+              :src="photoUrl"
+              :key="photoName"
+              alt="Image"
+              style="
+                background: #000;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+              "
+            />
+          </div>
 
           <!-- 显示图片  -->
         </div>
@@ -191,12 +256,21 @@
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button">开始检测</el-button>
-            <el-button type="primary" class="bottom-button">导出图片</el-button>
+            <el-button
+              type="primary"
+              class="bottom-button"
+              @click="dealwithPhoto"
+              >开始检测</el-button
+            >
+            <el-button type="primary" class="bottom-button" @click="savePhoto"
+              >导出图片</el-button
+            >
             <el-button type="primary" class="bottom-button" @click="resetPhoto"
               >重置图片</el-button
             >
-            <el-button type="primary" class="bottom-button" disabled>开发ing</el-button>
+            <el-button type="primary" class="bottom-button" disabled
+              >开发ing</el-button
+            >
           </div>
         </div>
         <!-- 视频下方操作按钮-->
@@ -213,33 +287,36 @@
 </template>
 
 <script>
-import myvideo from "../../video/myvideo.vue";
+import { saveAs } from "file-saver";
+import imagesLoaded from "vue-images-loaded";
 export default {
-  components: {
-    myvideo,
+  directives: {
+    imagesLoaded,
   },
   data() {
     return {
       haze: false,
       dark: false,
-      hdr:false,
-      people_detector_enable: false, // 行人监测
+      hdr: false,
+      people_detector_enable: false,
       people_tracker_enable: false,
       people_attribute_enable: false,
-      vehicle_detector_enable: false,//车辆监测
-      vehicle_tracker_enable:false,
+      vehicle_detector_enable: false,
+      vehicle_tracker_enable: false,
       vehicle_press_detector_enable: false,
       vehicle_license_enable: false,
       vehicle_attribute_enable: false,
-      vehicle_invasion_enable:false,
+      vehicle_invasion_enable: false,
       isShowPhoto: false,
       drawerVisible: false,
-      activeIndex: "4", // 更新为菜单项的实际索引
-      videoUrl: "http://vjs.zencdn.net/v/oceans.mp4",
-      uploadUrl: "http://localhost:8000/uploadPhoto",
+      activeIndex: "4",
       showProgress: false,
       progressPercentage: 0,
-      photeName:""
+      photoName: "",
+      photoUrl_: "", //本地图片路径,
+      isShowLocalPhoto: true,
+      uploadUrl: "http://localhost:8000/upload_photo",
+      photoUrl: "",
     };
   },
   computed: {
@@ -252,15 +329,54 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
+    // photoUrl() {
+    //   return `http://localhost:8000/stream_photo?name=${this.photoName}&style=2`;
+    // }
   },
   methods: {
+    savePhoto() {
+      if (!this.photoName) {
+        this.$message({
+          type: "error",
+          message: "未上传图片",
+        });
+      } else {
+        fetch(this.photoUrl)
+          .then((response) => response.blob()) // 将响应转换为 Blob
+          .then((blob) => {
+            // 创建一个临时 URL
+            const url = URL.createObjectURL(blob);
 
-    sendParameters(value) {
-      this.checkParameter(value)
+            // 创建一个隐藏的 <a> 元素用于下载
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = "downloaded-image.jpg"; // 下载时的文件名
+
+            // 将 <a> 元素添加到 DOM 中并触发点击事件
+            document.body.appendChild(a);
+            a.click();
+
+            // 释放 URL 对象并移除 <a> 元素
+            URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+          })
+          .catch((error) => {
+            this.$message({
+              type: "error",
+              message: "未进行预测",
+            });
+          });
+      }
+    },
+    imageProgress(instance, image) {
+      const result = image.isLoaded ? "loaded" : "broken";
+    },
+    sendParameters() {
       let data = {
         haze: this.haze,
         dark: this.dark,
-        hdr:  this.hdr,
+        hdr: this.hdr,
         people_detector: this.people_detector_enable,
         people_tracker: this.people_tracker_enable,
         people_attr_detector: this.people_attribute_enable,
@@ -269,63 +385,100 @@ export default {
         vehicle_attr_detector: this.vehicle_attribute_enable,
         vehicleplate_detector: this.vehicle_license_enable,
         vehicle_press_detector: this.vehicle_press_detector_enable,
-        vehicle_invasion:this.vehicle_invasion_enable
-      }
-      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
-        console.log(res)
-      })
+        vehicle_invasion: this.vehicle_invasion_enable,
+      };
+      return this.$axios
+        .post("http://localhost:8000/ConfirmParams", data)
+        .then((res) => {
+          
+        });
     },
-    checkParameter(value){
-      var that = this
-      if (value){ //有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
-        console.log(that.people_attribute_enable)
-        const people_list = [that.people_attribute_enable]
+    checkParameter(value) {
+      var that = this;
+      if (value) {
+        // 有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
+        const people_list = [that.people_attribute_enable];
         for (let i = 0; i < people_list.length; i++) {
-          if(people_list[i]){
-            that.people_tracker_enable = true
+          if (people_list[i]) {
+            that.people_tracker_enable = true;
           }
         }
-        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable,that.vehicle_invasion_enable]
+        const vehicle_list = [
+          that.vehicle_attribute_enable,
+          that.vehicle_license_enable,
+          that.vehicle_press_detector_enable,
+          that.vehicle_invasion_enable,
+        ];
         for (let i = 0; i < vehicle_list.length; i++) {
-          if(vehicle_list[i]){
-            that.vehicle_tracker_enable = true
+          if (vehicle_list[i]) {
+            that.vehicle_tracker_enable = true;
           }
         }
-      }else{ //检测关闭，额外功能也要关闭
-        if (!(that.people_detector_enable && that.people_tracker_enable))
-        {
-            that.people_attribute_enable = false
+      } else {
+        // 检测关闭，额外功能也要关闭
+        if (!(that.people_detector_enable && that.people_tracker_enable)) {
+          that.people_attribute_enable = false;
         }
-        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable))
-        {
-            that.vehicle_attribute_enable = false
-            that.vehicle_license_enable = false
-            that.vehicle_press_detector_enable = false
-            that.vehicle_invasion_enable = false
+        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable)) {
+          that.vehicle_attribute_enable = false;
+          that.vehicle_license_enable = false;
+          that.vehicle_press_detector_enable = false;
+          that.vehicle_invasion_enable = false;
         }
       }
+    },
+    dealwithPhoto() {
+      this.sendParameters()
+        .then(() => {
+            let data = {
+                name: this.photoName,
+            };
+            console.log(data);
+            return this.$axios.post("http://localhost:8000/start_process_photo", data);
+        })
+        .then(() => {
+            this.getPhoto();
+        })
+        .catch(error => {
+            console.error('处理过程出错:', error);
+        });
     },
     resetPhoto() {
-      this.isShowVideo = false;
+      this.isShowPhoto = false;
+      this.isShowLocalPhoto = true;
+      this.photoName = "";
+      this.photoUrl_ = "";
     },
-    getPhoto() {
-      this.isShowPhoto = true;
-      this.photo_url = 'http://localhost:8000/stream_photo?name=' + this.photeName + '&' + 'style=2'
+    async getPhoto() {
+      try {
+        const response = await fetch(`http://localhost:8000/stream_photo?name=${this.photoName}&style=2`);
+        
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const blob = await response.blob(); // 将响应转换为 Blob（二进制大对象）
+        const imageUrl = URL.createObjectURL(blob); // 使用 URL.createObjectURL() 将 Blob 转换为一个 URL
+        this.photoUrl = imageUrl; // 将这个 URL 赋值给图片的 src
+        
+        console.log(this.photoUrl);
+        this.isShowPhoto = true;
+      } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+      }
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
     },
     handleBeforeUpload(file) {
-      // 检查图片格式
       const supportedFormats = ["jpg", "jpeg", "png", "gif"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isSupportedFormat = supportedFormats.includes(fileExtension);
 
-      // 检查文件大小
       const maxSize = 100 * 1024 * 1024; // 100 MB
       const isSizeValid = file.size <= maxSize;
+
       if (isSupportedFormat && isSizeValid) {
-        // 弹出确认框
         this.showConfirmDialog(file);
         return false; // 阻止自动上传
       } else {
@@ -341,49 +494,64 @@ export default {
       }
     },
     showConfirmDialog(file) {
-      this.$confirm('确认上传此文件？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        // 用户点击确定按钮，允许上传
-        this.uploadFile(file);
-      }).catch(() => {
-        // 用户点击取消按钮，取消上传
-        this.$message({
-          type: 'info',
-          message: '已取消上传'
+      this.$confirm("确认上传此文件？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.uploadFile(file);
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消上传",
+          });
         });
-      });
     },
     uploadFile(file) {
-      // 手动触发上传
-      console.log('upload')
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.isShowPhoto = true;
+        this.isShowLocalPhoto = true;
+        this.photoUrl_ = e.target.result; // 将图片的 data URL 设置为 photoUrl
+      };
+      reader.readAsDataURL(file);
+
       const formData = new FormData();
-      formData.append('photo', file);
-      this.$axios.post(this.uploadUrl, formData).then(response => {
-        this.handleSuccess(response, file);
-      }).catch(error => {
-        this.handleError(error, file);
-      });
+      formData.append("photo", file);
+
+      this.$axios
+        .post(this.uploadUrl, formData)
+        .then((response) => {
+          this.handleSuccess(response, file);
+        })
+        .catch((error) => {
+          this.handleError(error, file);
+        });
     },
     handleSuccess(response, file) {
       this.$message({
-            type: 'success',
-            message: '上传成功!'
-          });
-      // 处理成功逻辑
-      this.photeName = response.data.photoname
-      this.getPhoto()
+        type: "success",
+        message: "上传成功!",
+      });
+      this.photoName = response.data.photoname;
     },
     handleError(error, file) {
-      console.error('上传失败:', error);
-      // 处理失败逻辑
+      this.$message({
+        type: "error",
+      });
+      console.error("上传失败:", error);
     },
     handleProgress(event, file) {
-      console.log('上传进度:', event.percent);
-      // 显示上传进度
-    }
+      console.log("上传进度:", event.percent);
+    },
+    onImageLoad() {
+      console.log("图片加载成功");
+    },
+    onImageError() {
+      console.error("图片加载失败");
+    },
   },
 };
 </script>
@@ -478,7 +646,7 @@ export default {
   z-index: 1000;
   transform: translateX(0);
   transition: transform 0.3s ease;
-  user-select:none;
+  user-select: none;
 }
 
 .drawer-close {
@@ -492,7 +660,7 @@ export default {
   z-index: 1000;
   transform: translateX(14vw);
   transition: transform 0.3s ease;
-  user-select:none;
+  user-select: none;
 }
 
 .drawer-content {

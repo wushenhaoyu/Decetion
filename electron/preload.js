@@ -21,5 +21,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     enterPage: () => {
        ipcRenderer.send('enter-page');
-    }
+    },
+    getCondaEnvs: () => ipcRenderer.invoke('get-conda-envs')
 });

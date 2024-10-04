@@ -254,6 +254,7 @@ def video_record_on(request):
         isrecord = True
         RecordCounter = 0
         return JsonResponse({'status': 'start record'})
+    return JsonResponse({'status': ""})
 def video_record_off(request):
     global RecordCounter
     global isrecord
@@ -265,6 +266,7 @@ def video_record_off(request):
         save_thread = threading.Thread(target=saverecord)
         save_thread.start()
         return JsonResponse({'status': 'process finish'})
+    return JsonResponse({'status': ""})
 
 # def saverecord():
 #         base_dir = 'AIdjango/dist/livedisplay_record'
@@ -792,3 +794,4 @@ def stream_photo(request):
     else:
         return JsonResponse({'message': "filepath is not exist",  'success': 0}, status=200)
     
+

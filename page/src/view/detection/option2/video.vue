@@ -160,15 +160,26 @@
           </el-upload>
           <!-- 上传视频  -->
           <!-- 显示视频  -->
-          <video
+          <div v-if="isShowVideo" style="background-color: #000;width: 100%;height: 100%;">
+            <video
             v-if="isShowVideo"
-            id="example"
-            class="vjs-default-skin vjs-big-play-centered"
             controls
             preload="auto"
+            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
+            :src="VideoUrl_"
+            type = "video/mp4"
           >
-            <source style="background: #000" :src="videoUrl" type="video/mp4" />
           </video>
+          <video
+            v-if="!isShowVideo"
+            id="example"
+            controls
+            preload="auto"
+            style="background: #000;max-width: 100%; max-height: 100%; object-fit: contain;"
+            :src="VideoUrl" type="video/mp4" 
+          >
+          </video>
+          </div>
           <!-- 显示视频  -->
         </div>
         <div style="height: 5%"></div>
@@ -181,10 +192,10 @@
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button" @click="getVideo"
+            <el-button type="primary" class="bottom-button" @click="dealWithVideo" 
               >开始检测</el-button
             >
-            <el-button type="primary" class="bottom-button" 
+            <el-button type="primary" class="bottom-button" @click="saveVideo"
               >导出视频</el-button
             >
             <el-button type="primary" class="bottom-button" 
@@ -235,6 +246,8 @@ export default {
       uploadUrl: "http://localhost:8000/uploadVideo",
       showProgress: false,
       progressPercentage: 0,
+      isShowLocalVideo: true,
+      VideoUrl_:""
     };
   },
   computed: {
@@ -247,8 +260,47 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
+    VideoUrl() {
+      return `http://localhost:8000/stream_photo?name=${this.VideoName}&style=2`;
+    },
   },
   methods: {
+    saveVideo() {
+        if (!this.VideoName)
+      {
+        this.$message({
+            type: 'error',
+            message: '未上传视频'
+          });
+      }else{
+        fetch(this.VideoUrl)
+        .then(response => response.blob()) // 将响应转换为 Blob
+        .then(blob => {
+          // 创建一个临时 URL
+          const url = URL.createObjectURL(blob);
+          
+          // 创建一个隐藏的 <a> 元素用于下载
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = 'downloaded-video.mp4'; // 下载时的文件名
+          
+          // 将 <a> 元素添加到 DOM 中并触发点击事件
+          document.body.appendChild(a);
+          a.click();
+
+          // 释放 URL 对象并移除 <a> 元素
+          URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        })
+        .catch(error => {
+          this.$message({
+            type: 'error',
+            message: '未进行预测'
+          });
+        });
+      }
+    },
     sendParameters(value) {
       this.checkParameter(value)
       let data = {
@@ -268,19 +320,53 @@ export default {
       this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
       })
     },
+    checkParameter(value) {
+      var that = this;
+      if (value) { // 有东西开启了，要保证额外功能开启的时候，保证追踪或者检测开启
+        const people_list = [that.people_attribute_enable];
+        for (let i = 0; i < people_list.length; i++) {
+          if (people_list[i]) {
+            that.people_tracker_enable = true;
+          }
+        }
+        const vehicle_list = [that.vehicle_attribute_enable, that.vehicle_license_enable, that.vehicle_press_detector_enable, that.vehicle_invasion_enable];
+        for (let i = 0; i < vehicle_list.length; i++) {
+          if (vehicle_list[i]) {
+            that.vehicle_tracker_enable = true;
+          }
+        }
+      } else { // 检测关闭，额外功能也要关闭
+        if (!(that.people_detector_enable && that.people_tracker_enable)) {
+          that.people_attribute_enable = false;
+        }
+        if (!(that.vehicle_detector_enable && that.vehicle_tracker_enable)) {
+          that.vehicle_attribute_enable = false;
+          that.vehicle_license_enable = false;
+          that.vehicle_press_detector_enable = false;
+          that.vehicle_invasion_enable = false;
+        }
+      }
+    },
     resetVideo() {
       this.isShowVideo = false;
+      this.isShowLocalVideo = true;
+      this.videoName = "";
+      this.videoUrl_ = "";
+    },
+    dealWithVideo()
+    {
+        data = {
+          name: this.videoName
+        }
+         this.$axios.post("http://localhost:8000/start_process_video",data).then(res => {
+        this.getVideo();
+      });
     },
     getVideo() {
-      this.isShowVideo = True;
-      this.$axios
-        .post("http://localhost:8000/getvideo/")
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      this.isShowLocalVideo = false;
+      this.$nextTick(() => {
+        this.isShowVideo = true;
+      });
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
@@ -333,56 +419,68 @@ export default {
         type: 'success',
         message: '上传成功!'
       });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.VideoUrl_ = e.target.result;
+        this.isShowVideo = true
+      };
+      reader.readAsDataURL(file);
       // 处理成功逻辑
     },
     handleProgress(event, file, fileList) {
-      this.progressPercentage = event.percent;
-      this.showProgress = true;
-      console.log('上传进度:', event.percent);
+      // this.progressPercentage = event.percent;
+      // this.showProgress = true;
+      // console.log('上传进度:', event.percent);
     },
     uploadFile(file) {
+
       const formData = new FormData();
       formData.append('video', file);
+    
 
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
-        onUploadProgress: (progressEvent) => {
+        /*onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           this.progressPercentage = percentCompleted;
           this.showProgress = true;
-        }
+        }*/
       }; 
-
+      // this.startProgressPolling();
+      console.log("123")
       this.$axios.post(this.uploadUrl, formData, config).then(response => {
-        this.videoName = response.data.videoname; // 假设服务器返回的数据结构为 { video_name: 'some-video-name' }
-        console.log('Video name:', this.videoName);
-        this.startProgressPolling(); // 开始轮询进度
         this.handleSuccess(response, file);
+        this.videoName = response.data.videoname;
       }).catch(error => {
         this.handleError(error, file);
       });
+      /*this.$axios.post(this.uploadUrl, formData, config).then(response => {
+        this.videoName = response.data.videoname; // 假设服务器返回的数据结构为 { video_name: 'some-video-name' }
+        console.log('Video name:', this.videoName);
+        //this.startProgressPolling(); // 开始轮询进度
+        this.handleSuccess(response, file);
+      }).catch(error => {
+        this.handleError(error, file);
+      });*/
     },
     startProgressPolling() {
-      this.intervalId = setInterval(() => {
-        let data = {
-          video_name: this.videoName
-        }
-        console.log(data)
-        this.$axios.get(`http://localhost:8000/get_progress`,data).then(response => {
-          const { progress, current, total } = response.data;
-          this.progressPercentage = progress;
-          this.currentFrame = current;
-          this.totalFrames = total;
-          if (progress === 100) {
-            clearInterval(this.intervalId); // 处理完成，停止轮询
-            this.onProcessingComplete();
-          }
-        }).catch(error => {
-          console.error('Error fetching progress:', error);
+      data = {
+          name: this.videoName
+      }
+      this.$axios.post("http://127.0.0.1:8000/get_progress",data).then(res => {
+        this.progress = res.progress;
+      });
+      const loading = this.$loading({
+          lock: true,
+          text: thisprogress,
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
         });
-      }, 500); // 每5秒查询一次
+        setTimeout(() => {
+          loading.close();
+        }, 2000);
     },
   },
 };
@@ -531,10 +629,10 @@ export default {
   transform: translate3d(-100%, -50%, 0) rotateX(180deg);
   transition: all 0.5s;
 }
-video::-webkit-media-controls-play-button {
+/*video::-webkit-media-controls-play-button {
   display: none;
 }
 video::-webkit-media-controls-timeline {
   display: none;
-}
+}*/
 </style>

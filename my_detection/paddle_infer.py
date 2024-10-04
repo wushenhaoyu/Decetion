@@ -489,7 +489,6 @@ class my_paddledetection:
     
     def visualize_image(self,image):
         self.im = image
-        self.im = cv2.cvtColor(self.im, cv2.COLOR_BGR2RGB)
         if self.vehicle_res is not None and self.vehicle_tracker_isOn:
             if self.vehicle_res['boxes'].size > 0 :
                 ids = self.vehicle_res['boxes'][:,0]
@@ -603,6 +602,7 @@ class my_paddledetection:
                     entrance=None,
                     center_traj=[{}]
                 )
+                self.im = cv2.cvtColor(self.im, cv2.COLOR_RGB2BGR)
                 selected_ids = []
                 selected_ids_ = []
                 # 遍历在线 ID
@@ -637,8 +637,7 @@ class my_paddledetection:
                         #保存文件
                     if self.people_waitting_dealwith_queue:
                         self.people_waitting_dealwith_flag = True
-            else:
-                self.im =  cv2.cvtColor(self.im, cv2.COLOR_BGR2RGB)
+
         if self.people_res is not None and self.people_detector_isOn:
             self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
             
