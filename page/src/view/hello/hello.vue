@@ -24,19 +24,19 @@
                             <div style="width: 100%;height: 2vh"> </div>
                             <div style="display: flex;justify-content: space-evenly;">
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/4.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">复杂天气条件</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">集成弱光、散射、HDR修复三种增强网络</div>
                                     <div style="height: 1vh;"></div>
                                 </div>
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/3.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">灵活功能调度</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">一次初始化，随意快速切换模型功能</div>
                                     <div style="height: 1vh;"></div>
                                 </div>
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/6.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">PPDet优化</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">二次封装PaddleDetection,便捷化模型推理</div>
                                     <div style="height: 1vh;"></div>
@@ -45,19 +45,19 @@
                             <div style="width: 100%;height: 2vh"> </div>
                             <div style="display: flex;justify-content: space-evenly;">
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/2.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">轻量化网络结构</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">弱光、散射增强网络采用超轻量化架构</div>
                                     <div style="height: 1vh;"></div>
                                 </div>
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/5.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">可边缘计算部署</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">网络复杂度低，算力资源要求小，支持串口视频流输入</div>
                                     <div style="height: 1vh;"></div>
                                 </div>
                                 <div style="width: 30%;height: 100%;background-color: #f6f6f7;border-radius: 1.5vw;">
-                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/emoji_u23f0.svg"/></div></div>
+                                    <div style="display: flex;"><div style="background-color: #e3e3e5;border-radius: 0.5vw;margin-left: 1vw;margin-top: 1vw;"><img style="width: 6vh;" src="../../assets/1.png"/></div></div>
                                     <div style="text-align: left;padding-left: 1.5vw;font-weight: 900;line-height: 4vh;font-size: 1vw;">实时性高</div>
                                     <div style="text-align: left;padding-left: 1.5vw;padding-right: 1.5vw;font-weight: 700;color: #6b6b70;font-size: 0.8vw;line-height: 2vh;">模型推理迅速，可保持较高帧率</div>
                                     <div style="height: 1vh;"></div>
