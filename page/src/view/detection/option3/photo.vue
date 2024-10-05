@@ -229,7 +229,7 @@
               "
             />
             <img
-              v-if="!isShowLocalPhoto"
+              v-if="!isShowLocalPhoto && photoUrl"
               id="example"
               class="vjs-default-skin vjs-big-play-centered"
               :src="photoUrl"
@@ -242,6 +242,57 @@
                 object-fit: contain;
               "
             />
+            <!--提示部分-->
+          <div v-if="logDetail"
+     ref="draggableBox"
+     style="height: 80%; width: 60%; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 8; background-color: white; border-radius: 0.5vw;">
+  <!-- 顶部标题 -->
+  <div @mousedown="startDrag"
+       style="cursor: move; width: 100%; height: 7vh; border-top-left-radius: 0.5vw; border-top-right-radius: 0.5vw; background-color: rgb(66,159,255); text-align: center; line-height: 7vh; font-size: 2vw; color: white; font-weight: 900;">
+    检测图片
+
+    <!-- 关闭按钮 -->
+    <button @click="closeWindow" 
+            style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; font-size: 2vw; color: white; cursor: pointer;">
+      ×
+    </button>
+  </div>
+
+  <!-- 主体内容，使用 flex 布局 -->
+  <div style="display: flex; height: calc(80% - 7vh); padding: 10px;">
+
+    <!-- 左侧图片区域 -->
+    <div style="flex: 3; display: flex; justify-content: center; align-items: center;padding-top: 40px;" >
+      <img :src="detailPhotoUrl" alt="image" style="width: 75%; height: auto; border-radius: 0.5vw;">
+    </div>
+
+    <!-- 右侧文本内容 -->
+    <div style="flex: 1.3; padding: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: -30px;">
+  <div style="font-size: 1.8vw; font-weight: 700; margin-bottom: 10px;">检测信息</div>
+  
+  <!-- 检测类别 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测类别: <br>
+    <span style="font-weight: normal;">{{ id }}</span>
+  </div>
+
+  <!-- 检测时间 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测时间: <br>
+    <span style="font-weight: normal;">{{ time }}</span>
+  </div>
+
+  <!-- 目标坐标 -->
+  <div style="font-size: 1.8vw; color: gray;">
+    目标坐标: <br>
+    <span style="font-weight: normal;">{{ location }}</span>
+  </div>
+</div>
+
+  </div>
+</div>
+
+          <!--提示部分-->
           </div>
 
           <!-- 显示图片  -->
@@ -284,29 +335,30 @@
             :data="paginatedData"
             tooltip-effect="dark"
             style="width: 100%"
+            :row-style="{ height: '50px' }"
           >
-          
-            <el-table-column  width="55"> </el-table-column>
-            <el-table-column prop="score" label="得分" width="70">
+            <el-table-column width="5"> </el-table-column>
+            <el-table-column prop="id" label="类别" width="60">
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
-            <el-table-column prop="location" label="坐标" width="80">
+            <el-table-column prop="time" label="时间" width="150">
             </el-table-column>
-            <el-table-column label="操作" width="100">
-      <template slot-scope="scope">
-        <el-button
-          type="primary"
-          @click="handleButtonClick(scope.row)"
-        >
-          查看图片
-        </el-button>
-      </template>
-    </el-table-column>
+            <el-table-column prop="location" label="坐标" width="150">
+            </el-table-column>
+            <el-table-column label="操作" width="110">
+              <template slot-scope="scope">
+                <el-button
+                  type="primary"
+                  class="chaKanButton"
+                  @click="handleButtonClick(scope.row.id,scope.row.time,scope.row.location, scope.row.name)"
+                >
+                  查看图片
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
-          <div style="padding: 5px; text-align: left">
+          <div style="padding: 20px; text-align: center ;font-size: 3.5vw;">
             <el-pagination
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
               :current-page="pageNum"
               :page-sizes="[10, 20, 50]"
               :page-size="pageSize"
@@ -336,12 +388,17 @@ export default {
       score: "100",
     };
     return {
-      currentPage:1,
-      pageNum:2,
+      id : "",
+      time : 0,
+      location: "",
+      isDragging: false, // 用于追踪拖动状态
+      offsetX: 0,
+      offsetY: 0,
+      currentPage: 1,
+      pageNum: 0,
       pageSize: 10,
-      total: 20,
-      tableData: Array(10).fill(item),
-      total :10,
+      tableData: [],
+      total: 0,
       haze: false,
       dark: false,
       hdr: false,
@@ -364,6 +421,8 @@ export default {
       isShowLocalPhoto: true,
       uploadUrl: "http://localhost:8000/upload_photo",
       photoUrl: "",
+      detailPhotoName: "",
+      logDetail: false,
     };
   },
   computed: {
@@ -400,6 +459,81 @@ export default {
     },
     handleCurrentChange(){
 
+    },
+    startDrag(event) {
+      this.isDragging = true; // 开始拖动
+      this.offsetX =
+        event.clientX - this.$refs.draggableBox.getBoundingClientRect().left;
+      this.offsetY =
+        event.clientY - this.$refs.draggableBox.getBoundingClientRect().top;
+
+      document.addEventListener("mousemove", this.doDrag);
+      document.addEventListener("mouseup", this.stopDrag);
+    },
+    doDrag(event) {
+      if (this.isDragging) {
+        const left = event.clientX - this.offsetX;
+        const top = event.clientY - this.offsetY;
+
+        this.$refs.draggableBox.style.left = `${left}px`;
+        this.$refs.draggableBox.style.top = `${top}px`;
+        this.$refs.draggableBox.style.transform = "none"; // 移动时取消 `transform`
+      }
+    },
+    stopDrag() {
+      this.isDragging = false;
+      document.removeEventListener("mousemove", this.doDrag);
+      document.removeEventListener("mouseup", this.stopDrag);
+    },
+    closeWindow() {
+      this.logDetail = false; // 设置为 false 以关闭窗口
+    },
+    async handleButtonClick(id, time, location, photoName) {
+      console.log(id, photoName);
+      this.id = id;
+      this.time = time;
+      this.location = location;
+      this.detailPhotoName = photoName;
+      if (id == "行人") {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          console.log(response.url);
+
+          this.detailPhotoUrl = response.url; // 将这个 URL 赋值给视频的 src
+
+          console.log(this.detailPhotoUrl);
+          this.logDetail = true;
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+      } else {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          console.log(response.url);
+
+          this.videoUrl = response.url; // 将这个 URL 赋值给视频的 src
+
+          console.log(this.videoUrl);
+          this.isShowLocalVideo = false;
+          this.isShowVideo = true; // 控制视频显示的变量
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+      }
     },
     savePhoto() {
       if (!this.photoName) {
@@ -494,22 +628,45 @@ export default {
         }
       }
     },
-    dealwithPhoto() {
-      this.sendParameters()
-        .then(() => {
-            let data = {
-                name: this.photoName,
-            };
-            console.log(data);
-            return this.$axios.post("http://localhost:8000/start_process_photo", data);
-        })
-        .then(() => {
-            this.getPhoto();
-        })
-        .catch(error => {
-            console.error('处理过程出错:', error);
-        });
-    },
+    async dealwithPhoto() {
+  let loadingInstance; // 在 try 块外定义 loadingInstance，以便在 catch 中访问
+      console.log("123");
+      
+  try {
+    // 显示 loading
+    loadingInstance = this.$loading({
+      lock: true,
+      text: `加载中...`, // 去掉百分比显示
+      spinner: "el-icon-loading",
+      background: "rgba(0, 0, 0, 0.7)",
+    });
+
+    // 发送处理参数
+    await this.sendParameters();
+
+    let data = {
+      name: this.photoName,
+    };
+    console.log(data);
+
+    // 开始处理照片
+    await this.$axios.post("http://localhost:8000/start_process_photo", data);
+
+
+    // 获取照片和日志
+    await this.getPhoto();
+    // await this.getLog();
+  } catch (error) {
+    console.error("处理过程出错:", error);
+  } finally {
+    // 确保 loading 被关闭
+    if (loadingInstance) {
+      loadingInstance.close();
+    }
+  }
+},
+
+
     resetPhoto() {
       this.isShowPhoto = false;
       this.isShowLocalPhoto = true;
@@ -517,25 +674,56 @@ export default {
       this.photoUrl_ = "";
     },
     async getPhoto() {
-      try {
-        const response = await fetch(`http://localhost:8000/stream_photo?name=${this.photoName}&style=2`);
-        
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        console.log(response);
-        
-        // const blob = await response.blob(); // 将响应转换为 Blob（二进制大对象）
-        // const imageUrl = URL.createObjectURL(blob); // 使用 URL.createObjectURL() 将 Blob 转换为一个 URL
-        this.photoUrl = response.url; // 将这个 URL 赋值给图片的 src
-        
-        console.log(this.photoUrl);
-        this.isShowPhoto = true;
-        this.isShowLocalPhoto = false;
-      } catch (error) {
-        console.error("There was a problem with the fetch operation:", error);
+  let flag = 0; // 初始化标志变量
+  const checkInterval = 1000; // 轮询间隔，单位为毫秒
+  
+  while (flag === 0) {
+    try {
+      const response = await fetch(`http://localhost:8000/stream_photo?name=${this.photoName}&style=2`);
+      
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
       }
-    },
+
+      const url = response.url; // 获取响应的 URL
+      
+      // 发送请求来检查 url 指向的内容
+      const contentResponse = await fetch(url); // 获取 url 指向的内容
+      
+      if (!contentResponse.ok) {
+        throw new Error("Failed to fetch content from the URL");
+      }
+
+      const contentType = contentResponse.headers.get("Content-Type");
+
+      if (contentType && contentType.includes("application/json")) {
+        // 如果返回的是 JSON，则表示图片未准备好
+        const jsonResponse = await contentResponse.json(); // 解析 JSON 响应
+        console.log(jsonResponse); // 查看 JSON 内容
+        // 检查 JSON 内容是否包含 success 字段并且值为 0
+        if (jsonResponse.success === 0) {
+          console.log("图片还在处理中...");
+          flag = 0; // 图片未准备好，继续轮询
+        }
+      } else if (contentType && contentType.includes("image/jpeg")) {
+        // 如果返回的是图像，则表示图片已准备好
+        this.photoUrl = url; // 使用 URL 赋值给图片的 src
+        console.log("图片已准备好，URL:", this.photoUrl);
+        flag = 1; // 图片已准备好，设置标志位为 1
+        this.isShowPhoto = true; // 显示图片
+        this.isShowLocalPhoto = false; // 隐藏本地图片
+      } else {
+        console.log("未知的响应类型");
+      }
+    } catch (error) {
+      console.error("获取照片时发生错误:", error);
+    }
+
+    // 等待指定的时间再进行下一次轮询
+    await new Promise(resolve => setTimeout(resolve, checkInterval));
+  }
+},
+
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
     },

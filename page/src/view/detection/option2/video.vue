@@ -3,7 +3,10 @@
     <!-- 固定在右边的抽屉 -->
     <div :class="drawer_class_ctrl" style="width: 15vw">
       <div class="drawer-content">
-        <div class="right-log-head" style="line-height: 6vh; position: absolute; z-index: 5; height: 6vh">
+        <div
+          class="right-log-head"
+          style="line-height: 6vh; position: absolute; z-index: 5; height: 6vh"
+        >
           处理中心
         </div>
         <div style="height: 3vh"></div>
@@ -12,7 +15,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             散射增强
           </div>
-          <el-switch v-model="haze" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="haze"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -20,7 +28,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             弱光增强
           </div>
-          <el-switch v-model="dark" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="dark"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -28,7 +41,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             行人跟踪
           </div>
-          <el-switch v-model="people_tracker_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="people_tracker_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -36,7 +54,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             行人属性检测
           </div>
-          <el-switch v-model="people_attribute_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="people_attribute_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -44,7 +67,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             车辆跟踪
           </div>
-          <el-switch v-model="vehicle_tracker_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="vehicle_tracker_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -52,7 +80,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             车辆属性检测
           </div>
-          <el-switch v-model="vehicle_attribute_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="vehicle_attribute_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -60,7 +93,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             车牌检测
           </div>
-          <el-switch v-model="vehicle_license_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="vehicle_license_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -68,7 +106,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             违章检测
           </div>
-          <el-switch v-model="vehicle_press_detector_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="vehicle_press_detector_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
         <el-divider></el-divider>
@@ -76,7 +119,12 @@
           <div style="height: 4vh; line-height: 4vh; user-select: none">
             违停检测
           </div>
-          <el-switch v-model="vehicle_invasion_enable" active-text="开启" inactive-text="关闭" @change="checkParameter">
+          <el-switch
+            v-model="vehicle_invasion_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
           </el-switch>
         </div>
       </div>
@@ -92,22 +140,36 @@
       <div style="height: 100%; width: 70%">
         <div style="height: 80%; width: 100%" class="upload">
           <!-- 上传视频  -->
-          <el-upload class="upload-demo" drag :action="uploadUrl" multiple :before-upload="handleBeforeUpload"
-            :on-success="handleSuccess" :on-error="handleError" :on-progress="handleProgress" v-if="!isShowVideo">
-            <div v-if="!showProgress" style="
+          <el-upload
+            class="upload-demo"
+            drag
+            :action="uploadUrl"
+            multiple
+            :before-upload="handleBeforeUpload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :on-progress="handleProgress"
+            v-if="!isShowVideo"
+          >
+            <div
+              v-if="!showProgress"
+              style="
                 position: relative;
                 top: 50%;
                 left: 50%;
                 transform: translate3d(-50%, -50%, 0);
                 width: auto;
                 height: auto;
-              ">
+              "
+            >
               <i class="el-icon-upload"></i>
-              <div class="el-upload__text" style="height: auto; line-height: 10vh">
+              <div
+                class="el-upload__text"
+                style="height: auto; line-height: 10vh"
+              >
                 将视频拖到此处，或<em>点击上传</em>
               </div>
             </div>
-
           </el-upload>
           <!-- 上传视频  -->
           <!-- 显示视频  -->
@@ -115,52 +177,114 @@
       <el-loading :text="`当前进度: ${progressPercentage}%`" lock fullscreen z-index="9999">
       </el-loading>
     </div> -->
-          <div v-if="isShowVideo" style="background-color: #000; width: 100%; height: 100%">
-            <video v-if="isShowLocalVideo" controls preload="auto" style="
+          <div
+            v-if="isShowVideo"
+            style="background-color: #000; width: 100%; height: 100%"
+          >
+            <video
+              v-if="isShowLocalVideo"
+              controls
+              preload="auto"
+              style="
                 background: #000;
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
-              " :src="VideoUrl_" type="video/mp4"></video>
-            <video v-if="!isShowLocalVideo" id="example" controls preload="auto" style="
+              "
+              :src="VideoUrl_"
+              type="video/mp4"
+            ></video>
+            <video
+              v-if="!isShowLocalVideo"
+              id="example"
+              controls
+              preload="auto"
+              style="
                 background: #000;
                 max-width: 100%;
                 max-height: 100%;
                 object-fit: contain;
-              " :src="videoUrl" type="video/mp4"></video>
+              "
+              :src="videoUrl"
+              type="video/mp4"
+            ></video>
           </div>
           <!-- 显示视频  -->
           <!--提示部分-->
           <div v-if="logDetail"
-            style="height: 80%;width: 60%;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);z-index: 8;background-color: white;border-radius: 0.5vw;">
-            <div
-              style="width: 100%; height: 7vh;border-top-left-radius: 0.5vw;border-top-right-radius: 0.5vw;background-color: rgb(66,159,255);text-align: center;line-height: 7vh;;font-size: 2vw;color: white;font-weight: 900;">
-              检测图片</div>
-            <div style="flex: 1; display: flex; justify-content: center; align-items: center; padding: 10px;">
-              <img src="detailPhotoUrl" alt="image" style="max-width: 100%; max-height: 100%; border-radius: 0.5vw;">
-            </div>
+     ref="draggableBox"
+     style="height: 80%; width: 60%; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 8; background-color: white; border-radius: 0.5vw;">
+  <!-- 顶部标题 -->
+  <div @mousedown="startDrag"
+       style="cursor: move; width: 100%; height: 7vh; border-top-left-radius: 0.5vw; border-top-right-radius: 0.5vw; background-color: rgb(66,159,255); text-align: center; line-height: 7vh; font-size: 2vw; color: white; font-weight: 900;">
+    检测图片
 
-            <!-- 右侧文字 -->
-            <div style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
-              <div style="font-size: 1.5vw; font-weight: 700; margin-bottom: 10px;">标题</div>
-              <div style="font-size: 1.2vw; color: gray; margin-bottom: 10px;">这里是第一行文字。</div>
-              <div style="font-size: 1.2vw; color: gray; margin-bottom: 10px;">这里是第二行文字。</div>
-              <div style="font-size: 1.2vw; color: gray;">这里是第三行文字。</div>
-            </div>
-          </div>
+    <!-- 关闭按钮 -->
+    <button @click="closeWindow" 
+            style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; font-size: 2vw; color: white; cursor: pointer;">
+      ×
+    </button>
+  </div>
+
+  <!-- 主体内容，使用 flex 布局 -->
+  <div style="display: flex; height: calc(80% - 7vh); padding: 10px;">
+
+    <!-- 左侧图片区域 -->
+    <div style="flex: 3; display: flex; justify-content: center; align-items: center;padding-top: 40px;" >
+      <img :src="detailPhotoUrl" alt="image" style="width: 75%; height: auto; border-radius: 0.5vw;">
+    </div>
+
+    <!-- 右侧文本内容 -->
+    <div style="flex: 1.3; padding: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: -30px;">
+  <div style="font-size: 1.8vw; font-weight: 700; margin-bottom: 10px;">检测信息</div>
+  
+  <!-- 检测类别 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测类别: <br>
+    <span style="font-weight: normal;">{{ id }}</span>
+  </div>
+
+  <!-- 检测时间 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测时间: <br>
+    <span style="font-weight: normal;">{{ time }}</span>
+  </div>
+
+  <!-- 目标坐标 -->
+  <div style="font-size: 1.8vw; color: gray;">
+    目标坐标: <br>
+    <span style="font-weight: normal;">{{ location }}</span>
+  </div>
+</div>
+
+  </div>
+</div>
+
           <!--提示部分-->
         </div>
         <div style="height: 5%"></div>
         <!-- 视频下方操作按钮-->
-        <div class="bottom-ctrl" style="height: 15%; width: 100%; font-size: 2vw">
+        <div
+          class="bottom-ctrl"
+          style="height: 15%; width: 100%; font-size: 2vw"
+        >
           <div class="bottom-ctrl-one">
             <!-- <el-button type="primary" class="bottom-button" @click="switchCamera">{{isShowCamera ? '关闭摄像头' : '开启摄像头'}}</el-button>
                 <el-button type="primary" class="bottom-button">开始检测</el-button> -->
             <!-- <el-button type="primary" class="bottom-button">开启录制</el-button> -->
-            <el-button type="primary" class="bottom-button" @click="dealWithVideo">开始检测</el-button>
-            <el-button type="primary" class="bottom-button" @click="saveVideo">导出视频</el-button>
+            <el-button
+              type="primary"
+              class="bottom-button"
+              @click="dealWithVideo"
+              >开始检测</el-button
+            >
+            <el-button type="primary" class="bottom-button" @click="saveVideo"
+              >导出视频</el-button
+            >
             <el-button type="primary" class="bottom-button">截取图片</el-button>
-            <el-button type="primary" class="bottom-button" @click="resetVideo">重置视频</el-button>
+            <el-button type="primary" class="bottom-button" @click="resetVideo"
+              >重置视频</el-button
+            >
           </div>
         </div>
         <!-- 视频下方操作按钮-->
@@ -169,30 +293,46 @@
       <div style="height: 100%; width: 30%">
         <div class="right-log">
           <div class="right-log-head">检测日志</div>
-          <el-table ref="multipleTable" :data="paginatedData" tooltip-effect="dark" style="width: 100%"
-            :row-style="{ height: '50px' }">
-
+          <el-table
+            ref="multipleTable"
+            :data="paginatedData"
+            tooltip-effect="dark"
+            style="width: 100%"
+            :row-style="{ height: '50px' }"
+          >
             <el-table-column width="5"> </el-table-column>
-            <el-table-column prop="id" label="类别" width="50">
+            <el-table-column prop="id" label="类别" width="60">
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
-            <el-table-column prop="time" label="时间" width="60">
+            <el-table-column prop="time" label="时间" width="150">
             </el-table-column>
             <el-table-column prop="location" label="坐标" width="150">
             </el-table-column>
-            <el-table-column prop="name" label="图片名称" width="0">
-            </el-table-column>
             <el-table-column label="操作" width="110">
               <template slot-scope="scope">
-                <el-button type="primary" class="chaKanButton" @click="handleButtonClick(scope.id, scope.name)">
+                <el-button
+                  type="primary"
+                  class="chaKanButton"
+                  @click="handleButtonClick(scope.row.id,scope.row.time,scope.row.location, scope.row.name)"
+                >
                   查看图片
                 </el-button>
               </template>
             </el-table-column>
+            <!-- <el-table-column prop="name" label="" width="0"  style="visibility: hidden;">
+              <template slot-scope="scope">
+    <span style="visibility: hidden;"></span>
+  </template>
+            </el-table-column> -->
           </el-table>
-          <div style="padding: 5px; text-align: left">
-            <el-pagination :current-page="pageNum" :page-sizes="[10, 20, 50]" :page-size="pageSize"
-              layout="total, prev, pager, next, jumper" :total="total">
+          <div style="padding: 20px; text-align: center ;font-size: 3.5vw;">
+            <el-pagination
+              :current-page="pageNum"
+              :page-sizes="[10, 20, 50]"
+              :page-size="pageSize"
+              layout="total, prev, pager, next, jumper"
+              :total="total"
+            >
             </el-pagination>
           </div>
         </div>
@@ -210,6 +350,12 @@ export default {
   },
   data() {
     return {
+      id : "",
+      time : 0,
+      location: "",
+      isDragging: false, // 用于追踪拖动状态
+      offsetX: 0,
+      offsetY: 0,
       currentPage: 1,
       pageNum: 0,
       pageSize: 10,
@@ -255,25 +401,54 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
-
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
   },
   methods: {
-    async handleButtonClick(id, photoName) {
+    startDrag(event) {
+      this.isDragging = true; // 开始拖动
+      this.offsetX =
+        event.clientX - this.$refs.draggableBox.getBoundingClientRect().left;
+      this.offsetY =
+        event.clientY - this.$refs.draggableBox.getBoundingClientRect().top;
+
+      document.addEventListener("mousemove", this.doDrag);
+      document.addEventListener("mouseup", this.stopDrag);
+    },
+    doDrag(event) {
+      if (this.isDragging) {
+        const left = event.clientX - this.offsetX;
+        const top = event.clientY - this.offsetY;
+
+        this.$refs.draggableBox.style.left = `${left}px`;
+        this.$refs.draggableBox.style.top = `${top}px`;
+        this.$refs.draggableBox.style.transform = "none"; // 移动时取消 `transform`
+      }
+    },
+    stopDrag() {
+      this.isDragging = false;
+      document.removeEventListener("mousemove", this.doDrag);
+      document.removeEventListener("mouseup", this.stopDrag);
+    },
+    closeWindow() {
+      this.logDetail = false; // 设置为 false 以关闭窗口
+    },
+    async handleButtonClick(id, time, location, photoName) {
       console.log(id, photoName);
+      this.id = id;
+      this.time = time;
+      this.location = location;
       this.detailPhotoName = photoName;
       if (id == "行人") {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=3`
+            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
-
 
           console.log(response.url);
 
@@ -284,8 +459,7 @@ export default {
         } catch (error) {
           console.error("There was a problem with the fetch operation:", error);
         }
-      }
-      else {
+      } else {
         try {
           const response = await fetch(
             `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
@@ -294,7 +468,6 @@ export default {
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
-
 
           console.log(response.url);
 
@@ -308,12 +481,8 @@ export default {
         }
       }
     },
-    handleSizeChange() {
-
-    },
-    handleCurrentChange() {
-
-    },
+    handleSizeChange() {},
+    handleCurrentChange() {},
     saveVideo() {
       if (!this.VideoName) {
         this.$message({
@@ -366,7 +535,7 @@ export default {
       };
       return this.$axios
         .post("http://localhost:8000/ConfirmParams", data)
-        .then((res) => { });
+        .then((res) => {});
     },
     checkParameter(value) {
       var that = this;
@@ -438,14 +607,18 @@ export default {
         console.log(data);
 
         // 开始处理视频
-        await this.$axios.post("http://localhost:8000/start_process_video", data);
-
+        await this.$axios.post(
+          "http://localhost:8000/start_process_video",
+          data
+        );
+        console.log(this.progressPercentage);
+        
         // 显示 loading
         const loadingInstance = this.$loading({
           lock: true,
           text: `加载中...${this.progressPercentage}%`,
-          spinner: 'el-icon-loading',
-          background: 'rgba(0, 0, 0, 0.7)',
+          spinner: "el-icon-loading",
+          background: "rgba(0, 0, 0, 0.7)",
         });
 
         // 调用函数轮询进度
@@ -467,20 +640,31 @@ export default {
         const response = await this.$axios.post("http://localhost:8000/log");
         console.log(response);
         if (response.status === 200) {
-          const convertedPeopleLog = response.data.people_log.map(item => {
-            return { id: '行人', time: item[0], location: `(${Math.floor(item[1][0])}, ${Math.floor(item[1][1])}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`, name: item[2] };
+          const convertedPeopleLog = response.data.people_log.map((item) => {
+            return {
+              id: "行人",
+              time: item[0],
+              location: `(${Math.floor(item[1][0])}, ${Math.floor(
+                item[1][1]
+              )}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`,
+              name: item[2],
+            };
           });
 
           // 转换 vehicle_log
-          const convertedVehicleLog = response.data.vehicle_log.map(item => {
-            return { id: '车辆', time: item[0], location: `(${Math.floor(item[1][0])}, ${Math.floor(item[1][1])}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`, name: item[2] };
+          const convertedVehicleLog = response.data.vehicle_log.map((item) => {
+            return {
+              id: "车辆",
+              time: item[0],
+              location: `(${Math.floor(item[1][0])}, ${Math.floor(
+                item[1][1]
+              )}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`,
+              name: item[2],
+            };
           });
 
           // 合并结果
-          const combinedLogs = [
-            ...convertedPeopleLog,
-            ...convertedVehicleLog
-          ];
+          const combinedLogs = [...convertedPeopleLog, ...convertedVehicleLog];
 
           // 将合并后的数据赋值给 paginatedData
           this.tableData = this.tableData.concat(combinedLogs);
@@ -488,19 +672,24 @@ export default {
           console.log(this.tableData);
         }
       } catch (error) {
-        console.error('请求失败:', error.response ? error.response.data : error);
+        console.error(
+          "请求失败:",
+          error.response ? error.response.data : error
+        );
       }
     },
     // 轮询进度检查函数
     async checkProgress(loadingInstance) {
       let progress = 0;
       while (progress < 100) {
-
         try {
           let data = {
             video_name: this.videoName,
           };
-          const response = await this.$axios.post('http://127.0.0.1:8000/get_progress', data);
+          const response = await this.$axios.post(
+            "http://127.0.0.1:8000/get_progress",
+            data
+          );
 
           if (response.status === 200 && response.data.progress !== undefined) {
             progress = response.data.progress; // 假设后端返回的进度在 `progress` 字段
@@ -508,21 +697,20 @@ export default {
             this.progressPercentage = progress; // 更新进度显示
             loadingInstance.setText(`加载中... ${this.progressPercentage}%`);
           } else {
-            console.warn('Invalid response format');
+            console.warn("Invalid response format");
           }
         } catch (error) {
-          console.error('There was a problem with the fetch operation:', error);
+          console.error("There was a problem with the fetch operation:", error);
         }
         // 等待一段时间再检查进度
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
       this.progressPercentage = 0;
     },
 
-
     // 自定义 sleep 函数，用于轮询间隔
     sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
     },
     async getVideo() {
       try {
@@ -533,7 +721,6 @@ export default {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-
 
         console.log(response.url);
 
@@ -550,7 +737,7 @@ export default {
       this.drawerVisible = !this.drawerVisible;
     },
     handleBeforeUpload(file) {
-      const supportedFormats = ["mp4", "avi", "mov", "mkv"];
+      const supportedFormats = ["mp4"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
       const isSupportedFormat = supportedFormats.includes(fileExtension);
 
@@ -563,7 +750,7 @@ export default {
       } else {
         let errorMessage = "";
         if (!isSupportedFormat) {
-          errorMessage += "不支持的视频格式。";
+          errorMessage += "不支持的视频格式。只支持mp4";
         }
         if (!isSizeValid) {
           errorMessage += "文件大小超过 100 MB。";
@@ -754,6 +941,10 @@ export default {
   /* 图标与文本之间的间距 */
 }
 
+.hidden-column .cell {
+  display: none;
+}
+
 .upload .el-upload__text {
   text-align: center;
   /* 确保文本内容在其容器中居中对齐 */
@@ -853,4 +1044,5 @@ export default {
 }
 video::-webkit-media-controls-timeline {
   display: none;
-}*/</style>
+}*/
+</style>

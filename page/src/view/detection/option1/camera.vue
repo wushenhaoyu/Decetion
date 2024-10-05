@@ -107,6 +107,57 @@
     <div v-if="isShowCameraSelectList" style="position: absolute;height: 90%;width: 90%;z-index: 4" @click="closeSelectCamera"></div>
     <div v-if="isShowRecordList" style="position: absolute;height: 90%;width: 90%;z-index: 4" @click="controlRecordList"></div>
     <!-- 以下为主内容 -->
+     <!--提示部分-->
+     <div v-if="logDetail"
+     ref="draggableBox"
+     style="height: 80%; width: 60%; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); z-index: 8; background-color: white; border-radius: 0.5vw;">
+  <!-- 顶部标题 -->
+  <div @mousedown="startDrag"
+       style="cursor: move; width: 100%; height: 7vh; border-top-left-radius: 0.5vw; border-top-right-radius: 0.5vw; background-color: rgb(66,159,255); text-align: center; line-height: 7vh; font-size: 2vw; color: white; font-weight: 900;">
+    检测图片
+
+    <!-- 关闭按钮 -->
+    <button @click="closeWindow" 
+            style="position: absolute; right: 10px; top: 10px; background: transparent; border: none; font-size: 2vw; color: white; cursor: pointer;">
+      ×
+    </button>
+  </div>
+
+  <!-- 主体内容，使用 flex 布局 -->
+  <div style="display: flex; height: calc(80% - 7vh); padding: 10px;">
+
+    <!-- 左侧图片区域 -->
+    <div style="flex: 3; display: flex; justify-content: center; align-items: center;padding-top: 40px;" >
+      <img :src="detailPhotoUrl" alt="image" style="width: 75%; height: auto; border-radius: 0.5vw;">
+    </div>
+
+    <!-- 右侧文本内容 -->
+    <div style="flex: 1.3; padding: 20px; display: flex; flex-direction: column; justify-content: center; margin-left: -30px;">
+  <div style="font-size: 1.8vw; font-weight: 700; margin-bottom: 10px;">检测信息</div>
+  
+  <!-- 检测类别 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测类别: <br>
+    <span style="font-weight: normal;">{{ id }}</span>
+  </div>
+
+  <!-- 检测时间 -->
+  <div style="font-size: 1.8vw; color: gray; margin-bottom: 10px;">
+    检测时间: <br>
+    <span style="font-weight: normal;">{{ time }}</span>
+  </div>
+
+  <!-- 目标坐标 -->
+  <div style="font-size: 1.8vw; color: gray;">
+    目标坐标: <br>
+    <span style="font-weight: normal;">{{ location }}</span>
+  </div>
+</div>
+
+  </div>
+</div>
+
+          <!--提示部分-->
     <div style="height: 5%"></div>
     <div class="main">
       <div style="height: 100%; width: 70%">
@@ -135,6 +186,7 @@
             
           </div>
           <!--提示部分-->
+          
           <!--获取录制视频界面-->
           <div v-if="isShowRecordList" style="height: 80%;width: 60%;position: absolute;left: 50%;top: 50%;transform: translate(-50%,-50%);z-index: 8;background-color: white;border-radius: 0.5vw;">
             <div style="width: 100%; height: 7vh;border-top-left-radius: 0.5vw;border-top-right-radius: 0.5vw;background-color: rgb(66,159,255);text-align: center;line-height: 7vh;;font-size: 2vw;color: white;font-weight: 900;">录制视频资源</div>
@@ -185,24 +237,35 @@
             :data="paginatedData"
             tooltip-effect="dark"
             style="width: 100%"
+            :row-style="{ height: '50px' }"
           >
-          
-            <el-table-column  width="55"> </el-table-column>
-            <el-table-column prop="size" label="宽高" width="70" >
+            <el-table-column width="5"> </el-table-column>
+            <el-table-column prop="id" label="类别" width="60">
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
-            <el-table-column prop="id" label="id" width="80">
+            <el-table-column prop="time" label="时间" width="150">
             </el-table-column>
-            <el-table-column prop="image" label="图片" show-overflow-tooltip>
+            <el-table-column prop="location" label="坐标" width="150">
+            </el-table-column>
+            <el-table-column label="操作" width="110">
+              <template slot-scope="scope">
+                <el-button
+                  type="primary"
+                  class="chaKanButton"
+                  @click="handleButtonClick(scope.row.id,scope.row.time,scope.row.location, scope.row.name)"
+                >
+                  查看图片
+                </el-button>
+              </template>
             </el-table-column>
           </el-table>
-          <div style="padding: 5px; text-align: left">
+          <div style="padding: 20px; text-align: center ;font-size: 3.5vw;">
             <el-pagination
-              :current-page="currentPage"
+              :current-page="pageNum"
+              :page-sizes="[10, 20, 50]"
               :page-size="pageSize"
-              layout="total, prev, pager, next"
+              layout="total, prev, pager, next, jumper"
               :total="total"
-               @current-change="handleCurrentChange"
             >
             </el-pagination>
           </div>
@@ -220,17 +283,18 @@ export default {
     myvideo,
   },
   data() {
-    const item = {
-      size: "50,50",
-      id: "1234567",
-      image: "上海市普陀区金沙江路 1518 弄",
-    };
     return {
-      currentPage:1,
-      pageNum:2,
+      id : "",
+      time : 0,
+      location: "",
+      isDragging: false, // 用于追踪拖动状态
+      offsetX: 0,
+      offsetY: 0,
+      currentPage: 1,
+      pageNum: 0,
       pageSize: 10,
-      total: 20,
-      tableData: Array(20).fill(item),
+      tableData: [],
+      total: 0,
       haze: false,
       dark: false,
       people_detector_enable: false, // 行人监测
@@ -254,6 +318,8 @@ export default {
       isStartRecord:false,
       isShowRecordList:false,
       recordList:[],
+      detailPhotoName: "",
+      logDetail: false,
     };
   },
   computed: {
@@ -276,6 +342,81 @@ export default {
     this.total = this.tableData.length; // 设置总数据条目数
   },
   methods: {
+    startDrag(event) {
+      this.isDragging = true; // 开始拖动
+      this.offsetX =
+        event.clientX - this.$refs.draggableBox.getBoundingClientRect().left;
+      this.offsetY =
+        event.clientY - this.$refs.draggableBox.getBoundingClientRect().top;
+
+      document.addEventListener("mousemove", this.doDrag);
+      document.addEventListener("mouseup", this.stopDrag);
+    },
+    doDrag(event) {
+      if (this.isDragging) {
+        const left = event.clientX - this.offsetX;
+        const top = event.clientY - this.offsetY;
+
+        this.$refs.draggableBox.style.left = `${left}px`;
+        this.$refs.draggableBox.style.top = `${top}px`;
+        this.$refs.draggableBox.style.transform = "none"; // 移动时取消 `transform`
+      }
+    },
+    stopDrag() {
+      this.isDragging = false;
+      document.removeEventListener("mousemove", this.doDrag);
+      document.removeEventListener("mouseup", this.stopDrag);
+    },
+    closeWindow() {
+      this.logDetail = false; // 设置为 false 以关闭窗口
+    },
+    async handleButtonClick(id, time, location, photoName) {
+      console.log(id, photoName);
+      this.id = id;
+      this.time = time;
+      this.location = location;
+      this.detailPhotoName = photoName;
+      if (id == "行人") {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          console.log(response.url);
+
+          this.detailPhotoUrl = response.url; // 将这个 URL 赋值给视频的 src
+
+          console.log(this.detailPhotoUrl);
+          this.logDetail = true;
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+      } else {
+        try {
+          const response = await fetch(
+            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          console.log(response.url);
+
+          this.videoUrl = response.url; // 将这个 URL 赋值给视频的 src
+
+          console.log(this.videoUrl);
+          this.isShowLocalVideo = false;
+          this.isShowVideo = true; // 控制视频显示的变量
+        } catch (error) {
+          console.error("There was a problem with the fetch operation:", error);
+        }
+      }
+    },
     
     handleCurrentChange(page) {
       this.currentPage = page;
@@ -284,6 +425,49 @@ export default {
     startRecordVideo(){
       this.$axios.post('http://127.0.0.1:8000/livedisplayRecord').then(res => {
       })
+    },
+    async getLog() {
+      try {
+        const response = await this.$axios.post("http://localhost:8000/log");
+        console.log(response);
+        if (response.status === 200) {
+          const convertedPeopleLog = response.data.people_log.map((item) => {
+            return {
+              id: "行人",
+              time: item[0],
+              location: `(${Math.floor(item[1][0])}, ${Math.floor(
+                item[1][1]
+              )}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`,
+              name: item[2],
+            };
+          });
+
+          // 转换 vehicle_log
+          const convertedVehicleLog = response.data.vehicle_log.map((item) => {
+            return {
+              id: "车辆",
+              time: item[0],
+              location: `(${Math.floor(item[1][0])}, ${Math.floor(
+                item[1][1]
+              )}, ${Math.floor(item[1][2])}, ${Math.floor(item[1][3])})`,
+              name: item[2],
+            };
+          });
+
+          // 合并结果
+          const combinedLogs = [...convertedPeopleLog, ...convertedVehicleLog];
+
+          // 将合并后的数据赋值给 paginatedData
+          this.tableData = this.tableData.concat(combinedLogs);
+          this.total = this.tableData.length;
+          console.log(this.tableData);
+        }
+      } catch (error) {
+        console.error(
+          "请求失败:",
+          error.response ? error.response.data : error
+        );
+      }
     },
     
     sendParameters(value) {
@@ -451,6 +635,7 @@ export default {
     switchCamera() {
       if (this.isShowCamera) {
         this.isShowCamera = false;
+        clearInterval(this.logPollingInterval);
         this.$axios.get("http://localhost:8000/closecam").then((response) => {
             //src让其为空
           })
@@ -469,8 +654,20 @@ export default {
         this.$axios.get("http://localhost:8000/opencam").then((response) => {
           
           })
+          console.log("abc");
         this.cameraUrl = "http://localhost:8000/livedisplay"
+        console.log("abc");
+        this.startLogPolling();
+        console.log("abc");
       }
+    },
+    startLogPolling() {
+      // 每隔 1000 毫秒（1 秒）调用 getLog
+      console.log("abc");
+      
+      this.logPollingInterval = setInterval(async () => {
+        await this.getLog();
+      }, 1000);
     },
     toggleDrawer() {
       this.drawerVisible = !this.drawerVisible;
