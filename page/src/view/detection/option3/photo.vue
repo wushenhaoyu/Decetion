@@ -419,11 +419,15 @@ export default {
       photoName: "",
       photoUrl_: "", //本地图片路径,
       isShowLocalPhoto: true,
-      uploadUrl: "http://localhost:8000/upload_photo",
+      uploadUrl: "",
       photoUrl: "",
       detailPhotoName: "",
       logDetail: false,
     };
+  },
+  created() {
+    // 在生命周期钩子里初始化 cameraUrl
+    this.uploadUrl = this.$globalVar.url + "upload_photo";
   },
   computed: {
     
@@ -441,9 +445,6 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
-    // photoUrl() {
-    //   return `http://localhost:8000/stream_photo?name=${this.photoName}&style=2`;
-    // }
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
@@ -497,7 +498,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
+            this.$globalVar.url + `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -516,7 +517,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
+            this.$globalVar.url + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -589,7 +590,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post("http://localhost:8000/ConfirmParams", data)
+        .post(this.$globalVar.url+"ConfirmParams", data)
         .then((res) => {
           
         });
@@ -650,7 +651,7 @@ export default {
     console.log(data);
 
     // 开始处理照片
-    await this.$axios.post("http://localhost:8000/start_process_photo", data);
+    await this.$axios.post(this.$globalVar.url+"start_process_photo", data);
 
 
     // 获取照片和日志
@@ -679,7 +680,7 @@ export default {
   
   while (flag === 0) {
     try {
-      const response = await fetch(`http://localhost:8000/stream_photo?name=${this.photoName}&style=2`);
+      const response = await fetch(this.$globalVar.url+`stream_photo?name=${this.photoName}&style=2`);
       
       if (!response.ok) {
         throw new Error("Network response was not ok");

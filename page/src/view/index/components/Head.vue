@@ -3,7 +3,7 @@
       <el-menu :default-active="activeIndex" class="el-menu-demo head" mode="horizontal" @select="handleSelect">
         <div style="height: 6vh;">
             <a :href="'https://www.paddlepaddle.org.cn/'" target="_blank" rel="noopener noreferrer">
-            <img :src="'/static/pic/logo.png'" alt="icon" height="100%" />
+            <img src="../../../assets/logo.png" alt="icon" height="100%" />
             </a>
         </div>
         <div class="spacer"></div>

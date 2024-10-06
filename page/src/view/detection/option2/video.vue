@@ -319,11 +319,6 @@
                 </el-button>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="name" label="" width="0"  style="visibility: hidden;">
-              <template slot-scope="scope">
-    <span style="visibility: hidden;"></span>
-  </template>
-            </el-table-column> -->
           </el-table>
           <div style="padding: 20px; text-align: center ;font-size: 3.5vw;">
             <el-pagination
@@ -376,7 +371,7 @@ export default {
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
       videoUrl: "",
-      uploadUrl: "http://localhost:8000/uploadVideo",
+      uploadUrl: "",
       showProgress: false,
       progressPercentage: 0,
       isShowLocalVideo: true,
@@ -401,6 +396,10 @@ export default {
         this.drawerVisible ? "el-icon-caret-right" : "el-icon-caret-left",
       ];
     },
+  },
+  created() {
+    // 在生命周期钩子里初始化 cameraUrl
+    this.uploadUrl = this.$globalVar.url + "uploadVideo";
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
@@ -443,7 +442,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
+            this.$globalVar.url +  `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -462,7 +461,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
+            this.$globalVar.url + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -482,7 +481,9 @@ export default {
       }
     },
     handleSizeChange() {},
-    handleCurrentChange() {},
+    handleCurrentChange(page) {
+      this.currentPage = page;
+    },
     saveVideo() {
       if (!this.VideoName) {
         this.$message({
@@ -534,7 +535,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post("http://localhost:8000/ConfirmParams", data)
+        .post( this.$globalVar.url + "ConfirmParams", data)
         .then((res) => {});
     },
     checkParameter(value) {
@@ -608,7 +609,7 @@ export default {
 
         // 开始处理视频
         await this.$axios.post(
-          "http://localhost:8000/start_process_video",
+          this.$globalVar.url + "start_process_video",
           data
         );
         console.log(this.progressPercentage);
@@ -637,7 +638,7 @@ export default {
 
     async getLog() {
       try {
-        const response = await this.$axios.post("http://localhost:8000/log");
+        const response = await this.$axios.post(this.$globalVar.url+"log");
         console.log(response);
         if (response.status === 200) {
           const convertedPeopleLog = response.data.people_log.map((item) => {
@@ -687,7 +688,7 @@ export default {
             video_name: this.videoName,
           };
           const response = await this.$axios.post(
-            "http://127.0.0.1:8000/get_progress",
+            this.$globalVar.url + "get_progress",
             data
           );
 
@@ -715,7 +716,7 @@ export default {
     async getVideo() {
       try {
         const response = await fetch(
-          `http://localhost:8000/stream_video?name=${this.videoName}&style=2`
+          this.$globalVar.url + `stream_video?name=${this.videoName}&style=2`
         );
 
         if (!response.ok) {
@@ -837,7 +838,7 @@ export default {
         name: this.videoName,
       };
       this.$axios
-        .post("http://127.0.0.1:8000/get_progress", data)
+        .post(this.$globalVar.url+"get_progress", data)
         .then((res) => {
           this.progress = res.progress;
         });

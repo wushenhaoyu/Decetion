@@ -309,7 +309,7 @@ export default {
       isShowCamera: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
-      cameraUrl: "http://localhost:8000/livedisplay",
+      cameraUrl: "",
       uploadUrl: "",
       showProgress: false,
       progressPercentage: 0,
@@ -321,6 +321,10 @@ export default {
       detailPhotoName: "",
       logDetail: false,
     };
+  },
+    created() {
+    // 在生命周期钩子里初始化 cameraUrl
+    this.cameraUrl = this.$globalVar.url + "livedisplay";
   },
   computed: {
     paginatedData() {
@@ -379,7 +383,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_photo?name=${this.detailPhotoName}&style=3`
+            this.$globalVar.url + `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -398,7 +402,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            `http://localhost:8000/stream_video?name=${this.detailPhotoName}&style=4`
+            this.$globalVar.url + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -423,12 +427,12 @@ export default {
     },
     
     startRecordVideo(){
-      this.$axios.post('http://127.0.0.1:8000/livedisplayRecord').then(res => {
+      this.$axios.post(this.$globalVar.url + 'livedisplayRecord').then(res => {
       })
     },
     async getLog() {
       try {
-        const response = await this.$axios.post("http://localhost:8000/log");
+        const response = await this.$axios.post(this.$globalVar.url+"log");
         console.log(response);
         if (response.status === 200) {
           const convertedPeopleLog = response.data.people_log.map((item) => {
@@ -486,7 +490,7 @@ export default {
         vehicle_press_detector: this.vehicle_press_detector_enable,
         vehicle_invasion:this.vehicle_invasion_enable
       }
-      this.$axios.post('http://localhost:8000/ConfirmParams', data).then(res => {
+      this.$axios.post(this.$globalVar.url+'ConfirmParams', data).then(res => {
       })
     },
     checkParameter(value){
@@ -523,7 +527,7 @@ export default {
       let data = {
         camId : id
       }
-      this.$axios.post("http://localhost:8000/Camchoice",data).then((response) => {
+      this.$axios.post(this.$globalVar.url+"Camchoice",data).then((response) => {
           console.log(response)
           if (response.data.success == 1)
           {
@@ -543,7 +547,7 @@ export default {
         }
     },
     getRecordList(){
-      this.$axios.get("http://localhost:8000/getAllRecordFile").then((response) => {
+      this.$axios.get(this.$globalVar.url+"getAllRecordFile").then((response) => {
           this.recordList = response.data.files
         })
     },
@@ -562,7 +566,7 @@ export default {
       }
     },
     startRecord(){
-      this.$axios.post("http://localhost:8000/video_record_on").then((response) => {
+      this.$axios.post(this.$globalVar.url+"video_record_on").then((response) => {
           if(response.data.status){
             this.$message({
             type: 'success',
@@ -579,7 +583,7 @@ export default {
         })
     },
     closeRecord(){
-      this.$axios.post("http://localhost:8000/video_record_off").then((response) => {
+      this.$axios.post(this.$globalVar.url+"video_record_off").then((response) => {
           if(response.data.status){
             this.$message({
             type: 'success',
@@ -600,7 +604,7 @@ export default {
       };
 
       try {
-        const response = await this.$axios.get('http://localhost:8000/stream_record_download', {
+        const response = await this.$axios.get(this.$globalVar.url+'stream_record_download', {
           params: data,
           responseType: 'blob' // 以 Blob 形式接收响应
         });
@@ -622,7 +626,7 @@ export default {
       {
         this.switchCamera()
       }else{
-        this.$axios.get("http://localhost:8000/getAllCam").then((response) => {
+        this.$axios.get(this.$globalVar.url+"getAllCam").then((response) => {
             if (response.data.success == 1)
             {
               this.cameraList = response.data.cam  
@@ -636,26 +640,18 @@ export default {
       if (this.isShowCamera) {
         this.isShowCamera = false;
         clearInterval(this.logPollingInterval);
-        this.$axios.get("http://localhost:8000/closecam").then((response) => {
+        this.$axios.get(this.$globalVar.url+"closecam").then((response) => {
             //src让其为空
           })
           this.cameraUrl = ""
-        /*this.$axios
-          .post("http://localhost:8000/closecam/")
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.error(error);
-          });*/
       } else {
         this.isShowCamera = true;
         this.sendParameters()
-        this.$axios.get("http://localhost:8000/opencam").then((response) => {
+        this.$axios.get(this.$globalVar.url+"opencam").then((response) => {
           
           })
           console.log("abc");
-        this.cameraUrl = "http://localhost:8000/livedisplay"
+        this.cameraUrl = this.$globalVar.url+"livedisplay"
         console.log("abc");
         this.startLogPolling();
         console.log("abc");
