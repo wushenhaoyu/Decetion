@@ -427,7 +427,7 @@ export default {
   },
   created() {
     // 在生命周期钩子里初始化 cameraUrl
-    this.uploadUrl = '/api/' + "upload_photo";
+    this.uploadUrl =  this.$apiBaseUrl + "upload_photo";
   },
   computed: {
     
@@ -498,7 +498,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            '/api/' + `stream_photo?name=${this.detailPhotoName}&style=3`
+             this.$apiBaseUrl + `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -517,7 +517,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            '/api/' + `stream_video?name=${this.detailPhotoName}&style=4`
+             this.$apiBaseUrl + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -590,7 +590,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post('/api/'+"ConfirmParams", data)
+        .post( this.$apiBaseUrl+"ConfirmParams", data)
         .then((res) => {
           
         });
@@ -651,7 +651,7 @@ export default {
     console.log(data);
 
     // 开始处理照片
-    await this.$axios.post('/api/'+"start_process_photo", data);
+    await this.$axios.post( this.$apiBaseUrl+"start_process_photo", data);
 
 
     // 获取照片和日志
@@ -680,7 +680,7 @@ export default {
   
   while (flag === 0) {
     try {
-      const response = await fetch('/api/'+`stream_photo?name=${this.photoName}&style=2`);
+      const response = await fetch( this.$apiBaseUrl+`stream_photo?name=${this.photoName}&style=2`);
       
       if (!response.ok) {
         throw new Error("Network response was not ok");

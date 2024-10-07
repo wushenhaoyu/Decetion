@@ -399,7 +399,7 @@ export default {
   },
   created() {
     // 在生命周期钩子里初始化 cameraUrl
-    this.uploadUrl = '/api/' + "uploadVideo";
+    this.uploadUrl =  this.$apiBaseUrl + "uploadVideo";
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
@@ -442,7 +442,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            '/api/' +  `stream_photo?name=${this.detailPhotoName}&style=3`
+             this.$apiBaseUrl +  `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -461,7 +461,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            '/api/' + `stream_video?name=${this.detailPhotoName}&style=4`
+             this.$apiBaseUrl + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -535,7 +535,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post( '/api/' + "ConfirmParams", data)
+        .post(  this.$apiBaseUrl + "ConfirmParams", data)
         .then((res) => {});
     },
     checkParameter(value) {
@@ -609,7 +609,7 @@ export default {
 
         // 开始处理视频
         await this.$axios.post(
-          '/api/' + "start_process_video",
+           this.$apiBaseUrl + "start_process_video",
           data
         );
         console.log(this.progressPercentage);
@@ -638,7 +638,7 @@ export default {
 
     async getLog() {
       try {
-        const response = await this.$axios.post('/api/'+"log");
+        const response = await this.$axios.post( this.$apiBaseUrl+"log");
         console.log(response);
         if (response.status === 200) {
           const convertedPeopleLog = response.data.people_log.map((item) => {
@@ -688,7 +688,7 @@ export default {
             video_name: this.videoName,
           };
           const response = await this.$axios.post(
-            '/api/' + "get_progress",
+             this.$apiBaseUrl + "get_progress",
             data
           );
 
@@ -716,7 +716,7 @@ export default {
     async getVideo() {
       try {
         const response = await fetch(
-          '/api/' + `stream_video?name=${this.videoName}&style=2`
+           this.$apiBaseUrl + `stream_video?name=${this.videoName}&style=2`
         );
 
         if (!response.ok) {
@@ -838,7 +838,7 @@ export default {
         name: this.videoName,
       };
       this.$axios
-        .post('/api/'+"get_progress", data)
+        .post( this.$apiBaseUrl+"get_progress", data)
         .then((res) => {
           this.progress = res.progress;
         });
