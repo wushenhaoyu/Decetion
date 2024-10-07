@@ -126,12 +126,31 @@ class HazeRemover:
     
 
 if __name__ == "__main__":
+    global total_time
+    global frame_count
+    total_time = 0
+    frame_count = 0
     haze_remover = HazeRemover()
     cap = cv2.VideoCapture(0)
+    start_time = time.time()
     while True:
         # 读取一帧图像
         _, frame = cap.read()
+        t_start = time.time()
         img = haze_remover.haze_frame(frame)
+        t_end = time.time()
+        total_time += (t_end - t_start)
+        frame_count += 1
+
+        # 计算并显示帧率和平均每帧推理时间
+        elapsed_time = time.time() - start_time
+        fps = frame_count / elapsed_time
+        avg_inference_time = total_time / frame_count if frame_count > 0 else 0
+
+        # 将 FPS 和平均每帧推理时间绘制在增强后的视频帧上
+        text = f"FPS: {fps:.2f}, Avg Inference Time: {avg_inference_time * 1000:.2f} ms"
+        
+        img = cv2.putText(img.copy(), text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         # 显示图像
         cv2.imshow('Mask Detection', img)
 

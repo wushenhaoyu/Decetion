@@ -9,9 +9,6 @@ import axios from 'axios'
 
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false
-Vue.prototype.$globalVar = {
-  url: 'https://aistudio.baidu.com/bd-gpu-03/user/6950158/8319014/'
-}
 Vue.use(ElementUI);
 /* eslint-disable no-new */
 new Vue({

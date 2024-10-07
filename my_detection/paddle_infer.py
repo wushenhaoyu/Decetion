@@ -113,7 +113,7 @@ def people_detector_init():
                     enable_mkldnn=False,
                     enable_mkldnn_bfloat16=False,
                     output_dir='output',
-                    threshold=0.5,
+                    threshold=0.2,
                     delete_shuffle_pass=False)
     return detector
 
@@ -132,7 +132,7 @@ def vehicle_detector_init():
                     enable_mkldnn=False,
                     enable_mkldnn_bfloat16=False,
                     output_dir='output',
-                    threshold=0.5,
+                    threshold=0.2,
                     delete_shuffle_pass=False)
     return detector
 
@@ -150,7 +150,7 @@ def people_attr_detector_init():
                     cpu_threads=1,
                     enable_mkldnn=False,
                     output_dir='output',
-                    threshold=0.5,)
+                    threshold=0.2,)
     return detector
 
 def vehicle_attr_detector_init():
@@ -397,14 +397,14 @@ class my_paddledetection:
 
         if self.people_detector_isOn:#行人检测
             people_res = self.people_detector.predict_image([input],visual=False)
-            self.people_res = self.people_detector.filter_box(people_res,0.5) # 过滤掉置信度小于0.5的框
+            self.people_res = self.people_detector.filter_box(people_res,0.2) # 过滤掉置信度小于0.5的框
         elif self.people_tracker_isOn:
             people_res = self.people_tracker.predict_image([copy.deepcopy(input)],visual=False,reuse_det_result=False)
             self.people_res = parse_mot_res(people_res)
 
         if self.vehicle_detector_isOn:#车辆检测
             vehicle_res = self.vehicle_detector.predict_image([input],visual=False)
-            self.vehicle_res = self.vehicle_detector.filter_box(vehicle_res,0.5) # 过滤掉置信度小于0.5的框
+            self.vehicle_res = self.vehicle_detector.filter_box(vehicle_res,0.2) # 过滤掉置信度小于0.5的框
         elif self.vehicle_tracker_isOn:
             self.entrance = None
             id_set = set()
@@ -672,14 +672,14 @@ class my_paddledetection:
             self.people_waitting_dealwith_queue.extend(res)
             if self.people_waitting_dealwith_queue:
                 self.people_waitting_dealwith_flag = True
-            self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.5)
+            self.im = visualize_box_mask(image, self.people_res, labels=['target'],threshold=0.2)
             
         if self.vehicle_res is not None and self.vehicle_detector_isOn:
             res = my_extract_crops_detector(self.im, self.vehicle_res['boxes'])
             self.people_waitting_dealwith_queue.extend(res)
             if self.vehicle_waitting_dealwith_queue:
                 self.vehicle_waitting_dealwith_flag = True
-            self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.5)
+            self.im = visualize_box_mask(image, self.vehicle_res, labels=['target'],threshold=0.2)
         self.im = np.ascontiguousarray(np.copy(self.im))
 
         if self.people_attr_res is not None:
@@ -700,7 +700,7 @@ class my_paddledetection:
         if self.vehiclepress_res is not None:
             press_vehicle =  self.vehiclepress_res['output'][0]
             if len(press_vehicle) > 0:
-                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'][0],0.5)
+                self.im = visualize_vehiclepress(self.im, self.vehiclepress_res['output'][0],0.2)
             self.im = np.ascontiguousarray(np.copy(self.im))
         if self.lanes_res is not None:
             lanes = self.lanes_res['output'][0]
@@ -928,7 +928,7 @@ if __name__ == "__main__":
         input = [frame[:, :, ::-1]]
         # 检测图像
         results = detector.predict_image(input, visual=False)  # bgr-->rgb
-        results = detector.filter_box(results,0.5)
+        results = detector.filter_box(results,0.2)
         crops_results = crop_image_with_det(input, results)
         attr_res_list = []
         for crop_result in crops_results:

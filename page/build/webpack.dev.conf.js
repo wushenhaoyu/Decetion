@@ -38,7 +38,16 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       ? { warnings: false, errors: true }
       : false,
     publicPath: config.dev.assetsPublicPath,
-    proxy: config.dev.proxyTable,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000', // 您的 API 服务器地址
+        changeOrigin: true,
+        secure: false,
+        pathRewrite: {
+          '^/api': '' // 将 /api 重写为 /
+        }
+      }
+    },
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,

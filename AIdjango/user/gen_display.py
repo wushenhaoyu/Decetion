@@ -203,7 +203,6 @@ def background_processing():
     global paddledetection_net
     print(111111223124235)
     while queueISdeal:
-            print("weweret")
             paddledetection_net.people_dealwith_queue()
             paddledetection_net.vehicle_dealwith_queue()
 

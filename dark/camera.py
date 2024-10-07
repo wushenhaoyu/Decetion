@@ -26,6 +26,8 @@ class VideoEnhancer:
         self.gpu_id = gpu_id
         self.normalize = normalize
         self.task = task
+        self.frame_count = 0
+        self.total_time = 0.0
 
         # 设置GPU设备
         paddle.set_device('gpu:' + str(self.gpu_id))
@@ -80,6 +82,7 @@ class VideoEnhancer:
 
         return enhanced_img_bgr
 
+    
     def start_camera(self):
         """
         启动摄像头并实时处理视频帧
@@ -90,19 +93,32 @@ class VideoEnhancer:
             print("无法打开摄像头")
             return
 
+        # 开始时间记录
+        start_time = time.time()
+
         # 实时视频处理
         while True:
             ret, frame = cap.read()  # 读取一帧视频
             if not ret:
                 break
-
-            # 显示原始视频帧
+                
             cv2.imshow('Original Video', frame)
-
             # 处理帧并显示增强后的视频帧
-            t = time.time()
+            t_start = time.time()
             enhanced_frame = self.process_frame(frame)
-            print(time.time() - t)
+            t_end = time.time()
+            self.total_time += (t_end - t_start)
+            self.frame_count += 1
+
+            # 计算并显示帧率和平均每帧推理时间
+            elapsed_time = time.time() - start_time
+            fps = self.frame_count / elapsed_time
+            avg_inference_time = self.total_time / self.frame_count if self.frame_count > 0 else 0
+
+            # 将 FPS 和平均每帧推理时间绘制在增强后的视频帧上
+            text = f"FPS: {fps:.2f}, Avg Inference Time: {avg_inference_time * 1000:.2f} ms"
+            cv2.putText(enhanced_frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
             cv2.imshow('Enhanced Video', enhanced_frame)
 
             # 按 'q' 键退出

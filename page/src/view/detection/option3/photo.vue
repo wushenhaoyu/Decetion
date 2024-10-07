@@ -427,7 +427,7 @@ export default {
   },
   created() {
     // 在生命周期钩子里初始化 cameraUrl
-    this.uploadUrl = this.$globalVar.url + "upload_photo";
+    this.uploadUrl = '/api/' + "upload_photo";
   },
   computed: {
     
@@ -498,7 +498,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            this.$globalVar.url + `stream_photo?name=${this.detailPhotoName}&style=3`
+            '/api/' + `stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -517,7 +517,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            this.$globalVar.url + `stream_video?name=${this.detailPhotoName}&style=4`
+            '/api/' + `stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -590,7 +590,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post(this.$globalVar.url+"ConfirmParams", data)
+        .post('/api/'+"ConfirmParams", data)
         .then((res) => {
           
         });
@@ -651,7 +651,7 @@ export default {
     console.log(data);
 
     // 开始处理照片
-    await this.$axios.post(this.$globalVar.url+"start_process_photo", data);
+    await this.$axios.post('/api/'+"start_process_photo", data);
 
 
     // 获取照片和日志
@@ -680,7 +680,7 @@ export default {
   
   while (flag === 0) {
     try {
-      const response = await fetch(this.$globalVar.url+`stream_photo?name=${this.photoName}&style=2`);
+      const response = await fetch('/api/'+`stream_photo?name=${this.photoName}&style=2`);
       
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -768,26 +768,31 @@ export default {
         });
     },
     uploadFile(file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.isShowPhoto = true;
-        this.isShowLocalPhoto = true;
-        this.photoUrl_ = e.target.result; // 将图片的 data URL 设置为 photoUrl
-      };
-      reader.readAsDataURL(file);
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    this.isShowPhoto = true;
+    this.isShowLocalPhoto = true;
+    this.photoUrl_ = e.target.result; // 将图片的 data URL 设置为 photoUrl
+  };
+  reader.readAsDataURL(file);
 
-      const formData = new FormData();
-      formData.append("photo", file);
+  const formData = new FormData();
+  formData.append("photo", file);
 
-      this.$axios
-        .post(this.uploadUrl, formData)
-        .then((response) => {
-          this.handleSuccess(response, file);
-        })
-        .catch((error) => {
-          this.handleError(error, file);
-        });
-    },
+  this.$axios
+    .post(this.uploadUrl, formData, {
+      headers: {
+        'Authorization': 'token5370ffbdcb08f3a7bfbf75287582539842d93c30', // 添加 Authorization 头
+        'Content-Type': 'multipart/form-data' // 确保使用 multipart/form-data
+      }
+    })
+    .then((response) => {
+      this.handleSuccess(response, file);
+    })
+    .catch((error) => {
+      this.handleError(error, file);
+    });
+},
     handleSuccess(response, file) {
       this.$message({
         type: "success",
