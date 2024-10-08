@@ -43,7 +43,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     publicPath: config.dev.assetsPublicPath,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000', // 您的 API 服务器地址
+        target:  'http://127.0.0.1:8000',//'https://nwpu.space:2017', // 您的 API 服务器地址
         changeOrigin: true,
         secure: false,
         pathRewrite: {

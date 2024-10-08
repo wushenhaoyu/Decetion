@@ -240,7 +240,9 @@ def changestyle():
     clear_directory('AIdjango/dist/livedisplay/vehicle')
     clear_directory('AIdjango/dist/livedisplay/people')
     queueISdeal  = True
-
+    
+t_start = time.time()
+t_end = time.time()
 def gen_display(camera):
     global RecordCounter
     global queueISdeal 
@@ -264,6 +266,7 @@ def gen_display(camera):
             # 将图片进行解码                
             if ret:
                 frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                t_start = time.time()
                 if params["haze_enabled"]:
                     frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
@@ -280,6 +283,13 @@ def gen_display(camera):
                     print(save_path)
                     cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
                 frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                t_end = time.time()
+                t = t_end - t_start
+                if t == 0:
+                    t = 1
+                text = f"FPS: {int(1/t):.2f}, Avg Inference Time: {t * 1000:.2f} ms"
+                
+                cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 ret, frame = cv2.imencode('.jpeg', frame)
                 # 递增计数器
                 RecordCounter += 1
