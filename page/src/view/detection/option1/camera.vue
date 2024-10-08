@@ -344,6 +344,11 @@ export default {
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
+    this.$notify({
+          title: '提示',
+          message: '该版本为AIstudio版暂无外接摄像头可用,如需使用可到github本地部署前后端体验',
+          type: 'warning'
+        });
   },
   methods: {
     startDrag(event) {
