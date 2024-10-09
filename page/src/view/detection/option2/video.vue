@@ -693,7 +693,7 @@ export default {
           );
 
           if (response.status === 200 && response.data.progress !== undefined) {
-            progress = response.data.progress; // 假设后端返回的进度在 `progress` 字段
+            progress = Math.round(response.data.progress); // 假设后端返回的进度在 `progress` 字段
             console.log(`当前进度: ${progress}%`);
             this.progressPercentage = progress; // 更新进度显示
             loadingInstance.setText(`加载中... ${this.progressPercentage}%`);
