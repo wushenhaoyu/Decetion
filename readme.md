@@ -1,7 +1,8 @@
 # 仓库结构
-│
+```bash
+│                                                
 ├───AIDjango          # 系统后端（Django）
-│
+│                                        
 ├───dark              # 弱光增强
 │
 ├───electron          # 启动器（Electron）
@@ -13,6 +14,7 @@
 ├───my_detection      # paddledetection魔改
 │
 └───page              # Vue.js 前端
+```   
 # 运行
 
 ## Django
@@ -24,17 +26,17 @@ python AIdjango/manage.py runserver
 
 ## Vue
 
-1.进入 `page` 目录：
-    ```bash
-    cd page
-    ```
+1.进入 page 目录：
+``` bash
+cd page
+```
 
 2. 安装 npm 依赖：
-    ```bash
-    npm install
-    ```
+```bash
+npm install
+```
 
 3. 启动开发环境：
-    ```bash
-    npm run dev
-    ```
+```bash
+npm run dev
+```
