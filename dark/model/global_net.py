@@ -23,29 +23,20 @@ class query_Attention(nn.Layer):
         B, N, C = x.shape
         head_dim = C // self.num_heads
 
-        # 计算 q, k 和 v
         k = self.k(x).reshape([B, N, self.num_heads, head_dim]).transpose([0, 2, 1, 3])
         v = self.v(x).reshape([B, N, self.num_heads, head_dim]).transpose([0, 2, 1, 3])
 
         q = self.q.expand([B, -1, -1]).reshape([B, -1, self.num_heads, head_dim]).transpose([0, 2, 1, 3])
 
-        # 计算注意力得分
         attn = paddle.matmul(q, k, transpose_y=True) * self.scale
         attn = F.softmax(attn, axis=-1)
         attn = self.attn_drop(attn)
 
-        # 应用注意力得分
         attn_v = paddle.matmul(attn, v)
 
-        # 打印 attn_v 的形状以确认维度
-        # print(attn_v.shape)
-
-        # 假设 attn_v 的维度是 (B, N, C, D)，调整 perm
         attn_v_transposed = paddle.transpose(attn_v, perm=[0, 2, 1, 3])
 
-        # 确认重塑的形状与实际维度匹配
         x = paddle.reshape(attn_v_transposed, shape=[B, 10, C])
-        # x = paddle.reshape(paddle.transpose(paddle.matmul(attn, v), perm=[0, 2, 1]), shape=[B, 10, C])
         x = self.proj(x)
         x = self.proj_drop(x)
 
@@ -105,11 +96,10 @@ class Global_pred(nn.Layer):
                 default_initializer=paddle.nn.initializer.Constant(value=1.0)
             )
         self.color_base = paddle.create_parameter(
-            shape=[3, 3],  # 形状是 3x3
-            dtype='float32',  # 数据类型
-            default_initializer=paddle.nn.initializer.Assign(paddle.eye(3))  # 初始化为单位矩阵
+            shape=[3, 3],  
+            dtype='float32', 
+            default_initializer=paddle.nn.initializer.Assign(paddle.eye(3))  
         )
-        # main blocks
         self.conv_large = conv_embedding(in_channels, out_channels)
         self.generator = query_SABlock(dim=out_channels, num_heads=num_heads)
         self.gamma_linear = nn.Linear(out_channels, 1)

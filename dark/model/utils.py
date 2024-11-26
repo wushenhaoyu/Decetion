@@ -6,22 +6,16 @@ import paddle.nn.functional as F
 
 def trunc_normal_(tensor, mean=0., std=1., a=-2., b=2.):
     def _norm_cdf(x):
-        # 将 x 转换为 tensor 类型
         x = paddle.to_tensor(x, dtype='float32')
         return (1. + paddle.erf(x / math.sqrt(2.))) / 2.
 
-    # Get the bounds for truncation in standard normal space
     low = _norm_cdf((a - mean) / std)
     high = _norm_cdf((b - mean) / std)
 
-    # Fill tensor with uniform numbers from [Low, Normal]
     uniform = paddle.uniform(tensor.shape, min=low, max=high)
-
-    # Use inverse CDF transform for truncated normal distribution
     tensor = paddle.clip(uniform, low, high)
     tensor = paddle.erfinv(2 * tensor - 1) * math.sqrt(2) * std + mean
 
-    # Clip to ensure no values fall outside the truncation range
     tensor = paddle.clip(tensor, min=a, max=b)
 
     return tensor

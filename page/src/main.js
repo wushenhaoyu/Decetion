@@ -10,6 +10,9 @@ import axios from 'axios'
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false
 Vue.use(ElementUI);
+const apiBaseUrl = process.env.VUE_APP_API_BASE_URL;
+console.log('API Base URL:', apiBaseUrl); // 这会输出你设置的值
+Vue.prototype.$apiBaseUrl = apiBaseUrl;
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -5,7 +5,6 @@ from .utils import  DropPath
 class Aff(nn.Layer):
     def __init__(self, dim):
         super(Aff, self).__init__()
-        # learnable
         self.alpha = paddle.base.framework.EagerParamBase.from_tensor(tensor
                                                                       =paddle.ones(shape=[1, 1, dim]))
         self.beta = paddle.base.framework.EagerParamBase.from_tensor(tensor
@@ -21,7 +20,6 @@ class Aff_channel(nn.Layer):
         tensor_beta = paddle.zeros(shape=[1, 1, dim])
         tensor_color = paddle.eye(num_rows=dim)
 
-        # 使用 create_parameter 创建参数
         self.alpha = self.create_parameter(
             shape=tensor_alpha.shape,
             dtype=tensor_alpha.dtype,
@@ -120,47 +118,19 @@ class CBlock_ln(nn.Layer):
         return x
 
 def window_partition(x, window_size):
-    """
-    Args:
-        x: (B, H, W, C)
-        window_size (int): window size
-    Returns:
-        windows: (num_windows*B, window_size, window_size, C)
-    """
+
     B, H, W, C = x.shape
     x = x.reshape([B, H // window_size, window_size, W // window_size, window_size, C])
     windows = x.transpose([0, 1, 3, 2, 4, 5]).reshape([-1, window_size, window_size, C])
     return windows
 
 def window_reverse(windows, window_size, H, W):
-    """
-    Args:
-        windows: (num_windows*B, window_size, window_size, C)
-        window_size (int): Window size
-        H (int): Height of image
-        W (int): Width of image
-    Returns:
-        x: (B, H, W, C)
-    """
     B = int(windows.shape[0] / (H * W / window_size / window_size))
     x = windows.reshape([B, H // window_size, W // window_size, window_size, window_size, -1])
     x = x.transpose([0, 1, 3, 2, 4, 5]).reshape([B, H, W, -1])
     return x
 
 class WindowAttention(nn.Layer):
-    r"""
-    Window based multi-head self attention (W-MSA) module with relative position bias.
-    It supports both of shifted and non-shifted window.
-
-    Args:
-        dim (int): Number of input channels.
-        window_size (tuple[int]): The height and width of the window.
-        num_heads (int): Number of attention heads.
-        qkv_bias (bool, optional): If True, add a learnable bias to query, key, value. Default: True
-        qk_scale (float | None, optional): Override default qk scale of head_dim ** -0.5 if set
-        attn_drop (float, optional): Dropout ratio of attention weight. Default: 0.0
-        proj_drop (float, optional): Dropout ratio of output. Default: 0.0
-    """
 
     def __init__(self, dim, window_size, num_heads, qkv_bias=True, qk_scale=None, attn_drop=0., proj_drop=0.):
         super(WindowAttention, self).__init__()
@@ -226,20 +196,17 @@ class SwinTransformerBlock(nn.Layer):
         x = self.norm1(x)
         x = x.reshape([B, H, W, C])
 
-        # cyclic shift
+
         if self.shift_size > 0:
             shifted_x = paddle.roll(x, shifts=(-self.shift_size, -self.shift_size), axis=(1, 2))
         else:
             shifted_x = x
 
-        # partition windows
-        x_windows = window_partition(shifted_x, self.window_size)  # nW*B, window_size, window_size, C
-        x_windows = x_windows.reshape([-1, self.window_size * self.window_size, C])  # nW*B, window_size*window_size, C
+        x_windows = window_partition(shifted_x, self.window_size) 
+        x_windows = x_windows.reshape([-1, self.window_size * self.window_size, C])  
 
-        # W-MSA/SW-MSA
-        attn_windows = self.attn(x_windows)  # nW*B, window_size*window_size, C
+        attn_windows = self.attn(x_windows)  
 
-        # merge windows
         attn_windows = attn_windows.reshape([-1, self.window_size, self.window_size, C])
         shifted_x = window_reverse(attn_windows, self.window_size, H, W)  # B H' W' C
 

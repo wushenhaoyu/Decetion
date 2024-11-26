@@ -54,11 +54,10 @@ def calculate_rgb_psnr(image1, image2):
     返回:
     float: 平均PSNR值。
     """
-    # 确保图像大小相同
     if image1.shape != image2.shape:
         raise ValueError("Images must have the same dimensions.")
     
-    # 对每个颜色通道计算PSNR
+
     sum = 0
     for channel in range(3):
         psnr_val = compare_psnr(

@@ -375,7 +375,6 @@
 </template>
 
 <script>
-import { saveAs } from "file-saver";
 import imagesLoaded from "vue-images-loaded";
 export default {
   directives: {
@@ -427,7 +426,7 @@ export default {
   },
   created() {
     // 在生命周期钩子里初始化 cameraUrl
-    this.uploadUrl = '/api/' + "upload_photo";
+    this.uploadUrl =  this.$apiBaseUrl + "/upload_photo";
   },
   computed: {
     
@@ -448,6 +447,11 @@ export default {
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
+    this.$notify({
+          title: '提示',
+          message: '系统特性:经过测试单独开始某些功能很卡，但是如果混合加入任一追踪或检测，速度就会很快，这一问题我们正在排查中，如果您觉得太慢请开启追踪或检测让服务器释放性能',
+          type: 'warning'
+        });
   },
   methods: {
     handleButtonClick(row) {
@@ -498,7 +502,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            '/api/' + `stream_photo?name=${this.detailPhotoName}&style=3`
+             this.$apiBaseUrl + `/stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -517,7 +521,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            '/api/' + `stream_video?name=${this.detailPhotoName}&style=4`
+             this.$apiBaseUrl + `/stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -590,7 +594,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post('/api/'+"ConfirmParams", data)
+        .post( this.$apiBaseUrl+"/ConfirmParams", data)
         .then((res) => {
           
         });
@@ -651,7 +655,7 @@ export default {
     console.log(data);
 
     // 开始处理照片
-    await this.$axios.post('/api/'+"start_process_photo", data);
+    await this.$axios.post( this.$apiBaseUrl+"/start_process_photo", data);
 
 
     // 获取照片和日志
@@ -680,7 +684,7 @@ export default {
   
   while (flag === 0) {
     try {
-      const response = await fetch('/api/'+`stream_photo?name=${this.photoName}&style=2`);
+      const response = await fetch( this.$apiBaseUrl+`/stream_photo?name=${this.photoName}&style=2`);
       
       if (!response.ok) {
         throw new Error("Network response was not ok");

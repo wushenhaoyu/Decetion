@@ -77,7 +77,7 @@ def get_args():
     arg(
         '--use_weights',
         type=process_path,
-        default='hdr/weights_.pdparams',  # PaddlePaddle权重文件后缀通常为.pdparams
+        default='hdr/weights_.pdparams',  
         help='Weights to use for prediction',
     )
     arg(

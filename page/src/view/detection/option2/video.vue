@@ -399,10 +399,15 @@ export default {
   },
   created() {
     // 在生命周期钩子里初始化 cameraUrl
-    this.uploadUrl = '/api/' + "uploadVideo";
+    this.uploadUrl =  this.$apiBaseUrl + "/uploadVideo";
   },
   mounted() {
     this.total = this.tableData.length; // 设置总数据条目数
+    this.$notify({
+          title: '提示',
+          message: '系统特性:经过测试单独开始某些功能很卡，但是如果混合加入任一追踪或检测，速度就会很快，这一问题我们正在排查中，如果您觉得太慢请开启追踪或检测让服务器释放性能',
+          type: 'warning'
+        });
   },
   methods: {
     startDrag(event) {
@@ -442,7 +447,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-            '/api/' +  `stream_photo?name=${this.detailPhotoName}&style=3`
+             this.$apiBaseUrl +  `/stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -461,7 +466,7 @@ export default {
       } else {
         try {
           const response = await fetch(
-            '/api/' + `stream_video?name=${this.detailPhotoName}&style=4`
+             this.$apiBaseUrl + `/stream_video?name=${this.detailPhotoName}&style=4`
           );
 
           if (!response.ok) {
@@ -535,7 +540,7 @@ export default {
         vehicle_invasion: this.vehicle_invasion_enable,
       };
       return this.$axios
-        .post( '/api/' + "ConfirmParams", data)
+        .post(  this.$apiBaseUrl + "/ConfirmParams", data)
         .then((res) => {});
     },
     checkParameter(value) {
@@ -609,7 +614,7 @@ export default {
 
         // 开始处理视频
         await this.$axios.post(
-          '/api/' + "start_process_video",
+           this.$apiBaseUrl + "/start_process_video",
           data
         );
         console.log(this.progressPercentage);
@@ -638,7 +643,7 @@ export default {
 
     async getLog() {
       try {
-        const response = await this.$axios.post('/api/'+"log");
+        const response = await this.$axios.post( this.$apiBaseUrl+"/log");
         console.log(response);
         if (response.status === 200) {
           const convertedPeopleLog = response.data.people_log.map((item) => {
@@ -688,12 +693,12 @@ export default {
             video_name: this.videoName,
           };
           const response = await this.$axios.post(
-            '/api/' + "get_progress",
+             this.$apiBaseUrl + "/get_progress",
             data
           );
 
           if (response.status === 200 && response.data.progress !== undefined) {
-            progress = response.data.progress; // 假设后端返回的进度在 `progress` 字段
+            progress = Math.round(response.data.progress); // 假设后端返回的进度在 `progress` 字段
             console.log(`当前进度: ${progress}%`);
             this.progressPercentage = progress; // 更新进度显示
             loadingInstance.setText(`加载中... ${this.progressPercentage}%`);
@@ -716,7 +721,7 @@ export default {
     async getVideo() {
       try {
         const response = await fetch(
-          '/api/' + `stream_video?name=${this.videoName}&style=2`
+           this.$apiBaseUrl + `/stream_video?name=${this.videoName}&style=2`
         );
 
         if (!response.ok) {
@@ -838,7 +843,7 @@ export default {
         name: this.videoName,
       };
       this.$axios
-        .post('/api/'+"get_progress", data)
+        .post( this.$apiBaseUrl+"/get_progress", data)
         .then((res) => {
           this.progress = res.progress;
         });

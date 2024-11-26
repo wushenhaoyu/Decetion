@@ -31,14 +31,13 @@ paddle.set_device('gpu:0')
 class HazeRemover:
     def __init__(self, model_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'paddle.pdparams')):
         self.model_path = model_path
-        self.model = self.load_checkpoint()
+        self.model = self.load_weight()
         print("HazeRemover已经准备完毕")
 
-    def load_checkpoint(self):
+    def load_weight(self):
         if os.path.exists(self.model_path):
-            # print(f'==> loading existing model: {self.model_path}')
             model_info = paddle.load(self.model_path)
-            model = GNet()  # 确保 GNet 在你的代码中定义
+            model = GNet()  
             device = paddle.set_device("gpu:0" if paddle.is_compiled_with_cuda() else "cpu")
             model.to(device)
 
@@ -108,8 +107,6 @@ class HazeRemover:
                 result = out
                 self.imwrite(result.numpy(), argspar.outest + files[i], range=(0, 1))
                 a.append(endtime1 - starttime)
-        #         print(f'The {i} Time: {endtime1 - starttime:.4f}.')
-        # print(np.mean(np.array(a)))
 
     def imwrite(self, img, path, range=(0, 1)):
         img = (img - range[0]) / (range[1] - range[0])

@@ -111,6 +111,13 @@
             rate_(){
                 this.showAlert = false
             }
+        },
+        mounted(){
+            this.$notify({
+                title: '提示',
+                message: '该线上体验产品由架设在校园内服务器提供算力，多人使用会导致崩溃，请您谅解，本作品最终形态为边缘计算平台部署',
+                type: 'warning'
+                });
         }
     }
 </script></script>

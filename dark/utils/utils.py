@@ -110,21 +110,20 @@ class L_color(nn.Layer):
 
 
 def validation(model, val_loader):
-    ssim = ssim()  # Paddle的SSIM
-    psnr = PSNR()  # 自定义的PSNR
+    ssim = ssim()  
+    psnr = PSNR() 
     ssim_list = []
     psnr_list = []
 
     for i, imgs in enumerate(val_loader):
         with paddle.no_grad():
-            low_img, high_img = imgs[0], imgs[1]  # 取消cuda，Paddle自动处理设备
+            low_img, high_img = imgs[0], imgs[1]  
             _, _, enhanced_img = model(low_img)
 
-        # SSIM 和 PSNR 计算
+
         ssim_value = ssim(enhanced_img, high_img).item()
         psnr_value = psnr(enhanced_img, high_img).item()
 
-        # 记录 SSIM 和 PSNR
         ssim_list.append(ssim_value)
         psnr_list.append(psnr_value)
 
