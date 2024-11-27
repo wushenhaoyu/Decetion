@@ -626,6 +626,9 @@ export default {
         console.error('Error downloading file:', error);
       }
     },
+    updateCameraUrl() {
+    this.cameraUrl = `${this.$apiBaseUrl}/livedisplay?timestamp=${new Date().getTime()}`;
+  },
     getCamera(){
       if (this.isShowCamera)
       {
@@ -656,7 +659,8 @@ export default {
           
           })
           console.log("abc");
-        this.cameraUrl =  this.$apiBaseUrl+"/livedisplay"
+        //this.cameraUrl =  this.$apiBaseUrl+"/livedisplay"
+        this.updateCameraUrl();
         console.log("abc");
         this.startLogPolling();
         console.log("abc");
@@ -668,6 +672,7 @@ export default {
       
       this.logPollingInterval = setInterval(async () => {
         await this.getLog();
+        this.updateCameraUrl();
       }, 1000);
     },
     toggleDrawer() {
