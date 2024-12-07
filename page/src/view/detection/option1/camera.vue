@@ -67,6 +67,17 @@
           > </el-switch>
         </div>
         <el-divider></el-divider>
+        <el-divider></el-divider>
+        <div style="user-select:none;">
+          <div style="height: 4vh;line-height: 4vh;  user-select:none;">图像分割 </div>
+          <el-switch
+            v-model="seg_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="sendParameters"
+          > </el-switch>
+        </div>
+        <el-divider></el-divider>
         <div style="user-select:none;">
         <div style="height: 4vh;line-height: 4vh;  user-select:none;">车牌检测 </div>
           <el-switch
@@ -306,6 +317,7 @@ export default {
       vehicle_license_enable: false,
       vehicle_attribute_enable: false,
       vehicle_invasion_enable:false,
+      seg_enable:false,
       isShowCamera: false,
       drawerVisible: false,
       activeIndex: "4", // 更新为菜单项的实际索引
@@ -388,7 +400,7 @@ export default {
       if (id == "行人") {
         try {
           const response = await fetch(
-             this.$apiBaseUrl + `/stream_photo?name=${this.detailPhotoName}&style=3`
+             this.$apiBaseUrl +  `/stream_photo?name=${this.detailPhotoName}&style=3`
           );
 
           if (!response.ok) {
@@ -467,7 +479,7 @@ export default {
           const combinedLogs = [...convertedPeopleLog, ...convertedVehicleLog];
 
           // 将合并后的数据赋值给 paginatedData
-          this.tableData = this.tableData.concat(combinedLogs);
+          this.tableData = combinedLogs;
           this.total = this.tableData.length;
           console.log(this.tableData);
         }
@@ -493,7 +505,8 @@ export default {
         vehicle_attr_detector: this.vehicle_attribute_enable,
         vehicleplate_detector: this.vehicle_license_enable,
         vehicle_press_detector: this.vehicle_press_detector_enable,
-        vehicle_invasion:this.vehicle_invasion_enable
+        vehicle_invasion:this.vehicle_invasion_enable,
+        seg_enable: this.seg_enable,
       }
       this.$axios.post( this.$apiBaseUrl+'/ConfirmParams', data).then(res => {
       })
@@ -658,12 +671,10 @@ export default {
         this.$axios.get( this.$apiBaseUrl+"/opencam").then((response) => {
           
           })
-          console.log("abc");
-        //this.cameraUrl =  this.$apiBaseUrl+"/livedisplay"
-        this.updateCameraUrl();
-        console.log("abc");
+          setTimeout(() => {
+          this.updateCameraUrl();
+        }, 1000);
         this.startLogPolling();
-        console.log("abc");
       }
     },
     startLogPolling() {
@@ -672,7 +683,7 @@ export default {
       
       this.logPollingInterval = setInterval(async () => {
         await this.getLog();
-        this.updateCameraUrl();
+        //this.updateCameraUrl();
       }, 1000);
     },
     toggleDrawer() {

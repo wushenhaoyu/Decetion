@@ -104,6 +104,19 @@
         <el-divider></el-divider>
         <div style="user-select: none">
           <div style="height: 4vh; line-height: 4vh; user-select: none">
+           图像分割
+          </div>
+          <el-switch
+            v-model="seg_enable"
+            active-text="开启"
+            inactive-text="关闭"
+            @change="checkParameter"
+          >
+          </el-switch>
+        </div>
+        <el-divider></el-divider>
+        <div style="user-select: none">
+          <div style="height: 4vh; line-height: 4vh; user-select: none">
             车牌检测
           </div>
           <el-switch
@@ -410,6 +423,7 @@ export default {
       vehicle_license_enable: false,
       vehicle_attribute_enable: false,
       vehicle_invasion_enable: false,
+      seg_enable: false,
       isShowPhoto: false,
       drawerVisible: false,
       activeIndex: "4",
@@ -592,6 +606,7 @@ export default {
         vehicleplate_detector: this.vehicle_license_enable,
         vehicle_press_detector: this.vehicle_press_detector_enable,
         vehicle_invasion: this.vehicle_invasion_enable,
+        seg_enable:this.seg_enable
       };
       return this.$axios
         .post( this.$apiBaseUrl+"/ConfirmParams", data)
