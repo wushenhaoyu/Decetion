@@ -504,7 +504,7 @@ export default {
       this.currentPage = page;
     },
     saveVideo() {
-      if (!this.VideoName) {
+      if (!this.videoName) {
         this.$message({
           type: "error",
           message: "未上传视频",
@@ -746,7 +746,6 @@ export default {
         console.log(response.url);
 
         this.videoUrl = response.url; // 将这个 URL 赋值给视频的 src
-
         console.log(this.videoUrl);
         this.isShowLocalVideo = false;
         this.isShowVideo = true; // 控制视频显示的变量

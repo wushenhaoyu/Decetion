@@ -622,7 +622,7 @@ export default {
       };
 
       try {
-        const response = await this.$axios.get( this.$apiBaseUrl+'/stream_record_download', {
+        const response = await this.$axios.get( this.$apiBaseUrl+'/stream_record', {
           params: data,
           responseType: 'blob' // 以 Blob 形式接收响应
         });
