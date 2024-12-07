@@ -41,7 +41,9 @@ from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
 from haze.test_real import HazeRemover
 from my_detection.paddle_infer import my_paddledetection
+from seg_infer import PaddleSegCamera
 from dark.camera import VideoEnhancer
+seg_net =None
 haze_net = None
 dark_net =None
 params = None
@@ -84,6 +86,7 @@ def initialize():
     global isrecord
     global RecordCounter
     global background_thread
+    global seg_net
     try:
         if haze_net is None:
             haze_net = HazeRemover()
@@ -96,6 +99,9 @@ def initialize():
         if paddledetection_net is None:
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
+        if seg_net is None:
+            seg_net = PaddleSegCamera()
+            print("SEGNET Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -108,7 +114,8 @@ def initialize():
             'vehicle_detector': False,#车辆检测
             'vehicle_attr_detector': False,#车辆属性检测
             'vehicleplate_detector': False,#车牌检测
-            'vehicle_press_detector': False
+            'vehicle_press_detector': False,
+            "seg_enable":False
         }
         if isrecord is None:
             isrecord = False
@@ -156,6 +163,7 @@ def ConfirmParams(request):
         'vehicle_attr_detector': data.get('vehicle_attr_detector'),#车辆属性检测
         'vehicleplate_detector': data.get('vehicleplate_detector'),#车牌检测
         'vehicle_press_detector': data.get('vehicle_press_detector'),#压线检测
+        "seg_enable":data.get("seg_enable")
         # "vehicle_invasion":data.get("vehicle_invasion")#违停检测
     }
     # 切换行人检测
@@ -272,6 +280,8 @@ def gen_display(camera):
                 # print(frame.shape)
                 if params["dark_enabled"]:
                     frame = dark_net.process_frame(frame)#传入RGB，传出RGB
+                if params["seg_enable"]:
+                    frame = seg_net.process_frame(frame)#传入RGB，传出RGB
                 # print(frame.shape)
                 frame = paddledetection_net.predit(frame)#传入RGB，
                 if isrecord:
@@ -282,6 +292,7 @@ def gen_display(camera):
                     save_path = os.path.join(save_dir, f"{RecordCounter}.jpg")
                     print(save_path)
                     cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
+                    RecordCounter += 1
                 frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
                 t_end = time.time()
                 t = t_end - t_start
@@ -292,11 +303,58 @@ def gen_display(camera):
                 cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 ret, frame = cv2.imencode('.jpeg', frame)
                 # 递增计数器
-                RecordCounter += 1
+                
                 yield (b'--frame\r\n'
                        b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
   
+def list_files_with_sizes(folder_path):
+    # 检查路径是否存在
+    if not os.path.exists(folder_path):
+        print("文件夹不存在！")
+        return
 
+    total_size = 0  # 初始化总大小变量
+
+    # 遍历文件夹中的所有文件
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        if os.path.isfile(file_path):  # 确保是文件而不是文件夹
+            file_size = os.path.getsize(file_path)  # 获取文件大小（字节）
+            total_size += file_size  # 累加文件大小
+            print(f"{filename}: {file_size / (1024 * 1024):.2f} MB")  # 转换为MB并打印
+
+    # 打印总大小并返回（以MB为单位）
+    print(f"总大小: {total_size / (1024 * 1024):.2f} MB")
+    total_size_mb = round(total_size / (1024 * 1024), 2)
+    
+    return total_size_mb   # 返回总大小（MB）
+def delete(request):
+    data = json.loads(request.body)
+    type = data.get("type")
+    print(type)
+    if type=="record":
+        clear_directory('AIdjango/dist/livedisplay_record2video/')
+        return JsonResponse({ "success": 1}, status=200)
+    elif type=="video":
+        clear_directory('AIdjango/dist/UploadvideoProcess/')
+        return JsonResponse({ "success": 1}, status=200)
+    elif type=="photo":
+        clear_directory('AIdjango/dist/UploadphotoProcess/')
+        return JsonResponse({ "success": 1}, status=200)
+    else:
+        return JsonResponse({ "message":"None"}, status=200)
+def get_sizes(request):
+    data = json.loads(request.body)
+    type = data.get("type")
+    print(type)
+    if type=="record":
+        return JsonResponse({ "size": list_files_with_sizes("AIdjango/dist/livedisplay_record2video/")}, status=200)
+    elif type=="video":
+        return JsonResponse({ "size": list_files_with_sizes("AIdjango/dist/UploadvideoProcess/")}, status=200)
+    elif type=="photo":
+        return JsonResponse({ "size": list_files_with_sizes("AIdjango/dist/UploadphotoProcess/")}, status=200)
+    else:
+        return JsonResponse({ "message":"None"}, status=200)
 
 def video_record_on(request):
     global isrecord
@@ -422,8 +480,11 @@ def saverecord():
     print(f"视频已成功保存为: {video_name}")
 
 def stream_record_download(request):
-        data = json.loads(request.body)
-        video_name = data.get('name')
+        # print(123123)
+        # print(request.body)
+        # data = json.loads(request.body)
+        # video_name = data.get('name')
+        video_name = request.GET.get('name') 
         file_path =  f'AIdjango/dist/livedisplay_record2video/{video_name}'
         response = StreamingHttpResponse(open(file_path, 'rb'))
         response['content_type'] = "application/octet-stream"
@@ -431,9 +492,10 @@ def stream_record_download(request):
         return response
 
 def stream_video_download(request):
-        data = json.loads(request.body)
-        video_name = data.get('name')
-        video_name = urllib.parse.quote(video_name)
+        # data = json.loads(request.body)
+        # video_name = data.get('name')
+        # video_name = urllib.parse.quote(video_name)
+        video_name = request.GET.get('name')
         # video_name = "2024-09-29-21-36-45.avi"
         file_path =  f'AIdjango/dist/UploadvideoProcess/{video_name}'
         response = StreamingHttpResponse(open(file_path, 'rb'))

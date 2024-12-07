@@ -622,7 +622,7 @@ export default {
       };
 
       try {
-        const response = await this.$axios.get( this.$apiBaseUrl+'/stream_record_download', {
+        const response = await this.$axios.get( this.$apiBaseUrl+'/stream_record', {
           params: data,
           responseType: 'blob' // 以 Blob 形式接收响应
         });
@@ -630,7 +630,7 @@ export default {
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'record_file'); // 设置下载文件名
+        link.setAttribute('download', 'record_file.mp4'); // 设置下载文件名
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link); // 清理临时元素
