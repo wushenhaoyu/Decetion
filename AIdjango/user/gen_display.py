@@ -123,6 +123,8 @@ def initialize():
             RecordCounter=0
         background_thread = threading.Thread(target=background_processing, daemon=True)
         background_thread.start()
+        if not os.path.exists('AIdjango/dist/videotemp/'):
+            os.makedirs('AIdjango/dist/videotemp/')
         if not os.path.exists('AIdjango/dist/livedisplay/'):
             os.makedirs('AIdjango/dist/livedisplay/')
         if not os.path.exists('AIdjango/dist/livedisplay/people'):
@@ -140,13 +142,14 @@ def initialize():
         if not os.path.exists('AIdjango/dist/UploadvideoSave/'):
             os.makedirs('AIdjango/dist/UploadvideoSave/')  
         if not os.path.exists('AIdjango/dist/UploadphotoProcess/'):
-            os.makedirs('AIdjango/dist/UploadphotoProcess/')                      
+            os.makedirs('AIdjango/dist/UploadphotoProcess/')                   
     except Exception as e:
         print(f"Error initializing models: {e}")
         return HttpResponse("Error initializing models.", status=500)
 
     return HttpResponse("Models initialized and ready.")
-
+def index(request):
+    return render(request,"index.html")
 def ConfirmParams(request):
     global paddledetection_net
     global params
@@ -333,7 +336,8 @@ def delete(request):
     type = data.get("type")
     print(type)
     if type=="record":
-        clear_directory('AIdjango/dist/livedisplay_record2video/')
+
+        clear_directory('AIdjango\dist\livedisplay_record2video')
         return JsonResponse({ "success": 1}, status=200)
     elif type=="video":
         clear_directory('AIdjango/dist/UploadvideoProcess/')
