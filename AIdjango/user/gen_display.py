@@ -42,6 +42,7 @@ from multiprocessing import Process, Manager, Event
 from haze.test_real import HazeRemover
 from my_detection.paddle_infer import my_paddledetection
 from dark.camera import VideoEnhancer
+from seg_infer import PaddleSegCamera
 seg_net =None
 haze_net = None
 dark_net =None
@@ -275,39 +276,42 @@ def gen_display(camera):
             frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
             # 将图片进行解码                
             if ret:
-                frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                t_start = time.time()
-                if params["haze_enabled"]:
-                    frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                if params["dark_enabled"]:
-                    frame = dark_net.process_frame(frame)#传入RGB，传出RGB
-                if params["seg_enable"]:
-                    frame = seg_net.process_frame(frame)#传入RGB，传出RGB
-                # print(frame.shape)
-                frame = paddledetection_net.predit(frame)#传入RGB，
-                if isrecord:
-                    if RecordCounter==0:
-                            current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-                            save_dir = f'AIdjango/dist/livedisplay_record/{current_time}'
-                            os.makedirs(save_dir, exist_ok=True)
-                    save_path = os.path.join(save_dir, f"{RecordCounter}.jpg")
-                    print(save_path)
-                    cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
-                    RecordCounter += 1
-                frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                t_end = time.time()
-                t = t_end - t_start
-                if t == 0:
-                    t = 1
-                text = f"FPS: {int(1/t):.2f}, Avg Inference Time: {t * 1000:.2f} ms"
-                
-                cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-                ret, frame = cv2.imencode('.jpeg', frame)
-                # 递增计数器
-                
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
+                try:
+                    frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    t_start = time.time()
+                    if params["haze_enabled"]:
+                        frame = haze_net.haze_frame(frame)#传入RGB，传出RGB
+                    # print(frame.shape)
+                    if params["dark_enabled"]:
+                        frame = dark_net.process_frame(frame)#传入RGB，传出RGB
+                    if params["seg_enable"]:
+                        frame = seg_net.process_frame(frame)#传入RGB，传出RGB
+                    # print(frame.shape)
+                    frame = paddledetection_net.predit(frame)#传入RGB，
+                    if isrecord:
+                        if RecordCounter==0:
+                                current_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                save_dir = f'AIdjango/dist/livedisplay_record/{current_time}'
+                                os.makedirs(save_dir, exist_ok=True)
+                        save_path = os.path.join(save_dir, f"{RecordCounter}.jpg")
+                        print(save_path)
+                        cv2.imwrite(save_path, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 保存为BGR格式
+                        RecordCounter += 1
+                    frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                    t_end = time.time()
+                    t = t_end - t_start
+                    if t == 0:
+                        t = 1
+                    text = f"FPS: {int(1/t):.2f}, Avg Inference Time: {t * 1000:.2f} ms"
+                    
+                    cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    ret, frame = cv2.imencode('.jpeg', frame)
+                    # 递增计数器
+                    
+                    yield (b'--frame\r\n'
+                        b'Content-Type: image/jpeg\r\n\r\n' + frame.tobytes() + b'\r\n')
+                except:
+                    pass
   
 def list_files_with_sizes(folder_path):
     # 检查路径是否存在
