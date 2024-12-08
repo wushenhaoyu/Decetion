@@ -99,7 +99,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'dist'),
             # '/home/dist/',  # 添加额外的模板目录
         ],
         'APP_DIRS': True,
@@ -113,8 +113,8 @@ TEMPLATES = [
         },
     },
 ]
-# STATIC_URL = '/dist/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'dist')
+STATIC_URL = '/dist/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'dist')
 #
 # STATICFILES_DIRS = [
 # os.path.join(BASE_DIR, "dist/assets"),
@@ -124,10 +124,15 @@ TEMPLATES = [
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'picture')
 # MEDIA_URL = '/picture/'
 
-STATIC_URL = '/assets/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+# STATIC_URL = '/assets/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'assets')
+# STATICFILES_DIRS = [
+# os.path.join(BASE_DIR, "dist/assets"),
+# ]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [
-os.path.join(BASE_DIR, "dist/assets"),
+os.path.join(BASE_DIR, "dist/static"),
 ]
 
 WSGI_APPLICATION = 'mydjango.wsgi.application'

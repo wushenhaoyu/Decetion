@@ -35,10 +35,35 @@ urlpatterns = [
     path("log",log),
     path("get_sizes",get_sizes),
     path("delete",delete),
-
-
     path("getAllPhotoFile",getAllPhotoFile),#得到所有的照片文件
     path("getAllVideoFile",getAllVideoFile),#得到所有的视频文件
+    path("api/ConfirmParams", ConfirmParams),
+    path("api/getAllCam", getAllCam),  # 得到所有的摄像头设备
+    path("api/Camchoice", Camchoice),  # 给出使用的摄像头
+    path('api/opencam', open_camera),  # 打开摄像头
+    path('api/closecam', close_camera),  # 关闭摄像头
+    path('api/livedisplay', video),  # 实时演示功能
+    path('api/video_record_on', video_record_on),  # 开启录制
+    path('api/video_record_off', video_record_off),  # 关闭录制
+    path("api/getAllRecordFile", getAllRecordFile),  # 得到所有的录制文件
+    path('api/uploadVideo', upload_video),  # 上传视频
+    path('api/uploadPhoto', upload_photo),  # 上传照片
+    path("api/get_progress", get_progress),  # 得到视频处理的进度条
+    path("api/stream_record_download", stream_record_download),  # 下载录制的视频
+    path("api/stream_photo_download", stream_photo_download),  # 下载录制的视频
+    path("api/stream_video_download", stream_video_download),  # 下载录制的视频
+    path('api/upload_photo', upload_photo, name='upload_photo'),  # 上传照片
+    path("api/stream_video", stream_video),
+    path("api/stream_record", stream_record_download),
+    path("api/stream_photo", stream_photo),
+    path("api/start_process_video", start_process_video),
+    path("api/start_process_photo", start_process_photo),
+    path("api/log", log),
+    path("api/get_sizes", get_sizes),
+    path("api/delete", delete),
+
+    path("api/getAllPhotoFile", getAllPhotoFile),  # 得到所有的照片文件
+    path("api/getAllVideoFile", getAllVideoFile),  # 得到所有的视频文件
 
 
 ]

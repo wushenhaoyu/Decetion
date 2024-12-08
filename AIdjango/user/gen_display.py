@@ -89,7 +89,7 @@ class paddlesegCamera:
         if cfg_file:
             self.args.cfg = cfg_file
         else:
-            self.args.cfg = os.path.join(current_directory, 'output_inference12', 'pp_liteseg_infer_model', 'deploy.yaml')
+            self.args.cfg = os.path.join(current_directory,'my_seg', 'output_inference', 'pp_liteseg_infer_model', 'deploy.yaml')
         
         # 初始化 Predictor
         self.predictor = Predictor(self.args)
@@ -156,7 +156,7 @@ def initialize():
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
         if seg_net is None:
-            seg_net = my_seg.paddlesegCamera()
+            seg_net = paddlesegCamera()
             print("SEGNET Detection initialized.")
         if params is None:
             params = {
