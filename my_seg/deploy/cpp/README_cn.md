@@ -1,4 +1,4 @@
-# PaddleSeg C++ 预测部署方案
+# my_seg.paddleseg C++ 预测部署方案
 
 ## 使用Paddle Inference C++部署PaddleSeg模型
 

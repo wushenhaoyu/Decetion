@@ -19,8 +19,8 @@ import numpy as np
 from paddle.inference import create_predictor
 from paddle.inference import Config as PredictConfig
 
-from paddleseg.utils import logger, get_image_list, progbar
-from paddleseg.deploy.infer import DeployConfig
+from my_seg.paddleseg.utils import logger, get_image_list, progbar
+from my_seg.paddleseg.deploy.infer import DeployConfig
 """
 Load images and run the model, it collects and saves dynamic shapes,
 which are used in deployment with TRT.

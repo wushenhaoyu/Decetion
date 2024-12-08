@@ -16,8 +16,8 @@ import os
 import json
 import yaml
 
-from paddleseg12.utils import logger
-from paddleseg12.cvlibs import Config
+from my_seg.paddleseg12.utils import logger
+from my_seg.paddleseg12.cvlibs import Config
 
 
 def save_model_info(model_info, save_path):

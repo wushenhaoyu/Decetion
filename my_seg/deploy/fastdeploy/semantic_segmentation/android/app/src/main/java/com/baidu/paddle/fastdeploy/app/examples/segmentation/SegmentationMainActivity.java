@@ -76,7 +76,7 @@ public class SegmentationMainActivity extends Activity implements View.OnClickLi
     long frameCounter = 0;
 
     // Call 'init' and 'release' manually later
-    PaddleSegModel predictor = new PaddleSegModel();
+    my_seg.paddlesegModel predictor = new my_seg.paddlesegModel();
     private List<BaseResultModel> results = new ArrayList<>();
 
     @Override

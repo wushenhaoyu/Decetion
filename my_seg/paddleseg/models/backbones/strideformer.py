@@ -20,11 +20,11 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle import regularizer
 
-from paddleseg.cvlibs import manager
-from paddleseg import utils
-from paddleseg.models.backbones.transformer_utils import DropPath
-from paddleseg.models.backbones.mobilenetv3 import _make_divisible, _create_act, Hardsigmoid
-from paddleseg.models.layers import layer_libs
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg import utils
+from my_seg.paddleseg.models.backbones.transformer_utils import DropPath
+from my_seg.paddleseg.models.backbones.mobilenetv3 import _make_divisible, _create_act, Hardsigmoid
+from my_seg.paddleseg.models.layers import layer_libs
 
 
 class StrideFormer(nn.Layer):

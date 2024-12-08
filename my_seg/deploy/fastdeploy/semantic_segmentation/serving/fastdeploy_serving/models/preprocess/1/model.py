@@ -63,7 +63,7 @@ class TritonPythonModel:
             self.output_dtype.append(output_config["data_type"])
         print("preprocess output names:", self.output_names)
 
-        # init PaddleSegPreprocess class
+        # init my_seg.paddlesegPreprocess class
         yaml_path = os.path.abspath(os.path.dirname(__file__)) + "/deploy.yaml"
         self.preprocess_ = fd.vision.segmentation.PaddleSegPreprocessor(
             yaml_path)
@@ -97,7 +97,7 @@ class TritonPythonModel:
             data = data.as_numpy()
             outputs, im_info = self.preprocess_.run(data)
 
-            # PaddleSeg preprocess has two outputs
+            # my_seg.paddleseg preprocess has two outputs
             dlpack_tensor = outputs[0].to_dlpack()
             output_tensor_0 = pb_utils.Tensor.from_dlpack(self.output_names[0],
                                                           dlpack_tensor)

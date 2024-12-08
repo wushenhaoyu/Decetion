@@ -24,9 +24,9 @@ import paddle.nn.functional as F
 from paddle.inference import create_predictor
 from paddle.inference import Config as PredictConfig
 
-from paddleseg.deploy.infer import DeployConfig
-from paddleseg.cvlibs import manager
-from paddleseg.utils import logger, metrics, progbar
+from my_seg.paddleseg.deploy.infer import DeployConfig
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.utils import logger, metrics, progbar
 from infer import auto_tune, use_auto_tune, Predictor
 
 

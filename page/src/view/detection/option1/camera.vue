@@ -139,7 +139,7 @@
 
     <!-- 左侧图片区域 -->
     <div style="flex: 3; display: flex; justify-content: center; align-items: center;padding-top: 40px;" >
-      <img :src="detailPhotoUrl" alt="image" style="width: 75%; height: auto; border-radius: 0.5vw;">
+      <img :src="detailPhotoUrl" alt="image" style="width: 75%; height: 100%; border-radius: 0.5vw;">
     </div>
 
     <!-- 右侧文本内容 -->

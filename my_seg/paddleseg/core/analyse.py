@@ -22,9 +22,9 @@ import numpy as np
 import paddle
 from PIL import Image
 
-from paddleseg import utils
-from paddleseg.core import infer
-from paddleseg.utils import logger, progbar, visualize, metrics
+from my_seg.paddleseg import utils
+from my_seg.paddleseg.core import infer
+from my_seg.paddleseg.utils import logger, progbar, visualize, metrics
 
 
 def mkdir(path):
@@ -79,7 +79,7 @@ def analyse(model,
             It should be provided when `is_slide` is True.
         crop_size (tuple|list, optional):  The crop size of sliding window, the first is width and the second is height.
             It should be provided when `is_slide` is True.
-        custom_color (list, optional): Save images with a custom color map. Default: None, use paddleseg's default color map.
+        custom_color (list, optional): Save images with a custom color map. Default: None, use my_seg.paddleseg's default color map.
 
     """
     utils.utils.load_entire_model(model, model_path)

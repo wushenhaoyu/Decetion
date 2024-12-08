@@ -1,7 +1,7 @@
 English | [简体中文](README_CN.md)
-# PaddleSeg Serving Deployment Demo
+# my_seg.paddleseg Serving Deployment Demo
 
-The PaddleSeg serving deployment Demo is built with FastDeploy Serving. FastDeploy Serving is a service-oriented deployment framework suitable for high-concurrency and high-throughput requests encapsulated based on the Triton Inference Server framework. It is a complete and high-performance service-oriented deployment framework that can be used in actual production. If you don’t need high-concurrency and high-throughput scenarios, and just want to quickly test the feasibility of online deployment of the model, please refer to [simple_serving](../simple_serving/)
+The my_seg.paddleseg serving deployment Demo is built with FastDeploy Serving. FastDeploy Serving is a service-oriented deployment framework suitable for high-concurrency and high-throughput requests encapsulated based on the Triton Inference Server framework. It is a complete and high-performance service-oriented deployment framework that can be used in actual production. If you don’t need high-concurrency and high-throughput scenarios, and just want to quickly test the feasibility of online deployment of the model, please refer to [simple_serving](../simple_serving/)
 
 ## 1. Environment
 
@@ -14,7 +14,7 @@ Before serving deployment, it is necessary to confirm the hardware and software 
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # Note: If the current branch cannot find the following fastdeploy test code, switch to the develop branch
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/serving/fastdeploy_serving
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/serving/fastdeploy_serving
 
 # Download PP_LiteSeg model file
 wget  https://bj.bcebos.com/paddlehub/fastdeploy/PP_LiteSeg_B_STDC2_cityscapes_with_argmax_infer.tgz
@@ -58,7 +58,7 @@ wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 python3 -m pip install tritonclient\[all\]
 
 # Send requests
-python3 paddleseg_grpc_client.py
+python3 my_seg.paddleseg_grpc_client.py
 ```
 
 When the request is sent successfully, the results are returned in json format and printed out:

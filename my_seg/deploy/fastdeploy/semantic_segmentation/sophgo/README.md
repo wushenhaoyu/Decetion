@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg在算能（Sophgo）硬件上通过FastDeploy部署模型
+# my_seg.paddleseg在算能（Sophgo）硬件上通过FastDeploy部署模型
 
 ## 1. 说明  
 PaddleSeg支持部署的支持如下型号的Sophgo芯片的部署  

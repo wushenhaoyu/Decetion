@@ -24,8 +24,8 @@ from paddle import ParamAttr
 from paddle.regularizer import L2Decay
 from paddle.nn.initializer import Normal, Constant
 
-from paddleseg12.cvlibs import manager
-from paddleseg12 import utils
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12 import utils
 
 __all__ = [
     "Lite_HRNet_18", "Lite_HRNet_30", "Lite_HRNet_naive",

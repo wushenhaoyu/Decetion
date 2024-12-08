@@ -16,10 +16,10 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.models.backbones.mscan import MSCAN
-from paddleseg.models.layers import NMF2D, ConvGNAct
-from paddleseg.utils import utils
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.models.backbones.mscan import MSCAN
+from my_seg.paddleseg.models.layers import NMF2D, ConvGNAct
+from my_seg.paddleseg.utils import utils
 
 
 @manager.MODELS.add_component

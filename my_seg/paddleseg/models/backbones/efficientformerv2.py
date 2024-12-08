@@ -19,9 +19,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.utils import utils
-from paddleseg.cvlibs import manager, param_init
-from paddleseg.models.backbones.transformer_utils import *
+from  my_seg.paddleseg.utils import utils
+from  my_seg.paddleseg.cvlibs import manager, param_init
+from  my_seg.paddleseg.models.backbones.transformer_utils import *
 
 EfficientFormer_width = {
     'L': [40, 80, 192, 384],

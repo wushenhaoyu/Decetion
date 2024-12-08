@@ -16,8 +16,8 @@ import paddle
 from paddle import nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.models import losses
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.models import losses
 
 
 @manager.LOSSES.add_component

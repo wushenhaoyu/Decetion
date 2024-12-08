@@ -8,7 +8,7 @@ def parse_arguments():
     import ast
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model", required=True, help="Path of PaddleSeg model.")
+        "--model", required=True, help="Path of my_seg.paddleseg model.")
     parser.add_argument(
         "--image", type=str, required=True, help="Path of test image file.")
     return parser.parse_args()

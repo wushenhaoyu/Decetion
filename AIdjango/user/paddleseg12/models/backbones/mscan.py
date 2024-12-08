@@ -20,11 +20,11 @@ import paddle.nn as nn
 from paddle.nn import Conv2D
 from paddle.nn.initializer import Assign, Normal
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.models.backbones.transformer_utils import (DropPath, ones_,
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.models.backbones.transformer_utils import (DropPath, ones_,
                                                           to_2tuple, zeros_)
-from paddleseg12.models.layers import SyncBatchNorm
-from paddleseg12.utils import utils
+from my_seg.paddleseg12.models.layers import SyncBatchNorm
+from my_seg.paddleseg12.utils import utils
 
 __all__ = ["MSCAN", "MSCAN_T", "MSCAN_S", "MSCAN_B", "MSCAN_L"]
 

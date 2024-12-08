@@ -4,16 +4,16 @@ import cv2
 import numpy as np
 from PIL import Image
 from deploy12.python.infer import Predictor, parse_args
-from paddleseg12.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg12.utils.visualize import get_pseudo_color_map
 
 # 确保当前路径被添加到 sys.path
 current_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_directory)
 
-class PaddleSegCamera:
+class my_seg.paddlesegCamera:
     def __init__(self, cfg_file=None):
         """
-        初始化 PaddleSegCamera 类，加载配置文件并初始化 Predictor。
+        初始化 my_seg.paddlesegCamera 类，加载配置文件并初始化 Predictor。
         """
         # 解析命令行参数
         self.args = parse_args()
@@ -67,6 +67,6 @@ class PaddleSegCamera:
 
 # 作为模块运行时
 if __name__ == '__main__':
-    # 创建 PaddleSegCamera 实例并运行
-    paddle_seg_camera = PaddleSegCamera()
+    # 创建 my_seg.paddlesegCamera 实例并运行
+    paddle_seg_camera = my_seg.paddlesegCamera()
     paddle_seg_camera.run()

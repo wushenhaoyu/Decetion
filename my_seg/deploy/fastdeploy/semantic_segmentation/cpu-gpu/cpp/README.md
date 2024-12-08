@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg CPU-GPU C++部署示例
+# my_seg.paddleseg CPU-GPU C++部署示例
 
 本目录下提供`infer.cc`快速完成PP-LiteSeg在CPU/GPU，以及GPU上通过Paddle-TensorRT加速部署的示例。
 
@@ -24,7 +24,7 @@ tar xvf fastdeploy-linux-x64-x.x.x.tgz
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/cpp-gpu/cpp
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/cpp-gpu/cpp
 
 # 编译部署示例
 mkdir build && cd build

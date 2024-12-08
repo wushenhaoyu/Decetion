@@ -1,6 +1,6 @@
 简体中文 | [English](README.md)
 
-# PaddleSeg Python轻量服务化部署示例
+# my_seg.paddleseg Python轻量服务化部署示例
 
 PaddleSeg Python轻量服务化部署是FastDeploy基于Flask框架搭建的可快速验证线上模型部署可行性的服务化部署示例，基于http请求完成AI推理任务，适用于无并发推理的简单场景，如有高并发，高吞吐场景的需求请参考[fastdeploy_serving](../fastdeploy_serving/)
 
@@ -14,7 +14,7 @@ PaddleSeg Python轻量服务化部署是FastDeploy基于Flask框架搭建的可�
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/serving/simple_serving
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/serving/simple_serving
 
 # 下载PP-LiteSeg模型文件
 wget https://bj.bcebos.com/paddlehub/fastdeploy/PP_LiteSeg_B_STDC2_cityscapes_with_argmax_infer.tgz

@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg 算能 C++ 部署示例
+# my_seg.paddleseg 算能 C++ 部署示例
 
 本目录下提供`infer.cc`快速完成PP-LiteSeg在SOPHGO BM1684x板子上加速部署的示例。
 
@@ -33,7 +33,7 @@
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/sophgo/cpp
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/sophgo/cpp
 ```
 
 ### 4.3 拷贝模型文件，以及配置文件至model文件夹

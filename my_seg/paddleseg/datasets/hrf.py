@@ -14,11 +14,11 @@
 
 import os
 
-from paddleseg.utils.download import download_file_and_uncompress
-from paddleseg.utils import seg_env
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import Compose
-from paddleseg.datasets import Dataset
+from my_seg.paddleseg.utils.download import download_file_and_uncompress
+from my_seg.paddleseg.utils import seg_env
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.transforms import Compose
+from my_seg.paddleseg.datasets import Dataset
 
 URL = 'https://bj.bcebos.com/paddleseg/dataset/hrf/hrf.zip'
 

@@ -1,9 +1,9 @@
 import paddle
 import paddle.nn as nn
-from paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.cvlibs import manager
 from paddle.vision.models.resnet import resnet18, resnet34, resnet50, resnet101
 import paddle.nn.functional as F
-from paddleseg12.models.backbones.resnet_ms3 import ResNet_MS3
+from my_seg.paddleseg12.models.backbones.resnet_ms3 import ResNet_MS3
 # from contrib.QualityInspector.qinspector.uad.utils.utils import plot_fig
 # from skimage import measure, morphology
 

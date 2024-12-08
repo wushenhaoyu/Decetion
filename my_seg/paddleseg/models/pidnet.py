@@ -20,8 +20,8 @@ import paddle.nn.functional as F
 from paddle.nn.initializer import Constant, Normal, Uniform
 from paddle import Tensor
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.utils import utils
 
 
 @manager.MODELS.add_component

@@ -5,7 +5,7 @@ from paddle_serving_client import Client
 from paddle_serving_app.reader import Sequential, File2Image, Resize, CenterCrop
 from paddle_serving_app.reader import RGB2BGR, Transpose, Div, Normalize
 
-from paddleseg.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 
 
 def parse_args():

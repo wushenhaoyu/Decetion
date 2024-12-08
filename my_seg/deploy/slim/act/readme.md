@@ -55,7 +55,7 @@
 
 - PaddlePaddle == develop （可从[Paddle官网](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html)下载安装）
 - PaddleSlim == develop
-- PaddleSeg == develop
+- my_seg.paddleseg == develop
 
 安装paddlepaddle：
 ```shell
@@ -75,7 +75,7 @@ python setup.py install
 ```shell
 cd ..
 git clone https://github.com/PaddlePaddle/PaddleSeg.git -b develop
-cd PaddleSeg/
+cd my_seg.paddleseg/
 python setup.py install
 ```
 
@@ -92,7 +92,7 @@ python setup.py install
 - 通过下面的指令可以对ppliteseg-tiny的模型进行导出，其他的模型导出可以参照[导出指南](https://github.com/PaddlePaddle/PaddleSeg/blob/release/2.8/docs/model_export_cn.md)：
 
 ```shell
-cd PaddleSeg/
+cd my_seg.paddleseg/
 wget https://paddleseg.bj.bcebos.com/dygraph/cityscapes/pp_liteseg_stdc1_cityscapes_1024x512_scale1.0_160k/model.pdparams
 
 python tools/export.py --config configs/pp_liteseg/pp_liteseg_stdc1_cityscapes_1024x512_scale0.5_160k.yml --model_path model.pdparams  --save_dir ppliteseg_tiny_scale1.0_export
@@ -112,7 +112,7 @@ python tools/export.py --config configs/pp_liteseg/pp_liteseg_stdc1_cityscapes_1
 ```shell
 # 单卡启动
 export CUDA_VISIBLE_DEVICES=0
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python run_seg.py \
       --act_config_path='./configs/ppliteseg/ppliteseg_qat.yaml' \
       --save_dir='./save_quant_model_qat'  \
@@ -120,7 +120,7 @@ python run_seg.py \
 
 # 多卡启动
 export CUDA_VISIBLE_DEVICES=0,1
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python -m paddle.distributed.launch run_seg.py \
       --act_config_path='./configs/ppliteseg/ppliteseg_qat.yaml' \
       --save_dir='./save_quant_model_qat'  \
@@ -162,7 +162,7 @@ TensorRT预测环境配置：
 ##### 4.1.1 基于压缩模型进行基于GPU的批量测试：
 
 ```shell
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python test_seg.py \
       --model_path=save_quant_model_qat \
       --dataset='cityscapes' \
@@ -178,7 +178,7 @@ python test_seg.py \
 ##### 4.1.2 基于压缩前模型进行基于GPU的批量测试：
 
 ```shell
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python test_seg.py \
       --model_path=ppliteseg_tiny_scale1.0_export/ \
       --dataset='cityscapes' \
@@ -196,7 +196,7 @@ python test_seg.py \
 - MKLDNN预测：
 
 ```shell
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python test_seg.py \
       --model_path=save_quant_model_qat \
       --dataset='cityscapes' \
@@ -214,7 +214,7 @@ python test_seg.py \
 ```shell
 wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 python test_seg.py \
       --model_path=ppliteseg_tiny_scale1.0_export \
       --dataset='cityscapes' \
@@ -229,7 +229,7 @@ python test_seg.py \
 ##### 4.2.2  基于压缩模型测试单张图片：
 
 ```shell
-cd PaddleSeg/deploy/slim/act/
+cd my_seg.paddleseg/deploy/slim/act/
 
 wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 
@@ -286,7 +286,7 @@ Int8推理结果
 
 ## 5.FAQ
 
-### 1. paddleslim 和 paddleseg 存在opencv的版本差异？
+### 1. paddleslim 和 my_seg.paddleseg 存在opencv的版本差异？
 
 **A**：去除Paddleslim中requirements.txt的opencv版本限制后重新安装。
 
@@ -327,7 +327,7 @@ Int8推理结果
 
 ### 6. ValueError: The axis is expected to be in range of [0,0) but got:
 
-**A**: 需要安装paddleseg devleop版本，如果确定已经安装，建议使用`pip uninstall paddleseg`卸载后重新安装。
+**A**: 需要安装paddleseg devleop版本，如果确定已经安装，建议使用`pip uninstall my_seg.paddleseg`卸载后重新安装。
 
 ### 7. NotImplementedError：delete weight dequant op pass is not supported for per channel quantization
 

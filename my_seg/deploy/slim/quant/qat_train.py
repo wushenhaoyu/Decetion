@@ -19,9 +19,9 @@ import paddle
 import numpy as np
 from paddleslim import QAT
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.core import train
-from paddleseg.utils import get_sys_env, logger, utils
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.core import train
+from my_seg.paddleseg.utils import get_sys_env, logger, utils
 from qat_config import quant_config
 """
 Apply quantization to segmentation model.

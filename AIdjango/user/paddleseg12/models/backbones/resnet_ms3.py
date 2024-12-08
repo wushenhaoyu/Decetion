@@ -16,7 +16,7 @@ import paddle
 import paddle.nn as nn
 from paddle.vision.models.resnet import resnet18, resnet34, resnet50, resnet101
 
-from paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.cvlibs import manager
 
 __all__ = ["ResNet_MS3", "ResNet18", "ResNet34", "ResNet50", "ResNet101"]
 

@@ -16,9 +16,9 @@ import paddle
 import paddle.nn as nn
 from paddle.nn import functional as F
 
-from paddleseg.utils import utils
-from paddleseg.models import layers
-from paddleseg.cvlibs import manager
+from my_seg.paddleseg.utils import utils
+from my_seg.paddleseg.models import layers
+from my_seg.paddleseg.cvlibs import manager
 
 
 @manager.MODELS.add_component

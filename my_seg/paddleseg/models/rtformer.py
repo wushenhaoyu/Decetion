@@ -18,11 +18,11 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager, param_init
-from paddleseg.models import layers
-from paddleseg.utils import utils
-from paddleseg.models.backbones.transformer_utils import (DropPath, Identity)
-from paddleseg.cvlibs.param_init import (constant_init, kaiming_normal_init,
+from my_seg.paddleseg.cvlibs import manager, param_init
+from my_seg.paddleseg.models import layers
+from my_seg.paddleseg.utils import utils
+from my_seg.paddleseg.models.backbones.transformer_utils import (DropPath, Identity)
+from my_seg.paddleseg.cvlibs.param_init import (constant_init, kaiming_normal_init,
                                          trunc_normal_init)
 
 

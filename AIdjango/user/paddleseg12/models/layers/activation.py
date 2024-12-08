@@ -33,7 +33,7 @@ class Activation(nn.Layer):
 
     Examples:
 
-        from paddleseg.models.common.activation import Activation
+        from my_seg.paddleseg.models.common.activation import Activation
 
         relu = Activation("relu")
         print(relu)

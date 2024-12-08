@@ -18,9 +18,9 @@ from typing import Any, Optional
 import yaml
 import paddle
 
-from paddleseg.cvlibs import manager, Config
-from paddleseg.utils import utils, logger
-from paddleseg.utils.utils import CachedProperty as cached_property
+from  my_seg.paddleseg.cvlibs import manager, Config
+from  my_seg.paddleseg.utils import utils, logger
+from  my_seg.paddleseg.utils.utils import CachedProperty as cached_property
 
 
 class Builder(object):

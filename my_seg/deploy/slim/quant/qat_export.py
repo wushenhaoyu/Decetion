@@ -19,9 +19,9 @@ import yaml
 import paddle
 from paddleslim import QAT
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.utils import logger, utils
-from paddleseg.deploy.export import WrappedModel
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.utils import logger, utils
+from my_seg.paddleseg.deploy.export import WrappedModel
 from qat_config import quant_config
 from qat_train import skip_quant
 

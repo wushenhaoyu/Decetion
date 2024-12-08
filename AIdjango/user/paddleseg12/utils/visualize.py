@@ -78,7 +78,7 @@ def get_pseudo_color_map(pred, color_map=None, use_multilabel=False):
     Args:
         pred (numpy.ndarray): the origin predicted image.
         color_map (list, optional): the palette color map. Default: None,
-            use paddleseg's default color map.
+            use my_seg.paddleseg's default color map.
         use_multilabel (bool, optional): Whether to enable multilabel mode. Default: False.
 
     Returns:
@@ -103,7 +103,7 @@ def get_color_map_list(num_classes, custom_color=None):
 
     Args:
         num_classes (int): Number of classes.
-        custom_color (list, optional): Save images with a custom color map. Default: None, use paddleseg's default color map.
+        custom_color (list, optional): Save images with a custom color map. Default: None, use my_seg.paddleseg's default color map.
 
     Returns:
         (list). The color map.

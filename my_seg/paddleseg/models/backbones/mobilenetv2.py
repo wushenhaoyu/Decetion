@@ -19,8 +19,8 @@ import paddle.nn.functional as F
 from paddle.nn import Conv2D, BatchNorm, Linear, Dropout
 from paddle.nn import AdaptiveAvgPool2D, MaxPool2D, AvgPool2D
 
-from paddleseg.cvlibs import manager
-from paddleseg import utils
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg import utils
 
 __all__ = [
     "MobileNetV2_x0_25",

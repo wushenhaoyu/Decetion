@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg 服务化部署示例
+# my_seg.paddleseg 服务化部署示例
 
 PaddleSeg 服务化部署示例是利用FastDeploy Serving搭建的服务化部署示例。FastDeploy Serving是基于Triton Inference Server框架封装的适用于高并发、高吞吐量请求的服务化部署框架，是一套可用于实际生产的完备且性能卓越的服务化部署框架。如没有高并发，高吞吐场景的需求，只想快速检验模型线上部署的可行性，请参考[simple_serving](../simple_serving/)
 
@@ -14,7 +14,7 @@ PaddleSeg 服务化部署示例是利用FastDeploy Serving搭建的服务化部�
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/serving/fastdeploy_serving
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/serving/fastdeploy_serving
 
 # 下载PP-LiteSeg模型文件
 wget  https://bj.bcebos.com/paddlehub/fastdeploy/PP_LiteSeg_B_STDC2_cityscapes_with_argmax_infer.tgz
@@ -58,7 +58,7 @@ wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 python3 -m pip install tritonclient[all]
 
 # 发送请求
-python3 paddleseg_grpc_client.py
+python3 my_seg.paddleseg_grpc_client.py
 ```
 
 发送请求成功后，会返回json格式的检测结果并打印输出:

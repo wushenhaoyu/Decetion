@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg TIMVX A311D C++ 部署示例
+# my_seg.paddleseg TIMVX A311D C++ 部署示例
 
 本目录下提供的 `infer.cc`，可以帮助用户快速完成 PP-LiteSeg 量化模型在晶晨 A311D 上的部署推理加速。
 

@@ -15,9 +15,9 @@
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils
-from paddleseg.models import layers
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg.utils import utils
+from  my_seg.paddleseg.models import layers
 
 __all__ = ["Xception41_deeplab", "Xception65_deeplab", "Xception71_deeplab"]
 

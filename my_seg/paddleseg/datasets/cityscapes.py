@@ -15,9 +15,9 @@
 import os
 import glob
 
-from paddleseg.datasets import Dataset
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import Compose
+from my_seg.paddleseg.datasets import Dataset
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.transforms import Compose
 
 
 @manager.DATASETS.add_component

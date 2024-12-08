@@ -25,7 +25,7 @@ def uniform_init(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 2)
@@ -47,7 +47,7 @@ def constant_init(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -69,7 +69,7 @@ def normal_init(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -102,7 +102,7 @@ def kaiming_normal_init(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -123,7 +123,7 @@ def trunc_normal_init(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -152,7 +152,7 @@ def kaiming_uniform(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -179,7 +179,7 @@ def xavier_uniform(param, **kwargs):
 
     Examples:
 
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
 
         linear = nn.Linear(2, 4)
@@ -194,7 +194,7 @@ def multihead_fill(layer, qkv_same_embed_dim=True):
     The default initialization of multi-head attention.
 
     Example:
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
         
         self_attn = nn.MultiHeadAttention(
@@ -222,7 +222,7 @@ def th_linear_fill(layer):
     The default way of linear initialization.
     
     Example:
-        from paddleseg.cvlibs import param_init
+        from my_seg.paddleseg.cvlibs import param_init
         import paddle.nn as nn
         
         linear = nn.Linear(128, 128)

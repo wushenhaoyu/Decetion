@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# PaddleSeg 语义分割模型RKNPU2部署方案-FastDeploy
+# my_seg.paddleseg 语义分割模型RKNPU2部署方案-FastDeploy
 
 ## 1. 说明   
 RKNPU2 提供了一个高性能接口来访问 Rockchip NPU，支持如下硬件的部署
@@ -8,7 +8,7 @@ RKNPU2 提供了一个高性能接口来访问 Rockchip NPU，支持如下硬件
 - RK3588/RK3588S
 - RV1103/RV1106
 
-本示例基于 RV3588 来介绍如何使用 FastDeploy 部署 PaddleSeg 模型
+本示例基于 RV3588 来介绍如何使用 FastDeploy 部署 my_seg.paddleseg 模型
 
 ## 2. 使用预导出的模型列表  
 
@@ -44,7 +44,7 @@ PaddleSeg模型导出，请参考其文档说明[模型导出](https://github.co
 
 ### 3.4 转换为RKNN模型
 RKNPU部署模型前需要将Paddle模型转换成RKNN模型，具体步骤如下:
-* PaddleSeg训练模型导出为推理模型，请参考[PaddleSeg模型导出说明](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export_cn.md)，也可以使用上表中的FastDeploy的预导出模型
+* my_seg.paddleseg训练模型导出为推理模型，请参考[PaddleSeg模型导出说明](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export_cn.md)，也可以使用上表中的FastDeploy的预导出模型
 * Paddle模型转换为ONNX模型，请参考[Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX)
 * ONNX模型转换RKNN模型的过程，请参考[转换文档](https://github.com/PaddlePaddle/FastDeploy/blob/develop/docs/cn/faq/rknpu2/export.md)进行转换。
 

@@ -9,14 +9,14 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils, logger
-from paddleseg.cvlibs.param_init import normal_init, trunc_normal_init, constant_init
-from paddleseg.models.backbones.transformer_utils import to_2tuple, DropPath
-from paddleseg.models.layers.vit_adapter_layers import (SpatialPriorModule,
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg.utils import utils, logger
+from  my_seg.paddleseg.cvlibs.param_init import normal_init, trunc_normal_init, constant_init
+from  my_seg.paddleseg.models.backbones.transformer_utils import to_2tuple, DropPath
+from  my_seg.paddleseg.models.layers.vit_adapter_layers import (SpatialPriorModule,
                                                         InteractionBlock,
                                                         deform_inputs)
-from paddleseg.models.layers.ms_deformable_attention import MSDeformAttn
+from  my_seg.paddleseg.models.layers.ms_deformable_attention import MSDeformAttn
 
 __all__ = ['ViTAdapter', 'ViTAdapter_Tiny']
 

@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# PaddleSeg 语义分割模型在昆仑芯上部署方案-FastDeploy
+# my_seg.paddleseg 语义分割模型在昆仑芯上部署方案-FastDeploy
 
 ## 1. 说明  
 PaddleSeg支持利用FastDeploy在昆仑芯片上部署Segmentation模型。

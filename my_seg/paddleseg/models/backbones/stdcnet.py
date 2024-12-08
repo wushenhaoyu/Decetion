@@ -17,9 +17,9 @@ import math
 import paddle
 import paddle.nn as nn
 
-from paddleseg.utils import utils
-from paddleseg.cvlibs import manager, param_init
-from paddleseg.models.layers.layer_libs import SyncBatchNorm
+from my_seg.paddleseg.utils import utils
+from my_seg.paddleseg.cvlibs import manager, param_init
+from my_seg.paddleseg.models.layers.layer_libs import SyncBatchNorm
 
 __all__ = ["STDC1", "STDC2"]
 

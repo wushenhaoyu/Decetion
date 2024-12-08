@@ -38,8 +38,8 @@ mkdir build && cd build && cmake ../ && make -j`nproc`
 wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 ```
 
-- Export PaddleSeg Model to onnx format
-  * [export PaddleSeg model](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export.md)
+- Export my_seg.paddleseg Model to onnx format
+  * [export my_seg.paddleseg model](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export.md)
   * convert exported model to onnx format with [Paddle2ONNX](https://github.com/PaddlePaddle/Paddle2ONNX)
 
 - You can download the bisenetv2 onnx model for this demo directly from the following url:

@@ -21,9 +21,9 @@ import paddle
 from paddle.distributed import fleet
 import paddle.nn.functional as F
 
-from paddleseg.utils import TimeAverager, calculate_eta, resume, logger, worker_init_fn
-from paddleseg.core.val import evaluate
-from paddleseg.models.losses import DistillCrossEntropyLoss
+from my_seg.paddleseg.utils import TimeAverager, calculate_eta, resume, logger, worker_init_fn
+from my_seg.paddleseg.core.val import evaluate
+from my_seg.paddleseg.models.losses import DistillCrossEntropyLoss
 
 
 def check_logits_losses(logits_list, losses):
@@ -104,7 +104,7 @@ def distill_train(distill_model,
         num_workers (int, optional): Num workers for data loader. Default: 0.
         use_vdl (bool, optional): Whether to record the data to VisualDL during training. Default: False.
         losses (dict): A dict including 'types' and 'coef'. The length of coef should equal to 1 or len(losses['types']).
-            The 'types' item is a list of object of paddleseg.models.losses while the 'coef' item is a list of the relevant coefficient.
+            The 'types' item is a list of object of my_seg.paddleseg.models.losses while the 'coef' item is a list of the relevant coefficient.
         distill_losses (dict): A dict including 'types' and 'coef'. The format of distill_losses is the same as losses.
         keep_checkpoint_max (int, optional): Maximum number of checkpoints to save. Default: 5.
         test_config(dict, optional): Evaluation config.

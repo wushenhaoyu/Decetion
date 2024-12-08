@@ -20,9 +20,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 from paddle.nn.initializer import TruncatedNormal, Constant, Normal
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils, logger
-from paddleseg.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.utils import utils, logger
+from my_seg.paddleseg.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
 
 zeros_ = Constant(value=0.)
 

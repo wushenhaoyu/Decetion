@@ -17,8 +17,8 @@ import numpy as np
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg12.cvlibs import manager, param_init
-from paddleseg12.utils import utils
+from my_seg.paddleseg12.cvlibs import manager, param_init
+from my_seg.paddleseg12.utils import utils
 
 
 @manager.MODELS.add_component

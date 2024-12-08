@@ -1,4 +1,4 @@
-# PaddleSeg Matting模型高性能全场景部署方案-FastDeploy
+# my_seg.paddleseg Matting模型高性能全场景部署方案-FastDeploy
 
 ## 1. 说明
 PaddleSeg支持利用FastDeploy在NVIDIA GPU、X86 CPU、飞腾CPU、ARM CPU、Intel GPU(独立显卡/集成显卡)硬件上快速部署Matting模型

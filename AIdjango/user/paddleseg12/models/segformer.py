@@ -7,9 +7,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.models import layers
-from paddleseg12.utils import utils
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.models import layers
+from my_seg.paddleseg12.utils import utils
 
 
 class MLP(nn.Layer):

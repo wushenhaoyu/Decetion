@@ -2,9 +2,9 @@ import argparse
 import os
 import numpy as np
 import cv2
-from paddleseg.transforms import Normalize, Compose
-from paddleseg.utils import get_image_list
-from paddleseg.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg.transforms import Normalize, Compose
+from my_seg.paddleseg.utils import get_image_list
+from my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 from onnxruntime import InferenceSession
 
 

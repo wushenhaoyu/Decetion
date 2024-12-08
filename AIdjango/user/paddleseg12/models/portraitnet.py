@@ -14,8 +14,8 @@
 
 import paddle.nn as nn
 
-from paddleseg12 import utils
-from paddleseg12.cvlibs import manager
+from my_seg.paddleseg12 import utils
+from my_seg.paddleseg12.cvlibs import manager
 
 
 @manager.MODELS.add_component

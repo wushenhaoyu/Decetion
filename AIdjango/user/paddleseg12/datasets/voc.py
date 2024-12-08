@@ -14,11 +14,11 @@
 
 import os
 
-from paddleseg12.datasets import Dataset
-from paddleseg12.utils.download import download_file_and_uncompress
-from paddleseg12.utils import seg_env
-from paddleseg12.cvlibs import manager
-from paddleseg12.transforms import Compose
+from my_seg.paddleseg12.datasets import Dataset
+from my_seg.paddleseg12.utils.download import download_file_and_uncompress
+from my_seg.paddleseg12.utils import seg_env
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.transforms import Compose
 
 URL = "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar"
 

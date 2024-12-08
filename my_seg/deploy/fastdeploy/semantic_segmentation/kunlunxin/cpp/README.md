@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg XPU C++部署示例
+# my_seg.paddleseg XPU C++部署示例
 
 本目录下提供`infer.cc`快速完成PP-LiteSeg在昆仑芯 XPU 上部署的示例。
 
@@ -16,7 +16,7 @@
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/kunlunxin/cpp
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/kunlunxin/cpp
 
 mkdir build
 cd build

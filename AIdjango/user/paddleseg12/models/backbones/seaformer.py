@@ -16,10 +16,10 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg12.cvlibs import manager, param_init
-from paddleseg12.models import layers
-from paddleseg12.models.backbones.transformer_utils import DropPath, zeros_, ones_
-from paddleseg12.utils import utils
+from my_seg.paddleseg12.cvlibs import manager, param_init
+from my_seg.paddleseg12.models import layers
+from my_seg.paddleseg12.models.backbones.transformer_utils import DropPath, zeros_, ones_
+from my_seg.paddleseg12.utils import utils
 
 
 class SeaFormer(nn.Layer):

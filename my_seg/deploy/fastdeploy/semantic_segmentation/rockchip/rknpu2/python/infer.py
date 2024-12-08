@@ -21,9 +21,9 @@ def parse_arguments():
     import ast
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--model_file", required=True, help="Path of PaddleSeg model.")
+        "--model_file", required=True, help="Path of my_seg.paddleseg model.")
     parser.add_argument(
-        "--config_file", required=True, help="Path of PaddleSeg config.")
+        "--config_file", required=True, help="Path of my_seg.paddleseg config.")
     parser.add_argument(
         "--image", type=str, required=True, help="Path of test image file.")
     return parser.parse_args()

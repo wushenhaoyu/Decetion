@@ -23,9 +23,9 @@ import numpy as np
 import paddle
 import cv2
 
-from paddleseg.utils import logger, seg_env, get_sys_env
-from paddleseg.utils.download import download_file_and_uncompress
-from paddleseg.models.layers.layer_libs import NaiveSyncBatchNorm
+from  my_seg.paddleseg.utils import logger, seg_env, get_sys_env
+from  my_seg.paddleseg.utils.download import download_file_and_uncompress
+from  my_seg.paddleseg.models.layers.layer_libs import NaiveSyncBatchNorm
 
 
 def set_seed(seed=None):

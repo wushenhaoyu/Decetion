@@ -16,9 +16,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg import utils
-from paddleseg.cvlibs import manager
-from paddleseg.models import layers
+from my_seg.paddleseg import utils
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.models import layers
 from .upernet import UPerNetHead
 
 

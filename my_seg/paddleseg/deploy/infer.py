@@ -16,8 +16,8 @@ import os
 
 import yaml
 
-import paddleseg.transforms as T
-from paddleseg.cvlibs import manager
+import my_seg.paddleseg.transforms as T
+from my_seg.paddleseg.cvlibs import manager
 
 
 class DeployConfig:

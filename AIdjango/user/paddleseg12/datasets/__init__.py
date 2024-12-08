@@ -29,7 +29,7 @@ from .chase_db1 import CHASEDB1
 from .pp_humanseg14k import PPHumanSeg14K
 from .pssl import PSSLDataset
 
-from paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.cvlibs import manager
 
 # for PaddleX
 SegDataset = Dataset

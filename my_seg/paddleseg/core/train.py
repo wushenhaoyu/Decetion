@@ -24,12 +24,12 @@ from copy import deepcopy
 import paddle
 import paddle.nn.functional as F
 
-from paddleseg.utils import (TimeAverager, calculate_eta, resume,
+from my_seg.paddleseg.utils import (TimeAverager, calculate_eta, resume,
                              worker_init_fn, train_profiler, op_flops_funs,
                              init_ema_params, update_ema_model, logger)
-from paddleseg.core.val import evaluate
-from paddleseg.core.export import export, save_model_info, update_train_results
-from paddleseg.utils.logger import setup_logger
+from my_seg.paddleseg.core.val import evaluate
+from my_seg.paddleseg.core.export import export, save_model_info, update_train_results
+from my_seg.paddleseg.utils.logger import setup_logger
 
 
 def check_logits_losses(logits_list, losses):
@@ -105,7 +105,7 @@ def train(model,
         num_workers (int, optional): Num workers for data loader. Default: 0.
         use_vdl (bool, optional): Whether to record the data to VisualDL during training. Default: False.
         losses (dict, optional): A dict including 'types' and 'coef'. The length of coef should equal to 1 or len(losses['types']).
-            The 'types' item is a list of object of paddleseg.models.losses while the 'coef' item is a list of the relevant coefficient.
+            The 'types' item is a list of object of my_seg.paddleseg.models.losses while the 'coef' item is a list of the relevant coefficient.
         keep_checkpoint_max (int, optional): Maximum number of checkpoints to save. Default: 5.
         test_config(dict, optional): Evaluation config.
         precision (str, optional): Use AMP if precision='fp16'. If precision='fp32', the training is normal.

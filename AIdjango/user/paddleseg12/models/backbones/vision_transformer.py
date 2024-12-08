@@ -20,9 +20,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.utils import utils, logger
-from paddleseg12.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.utils import utils, logger
+from my_seg.paddleseg12.models.backbones.transformer_utils import to_2tuple, DropPath, Identity
 
 
 class Mlp(nn.Layer):

@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# PaddleSeg 语义分割模型在晶晨NPU上的部署方案-FastDeploy
+# my_seg.paddleseg 语义分割模型在晶晨NPU上的部署方案-FastDeploy
 
 ## 1. 说明  
 
@@ -16,7 +16,7 @@
 |:---------------------------------------------------------------- |:----- |:----- | :----- | :----- | :----- |
 | [PP-LiteSeg-T(STDC1)-cityscapes-without-argmax](https://bj.bcebos.com/fastdeploy/models/rk1/ppliteseg.tar.gz)| 31MB  | 1024x512 | 77.04% | 77.73% | 77.46% |
 **注意**
-- PaddleSeg量化模型包含`model.pdmodel`、`model.pdiparams`、`deploy.yaml`和`subgraph.txt`四个文件，FastDeploy会从yaml文件中获取模型在推理时需要的预处理信息，subgraph.txt是为了异构计算而存储的配置文件
+- my_seg.paddleseg量化模型包含`model.pdmodel`、`model.pdiparams`、`deploy.yaml`和`subgraph.txt`四个文件，FastDeploy会从yaml文件中获取模型在推理时需要的预处理信息，subgraph.txt是为了异构计算而存储的配置文件
 - 若以上列表中无满足要求的模型，可参考下方教程自行导出适配A311D的模型
 
 ## 3. 自行导出晶晨A311D支持的PaddleSeg模型
@@ -25,9 +25,9 @@
 - 支持[PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg)高于2.6版本的Segmentation模型，目前FastDeploy测试过可在晶晨A311D成功部署的模型:   
 - [PP-LiteSeg系列模型](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/configs/pp_liteseg/README.md)
 
-### 3.2 PaddleSeg动态图模型导出为A311D支持的INT8模型
+### 3.2 my_seg.paddleseg动态图模型导出为A311D支持的INT8模型
 模型导出分为以下两步
-1. PaddleSeg训练的动态图模型导出为推理静态图模型，请参考其文档说明[模型导出](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export_cn.md)
+1. my_seg.paddleseg训练的动态图模型导出为推理静态图模型，请参考其文档说明[模型导出](https://github.com/PaddlePaddle/PaddleSeg/blob/develop/docs/model_export_cn.md)
 晶晨A311D仅支持INT8
 2. 将推理模型量化压缩为INT8模型，FastDeploy模型量化的方法及一键自动化压缩工具可以参考[模型量化](../../../quantize/README.md)
 

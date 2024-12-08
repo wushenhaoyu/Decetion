@@ -7,8 +7,8 @@ from functools import partial
 import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
-from paddleseg.models.backbones.transformer_utils import DropPath
-from paddleseg.models.layers.ms_deformable_attention import MSDeformAttn
+from  my_seg.paddleseg.models.backbones.transformer_utils import DropPath
+from  my_seg.paddleseg.models.layers.ms_deformable_attention import MSDeformAttn
 
 
 def get_reference_points(spatial_shapes):

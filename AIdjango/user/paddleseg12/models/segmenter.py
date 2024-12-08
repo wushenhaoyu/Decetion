@@ -17,9 +17,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddleseg12.utils import utils
-from paddleseg12.cvlibs import manager, param_init
-from paddleseg12.models.backbones import vision_transformer, transformer_utils
+from my_seg.paddleseg12.utils import utils
+from my_seg.paddleseg12.cvlibs import manager, param_init
+from my_seg.paddleseg12.models.backbones import vision_transformer, transformer_utils
 
 __all__ = ['LinearSegmenter', 'MaskSegmenter']
 

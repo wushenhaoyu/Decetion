@@ -18,9 +18,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager, param_init
-from paddleseg.models import layers
-from paddleseg.utils import utils
+from  my_seg.paddleseg.cvlibs import manager, param_init
+from  my_seg.paddleseg.models import layers
+from  my_seg.paddleseg.utils import utils
 
 __all__ = [
     "HRNet_W18_Small_V1", "HRNet_W18_Small_V2", "HRNet_W18", "HRNet_W30",

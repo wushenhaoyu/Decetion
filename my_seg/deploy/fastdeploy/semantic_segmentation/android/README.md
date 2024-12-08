@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# 图像分割 PaddleSeg Android Demo 使用文档  
+# 图像分割 my_seg.paddleseg Android Demo 使用文档  
 
 在 Android 上实现实时的人像分割功能，此 Demo 有很好的易用性和开放性，如在 Demo 中跑自己训练好的模型等。
 
@@ -10,8 +10,8 @@
 
 ## 部署步骤
 
-1. 图像分割 PaddleSeg Demo 位于 `path/to/paddleseg/android` 目录
-2. 用 Android Studio 打开 paddleseg/android 工程
+1. 图像分割 my_seg.paddleseg Demo 位于 `path/to/paddleseg/android` 目录
+2. 用 Android Studio 打开 my_seg.paddleseg/android 工程
 3. 手机连接电脑，打开 USB 调试和文件传输模式，并在 Android Studio 上连接自己的手机设备（手机需要开启允许从 USB 安装软件权限）
 
 <p align="center">
@@ -29,7 +29,7 @@
   | <img width="300" height="500" alt="image" src="https://user-images.githubusercontent.com/31974251/203268599-c94018d8-3683-490a-a5c7-a8136a4fa284.jpg">  | <img width="300" height="500" alt="image" src="https://user-images.githubusercontent.com/31974251/203267867-7c51b695-65e6-402e-9826-5d6d5864da87.gif"> | <img width="300" height="500" alt="image" src="https://user-images.githubusercontent.com/31974251/197332983-afbfa6d5-4a3b-4c54-a528-4a3e58441be1.jpg"> |  
 
 
-## PaddleSegModel Java API 说明  
+## my_seg.paddlesegModel Java API 说明  
 - 模型初始化 API: 模型初始化API包含两种方式，方式一是通过构造函数直接初始化；方式二是，通过调用init函数，在合适的程序节点进行初始化。PaddleSegModel初始化参数说明如下：  
   - modelFile: String, paddle格式的模型文件路径，如 model.pdmodel
   - paramFile: String, paddle格式的参数文件路径，如 model.pdiparams  
@@ -38,9 +38,9 @@
 
 ```java
 // 构造函数: constructor w/o label file
-public PaddleSegModel(); // 空构造函数，之后可以调用init初始化
-public PaddleSegModel(String modelFile, String paramsFile, String configFile);
-public PaddleSegModel(String modelFile, String paramsFile, String configFile, RuntimeOption option);
+public my_seg.paddlesegModel(); // 空构造函数，之后可以调用init初始化
+public my_seg.paddlesegModel(String modelFile, String paramsFile, String configFile);
+public my_seg.paddlesegModel(String modelFile, String paramsFile, String configFile, RuntimeOption option);
 // 手动调用init初始化: call init manually w/o label file
 public boolean init(String modelFile, String paramsFile, String configFile, RuntimeOption option);
 ```  
@@ -102,7 +102,7 @@ import com.baidu.paddle.fastdeploy.vision.SegmentationResult;
 import com.baidu.paddle.fastdeploy.vision.segmentation.PaddleSegModel;
 
 // 初始化模型
-PaddleSegModel model = new PaddleSegModel(
+PaddleSegModel model = new my_seg.paddlesegModel(
   "portrait_pp_humansegv2_lite_256x144_inference_model/model.pdmodel",
   "portrait_pp_humansegv2_lite_256x144_inference_model/model.pdiparams",
   "portrait_pp_humansegv2_lite_256x144_inference_model/deploy.yml");
@@ -140,7 +140,7 @@ import com.baidu.paddle.fastdeploy.LitePowerMode;
 import com.baidu.paddle.fastdeploy.vision.SegmentationResult;
 import com.baidu.paddle.fastdeploy.vision.segmentation.PaddleSegModel;
 // 新建空模型
-PaddleSegModel model = new PaddleSegModel();  
+PaddleSegModel model = new my_seg.paddlesegModel();  
 // 模型路径
 String modelFile = "portrait_pp_humansegv2_lite_256x144_inference_model/model.pdmodel";
 String paramFile = "portrait_pp_humansegv2_lite_256x144_inference_model/model.pdiparams";

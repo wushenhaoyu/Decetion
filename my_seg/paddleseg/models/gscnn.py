@@ -18,11 +18,11 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg.models import layers
-from paddleseg.models.backbones import resnet_vd
-from paddleseg.models import deeplab
-from paddleseg.utils import utils
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.models import layers
+from my_seg.paddleseg.models.backbones import resnet_vd
+from my_seg.paddleseg.models import deeplab
+from my_seg.paddleseg.utils import utils
 
 
 @manager.MODELS.add_component

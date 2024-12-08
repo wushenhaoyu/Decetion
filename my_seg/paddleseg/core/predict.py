@@ -19,9 +19,9 @@ import cv2
 import numpy as np
 import paddle
 
-from paddleseg import utils
-from paddleseg.core import infer
-from paddleseg.utils import logger, progbar, visualize
+from my_seg.paddleseg import utils
+from my_seg.paddleseg.core import infer
+from my_seg.paddleseg.utils import logger, progbar, visualize
 
 
 def mkdir(path):
@@ -79,7 +79,7 @@ def predict(model,
             It should be provided when `is_slide` is True.
         crop_size (tuple|list, optional):  The crop size of sliding window, the first is width and the second is height.
             It should be provided when `is_slide` is True.
-        custom_color (list, optional): Save images with a custom color map. Default: None, use paddleseg's default color map.
+        custom_color (list, optional): Save images with a custom color map. Default: None, use my_seg.paddleseg's default color map.
         use_multilabel (bool, optional): Whether to enable multilabel mode. Default: False.
 
     """

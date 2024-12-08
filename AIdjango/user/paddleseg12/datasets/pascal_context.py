@@ -15,9 +15,9 @@
 import os
 
 from PIL import Image
-from paddleseg12.datasets import Dataset
-from paddleseg12.cvlibs import manager
-from paddleseg12.transforms import Compose
+from my_seg.paddleseg12.datasets import Dataset
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.transforms import Compose
 
 
 @manager.DATASETS.add_component

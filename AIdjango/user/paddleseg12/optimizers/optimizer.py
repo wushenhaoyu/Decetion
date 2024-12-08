@@ -14,14 +14,14 @@
 
 import paddle
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.utils import logger
-import paddleseg12.optimizers.custom_optimizers as custom_opt
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.utils import logger
+import my_seg.paddleseg12.optimizers.custom_optimizers as custom_opt
 
 
 class BaseOptimizer(object):
     """
-    Base optimizer in PaddleSeg.
+    Base optimizer in my_seg.paddleseg.
 
     Args:
         weight_decay(float, optional): A float value as coeff of L2 regularization.

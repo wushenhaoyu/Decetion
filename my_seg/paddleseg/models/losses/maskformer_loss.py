@@ -23,7 +23,7 @@ import paddle.nn as nn
 import paddle.distributed as dist
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
+from my_seg.paddleseg.cvlibs import manager
 
 
 def dice_loss(inputs, targets, num_masks):

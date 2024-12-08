@@ -18,10 +18,10 @@ import yaml
 import json
 from copy import deepcopy
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.utils import logger, utils
-from paddleseg.utils.save_info import save_model_info, update_train_results
-from paddleseg.deploy.export import WrappedModel
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.utils import logger, utils
+from my_seg.paddleseg.utils.save_info import save_model_info, update_train_results
+from my_seg.paddleseg.deploy.export import WrappedModel
 
 
 def export(args, model=None, save_dir=None, use_ema=False):

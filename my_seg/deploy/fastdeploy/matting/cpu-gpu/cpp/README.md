@@ -24,7 +24,7 @@ tar xvf fastdeploy-linux-x64-x.x.x.tgz
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/matting/cpp-gpu/cpp
+cd my_seg.paddleseg/deploy/fastdeploy/matting/cpp-gpu/cpp
 
 # 编译部署示例 
 mkdir build && cd build

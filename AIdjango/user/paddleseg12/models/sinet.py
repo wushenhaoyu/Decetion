@@ -18,9 +18,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg12.models import layers
-from paddleseg12.cvlibs import manager
-from paddleseg12.utils import utils
+from my_seg.paddleseg12.models import layers
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.utils import utils
 
 CFG = [[[3, 1], [5, 1]], [[3, 1], [3, 1]], [[3, 1], [5, 1]], [[3, 1], [3, 1]],
        [[5, 1], [3, 2]], [[5, 2], [3, 4]], [[3, 1], [3, 1]], [[5, 1], [5, 1]],

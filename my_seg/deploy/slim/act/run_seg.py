@@ -17,10 +17,10 @@ import argparse
 import random
 import paddle
 import numpy as np
-from paddleseg.cvlibs import Config
-from paddleseg.cvlibs import SegBuilder
-from paddleseg.utils import worker_init_fn, metrics
-from paddleseg.core.infer import reverse_transform
+from my_seg.paddleseg.cvlibs import Config
+from my_seg.paddleseg.cvlibs import SegBuilder
+from my_seg.paddleseg.utils import worker_init_fn, metrics
+from my_seg.paddleseg.core.infer import reverse_transform
 
 from paddleslim.auto_compression import AutoCompression
 from paddleslim.common import load_config as load_slim_config

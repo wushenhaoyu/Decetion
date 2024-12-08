@@ -18,12 +18,12 @@ import copy
 import cv2
 import numpy as np
 
-from paddleseg.cvlibs import manager
-from paddleseg.transforms import Compose
-from paddleseg.datasets import Dataset
-from paddleseg.utils.download import download_file_and_uncompress
-from paddleseg.utils import seg_env
-import paddleseg.transforms.functional as F
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.transforms import Compose
+from my_seg.paddleseg.datasets import Dataset
+from my_seg.paddleseg.utils.download import download_file_and_uncompress
+from my_seg.paddleseg.utils import seg_env
+import my_seg.paddleseg.transforms.functional as F
 
 URL = "https://paddleseg.bj.bcebos.com/dataset/Supervisely_face.zip"
 

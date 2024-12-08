@@ -19,7 +19,7 @@ PaddleSeg支持利用FastDeploy在NVIDIA GPU、X86 CPU、飞腾CPU、ARM CPU、I
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/matting/cpp-gpu/python
+cd my_seg.paddleseg/deploy/fastdeploy/matting/cpp-gpu/python
 
 # 下载PP-Matting模型文件和测试图片
 wget https://bj.bcebos.com/paddlehub/fastdeploy/PP-Matting-512.tgz

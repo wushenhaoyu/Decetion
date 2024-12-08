@@ -16,8 +16,8 @@ import argparse
 
 from paddleslim.dygraph.dist import Distill
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.utils import logger, utils
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.utils import logger, utils
 from distill_utils import distill_train
 from distill_config import prepare_distill_adaptor, prepare_distill_config
 

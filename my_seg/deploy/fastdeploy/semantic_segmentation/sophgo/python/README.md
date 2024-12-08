@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg 算能 Python部署示例
+# my_seg.paddleseg 算能 Python部署示例
 
 ## 1. 部署环境准备
 
@@ -16,12 +16,12 @@
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/sophgo/python
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/sophgo/python
 
 # 下载图片
 wget https://paddleseg.bj.bcebos.com/dygraph/demo/cityscapes_demo.png
 
-# PaddleSeg模型转换为bmodel模型
+# my_seg.paddleseg模型转换为bmodel模型
 将Paddle模型转换为SOPHGO bmodel模型，转换步骤参考[文档](../README_CN.md)
 
 # 推理

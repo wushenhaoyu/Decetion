@@ -20,7 +20,7 @@ import shutil
 import paddle
 from paddleslim.quant import quant_post_static
 
-from paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
 
 paddle.enable_static()
 

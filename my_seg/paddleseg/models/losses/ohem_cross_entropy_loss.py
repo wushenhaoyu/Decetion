@@ -16,7 +16,7 @@ import paddle
 from paddle import nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
+from my_seg.paddleseg.cvlibs import manager
 
 _IS_NPU = "npu" in paddle.get_device()
 _IS_MLU = "mlu" in paddle.get_device()

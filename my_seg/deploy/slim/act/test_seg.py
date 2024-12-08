@@ -19,12 +19,12 @@ import sys
 import cv2
 import numpy as np
 import paddle
-import paddleseg.transforms as T
-from paddleseg.cvlibs import Config
-from paddleseg.core.infer import reverse_transform
-from paddleseg.utils.visualize import get_pseudo_color_map
-from paddleseg.utils import metrics
-from paddleseg.cvlibs import SegBuilder
+import my_seg.paddleseg.transforms as T
+from my_seg.paddleseg.cvlibs import Config
+from my_seg.paddleseg.core.infer import reverse_transform
+from my_seg.paddleseg.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg.utils import metrics
+from my_seg.paddleseg.cvlibs import SegBuilder
 
 from paddle.inference import create_predictor, PrecisionType
 from paddle.inference import Config as PredictConfig

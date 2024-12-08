@@ -15,7 +15,7 @@
 import paddle
 import paddle.nn as nn
 
-from paddleseg12.cvlibs import param_init
+from my_seg.paddleseg12.cvlibs import param_init
 
 
 class PolarizedSelfAttentionModule(nn.Layer):

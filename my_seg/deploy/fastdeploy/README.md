@@ -1,4 +1,4 @@
-# PaddleSeg高性能全场景模型部署方案—FastDeploy
+# my_seg.paddleseg高性能全场景模型部署方案—FastDeploy
 
 ## 目录  
 - [FastDeploy介绍](#FastDeploy介绍)  

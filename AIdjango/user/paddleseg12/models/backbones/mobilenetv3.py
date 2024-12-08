@@ -18,9 +18,9 @@ from paddle import ParamAttr
 from paddle.regularizer import L2Decay
 from paddle.nn import AdaptiveAvgPool2D, BatchNorm, Conv2D, Dropout, Linear
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.utils import utils, logger
-from paddleseg12.models import layers
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.utils import utils, logger
+from my_seg.paddleseg12.models import layers
 
 __all__ = [
     "MobileNetV3_small_x0_35", "MobileNetV3_small_x0_5",

@@ -16,9 +16,9 @@ import argparse
 
 from paddleslim import QAT
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.core import evaluate
-from paddleseg.utils import logger, utils
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.core import evaluate
+from my_seg.paddleseg.utils import logger, utils
 from qat_config import quant_config
 from qat_train import skip_quant
 

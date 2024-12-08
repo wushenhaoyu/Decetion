@@ -21,9 +21,9 @@ from typing import Any, Dict, Optional
 import yaml
 import paddle
 
-from paddleseg.cvlibs import config_checker as checker
-from paddleseg.cvlibs import manager
-from paddleseg.utils import logger, utils
+from  my_seg.paddleseg.cvlibs import config_checker as checker
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg.utils import logger, utils
 
 _INHERIT_KEY = '_inherited_'
 _BASE_KEY = '_base_'
@@ -37,10 +37,10 @@ class Config(object):
         batch_size: The number of samples per gpu.
         iters: The total training steps.
         train_dataset: A training data config including type/data_root/transforms/mode.
-            For data type, please refer to paddleseg.datasets.
-            For specific transforms, please refer to paddleseg.transforms.transforms.
+            For data type, please refer to my_seg.paddleseg.datasets.
+            For specific transforms, please refer to my_seg.paddleseg.transforms.transforms.
         val_dataset: A validation data config including type/data_root/transforms/mode.
-        optimizer: A optimizer config. Please refer to paddleseg.optimizers.
+        optimizer: A optimizer config. Please refer to my_seg.paddleseg.optimizers.
         loss: A loss config. Multi-loss config is available. The loss type order is 
             consistent with the seg model outputs, where the coef term indicates the 
             weight of corresponding loss. Note that the number of coef must be the 
@@ -48,8 +48,8 @@ class Config(object):
             if using the same loss type among the outputs, otherwise the number of
             loss type must be consistent with coef.
         model: A model config including type/backbone and model-dependent arguments.
-            For model type, please refer to paddleseg.models.
-            For backbone, please refer to paddleseg.models.backbones.
+            For model type, please refer to my_seg.paddleseg.models.
+            For backbone, please refer to my_seg.paddleseg.models.backbones.
 
     Args:
         path (str) : The path of config file, supports yaml format only.

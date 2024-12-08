@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文  
 
-# PaddleSeg 语义分割模瑞芯微NPU部署方案-FastDeploy
+# my_seg.paddleseg 语义分割模瑞芯微NPU部署方案-FastDeploy
 
 ## 1. 说明   
 本示例基于RV1126来介绍如何使用FastDeploy部署PaddleSeg模型，支持如下芯片的部署：  
@@ -15,7 +15,7 @@
 |:---------------------------------------------------------------- |:----- |:----- | :----- | :----- | :----- |
 | [PP-LiteSeg-T(STDC1)-cityscapes-without-argmax](https://bj.bcebos.com/fastdeploy/models/rk1/ppliteseg.tar.gz)| 31MB  | 1024x512 | 77.04% | 77.73% | 77.46% |
 **注意**
-- PaddleSeg量化模型包含`model.pdmodel`、`model.pdiparams`、`deploy.yaml`和`subgraph.txt`四个文件，FastDeploy会从yaml文件中获取模型在推理时需要的预处理信息，subgraph.txt是为了异构计算而存储的配置文件
+- my_seg.paddleseg量化模型包含`model.pdmodel`、`model.pdiparams`、`deploy.yaml`和`subgraph.txt`四个文件，FastDeploy会从yaml文件中获取模型在推理时需要的预处理信息，subgraph.txt是为了异构计算而存储的配置文件
 
 ## 3. 自行导出RV1126支持的INT8模型  
 

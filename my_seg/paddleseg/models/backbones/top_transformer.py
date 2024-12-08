@@ -19,9 +19,9 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg.cvlibs import manager
-from paddleseg import utils
-from paddleseg.models.backbones.transformer_utils import Identity, DropPath
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg import utils
+from  my_seg.paddleseg.models.backbones.transformer_utils import Identity, DropPath
 
 __all__ = ["TopTransformer_Base", "TopTransformer_Small", "TopTransformer_Tiny"]
 

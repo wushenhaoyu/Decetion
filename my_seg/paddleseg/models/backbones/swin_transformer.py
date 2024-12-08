@@ -17,9 +17,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import numpy as np
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import utils
-from paddleseg.models.backbones.transformer_utils import *
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg.utils import utils
+from  my_seg.paddleseg.models.backbones.transformer_utils import *
 
 
 class Mlp(nn.Layer):

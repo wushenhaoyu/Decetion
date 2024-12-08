@@ -20,8 +20,8 @@ import paddle.nn.functional as F
 from paddle.nn.initializer import Constant, Normal, Uniform
 from paddle import Tensor
 
-from paddleseg.cvlibs import manager
-from paddleseg.models.layers import ConvBNAct
+from  my_seg.paddleseg.cvlibs import manager
+from  my_seg.paddleseg.models.layers import ConvBNAct
 
 __all__ = [
     "PIDNet_Small",

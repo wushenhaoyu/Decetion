@@ -20,9 +20,9 @@ import time
 import yaml
 import numpy as np
 
-from paddleseg.deploy.infer import DeployConfig
-from paddleseg.utils import logger
-from paddleseg.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg.deploy.infer import DeployConfig
+from my_seg.paddleseg.utils import logger
+from my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 from infer import auto_tune, use_auto_tune, Predictor
 
 

@@ -15,10 +15,10 @@
 import paddle
 import paddle.nn as nn
 
-from paddleseg.cvlibs import manager
-from paddleseg.utils import load_entire_model
-from paddleseg.cvlibs.param_init import kaiming_normal_init
-from paddleseg.models.layers.layer_libs import SyncBatchNorm
+from my_seg.paddleseg.cvlibs import manager
+from my_seg.paddleseg.utils import load_entire_model
+from my_seg.paddleseg.cvlibs.param_init import kaiming_normal_init
+from my_seg.paddleseg.models.layers.layer_libs import SyncBatchNorm
 
 
 @manager.MODELS.add_component

@@ -4,7 +4,7 @@ import cv2
 from PIL import Image
 import numpy as np
 from deploy.python.infer import Predictor ,parse_args,main
-from paddleseg.utils.visualize import get_pseudo_color_map
+from my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 current_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_directory)
 

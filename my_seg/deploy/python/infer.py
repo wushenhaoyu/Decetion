@@ -20,9 +20,9 @@ import numpy as np
 from paddle.inference import create_predictor, PrecisionType
 from paddle.inference import Config as PredictConfig
 
-from paddleseg.deploy.infer import DeployConfig
-from paddleseg.utils import get_image_list, logger
-from paddleseg.utils.visualize import get_pseudo_color_map
+from  my_seg.paddleseg.deploy.infer import DeployConfig
+from  my_seg.paddleseg.utils import get_image_list, logger
+from  my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(current_directory)

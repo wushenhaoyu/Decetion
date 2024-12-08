@@ -20,7 +20,7 @@ import sys
 
 import cv2
 import paddle
-import paddleseg
+import  my_seg.paddleseg
 
 IS_WINDOWS = sys.platform == 'win32'
 
@@ -121,7 +121,7 @@ def get_sys_env():
     except:
         pass
 
-    env_info['PaddleSeg'] = paddleseg.__version__
+    env_info['PaddleSeg'] = my_seg.paddleseg.__version__
     env_info['PaddlePaddle'] = paddle.__version__
     env_info['OpenCV'] = cv2.__version__
 

@@ -20,9 +20,9 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 import paddle.nn.initializer as paddle_init
 
-from paddleseg12.cvlibs import manager
-from paddleseg12.utils import utils
-from paddleseg12.models.backbones.transformer_utils import *
+from my_seg.paddleseg12.cvlibs import manager
+from my_seg.paddleseg12.utils import utils
+from my_seg.paddleseg12.models.backbones.transformer_utils import *
 
 
 class Mlp(nn.Layer):

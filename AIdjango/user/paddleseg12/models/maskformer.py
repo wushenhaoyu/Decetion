@@ -21,10 +21,10 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 
-from paddleseg12.models import layers
-from paddleseg12.cvlibs import manager, param_init
-from paddleseg12.utils import utils
-from paddleseg12.core.train import check_logits_losses
+from my_seg.paddleseg12.models import layers
+from my_seg.paddleseg12.cvlibs import manager, param_init
+from my_seg.paddleseg12.utils import utils
+from my_seg.paddleseg12.core.train import check_logits_losses
 
 
 @manager.MODELS.add_component
@@ -38,7 +38,7 @@ class MaskFormer(nn.Layer):
 
     Args:
         num_classes(int): The number of classes that you want the model to classify.
-        backbone(nn.Layer): The backbone module defined in the paddleseg backbones.
+        backbone(nn.Layer): The backbone module defined in the my_seg.paddleseg backbones.
         sem_seg_postprocess_before_inference(bool): If True, do result postprocess before inference. 
         pretrained(str): The path to the pretrained model of MaskFormer.
 

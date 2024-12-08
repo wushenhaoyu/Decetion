@@ -1,6 +1,6 @@
 [English](README.md) | 简体中文
 
-# PaddleSeg 语义分割模型在华为昇腾上部署方案-FastDeploy
+# my_seg.paddleseg 语义分割模型在华为昇腾上部署方案-FastDeploy
 
 ## 1. 说明  
 PaddleSeg支持通过FastDeploy在华为昇腾上部署Segmentation相关模型

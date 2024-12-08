@@ -1,5 +1,5 @@
 [English](README.md) | 简体中文
-# PaddleSeg RKNPU2 C++部署示例
+# my_seg.paddleseg RKNPU2 C++部署示例
 
 本目录下用于展示PaddleSeg系列模型在RKNPU2上的部署，以下的部署过程以PPHumanSeg为例子。
 
@@ -22,7 +22,7 @@
 git clone https://github.com/PaddlePaddle/PaddleSeg.git 
 # 注意：如果当前分支找不到下面的fastdeploy测试代码，请切换到develop分支
 # git checkout develop
-cd PaddleSeg/deploy/fastdeploy/semantic_segmentation/rockchip/rknpu2/cpp
+cd my_seg.paddleseg/deploy/fastdeploy/semantic_segmentation/rockchip/rknpu2/cpp
 
 # 编译部署示例
 mkdir build && cd build

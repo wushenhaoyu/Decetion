@@ -16,7 +16,7 @@ import paddle
 import paddle.nn.functional as F
 from paddle import nn
 
-from paddleseg.models import layers
+from  my_seg.paddleseg.models import layers
 
 
 class CustomAvgPool2D(nn.Layer):

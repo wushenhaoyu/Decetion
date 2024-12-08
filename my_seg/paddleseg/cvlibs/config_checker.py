@@ -14,8 +14,8 @@
 
 import copy
 
-from paddleseg.utils import logger
-from paddleseg.utils import utils
+from  my_seg.paddleseg.utils import logger
+from  my_seg.paddleseg.utils import utils
 
 
 class ConfigChecker(object):

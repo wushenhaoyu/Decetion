@@ -19,8 +19,8 @@ import time
 import paddle
 import paddle.nn.functional as F
 
-from paddleseg12.utils import metrics, TimeAverager, calculate_eta, logger, progbar
-from paddleseg12.core import infer
+from my_seg.paddleseg12.utils import metrics, TimeAverager, calculate_eta, logger, progbar
+from my_seg.paddleseg12.core import infer
 
 np.set_printoptions(suppress=True)
 

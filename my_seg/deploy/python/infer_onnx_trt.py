@@ -24,8 +24,8 @@ import pycuda.autoinit
 import onnx
 import onnxruntime
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.utils import logger, utils
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.utils import logger, utils
 """
 Export the Paddle model to ONNX, infer the ONNX model by TRT.
 Or, load the ONNX model and infer it by TRT.
@@ -33,7 +33,7 @@ Or, load the ONNX model and infer it by TRT.
 Prepare:
 * Install gpu driver, cuda toolkit and cudnn
 * Install PaddlePaddle
-* Install the requirements of PaddleSeg
+* Install the requirements of my_seg.paddleseg
 * Download TensorRT 5/7 tar file according the version of cuda
 * Install the trt whl in tar file, export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:TensorRT-7/lib
 * Run `pip install 'pycuda>=2019.1.1'`

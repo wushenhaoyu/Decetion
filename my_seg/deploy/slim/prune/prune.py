@@ -22,10 +22,10 @@ import paddle
 from paddleslim.dygraph import L1NormFilterPruner
 from paddleslim.analysis import dygraph_flops
 
-from paddleseg.cvlibs import Config, SegBuilder
-from paddleseg.core.val import evaluate
-from paddleseg.core.train import train
-from paddleseg.utils import logger, utils
+from my_seg.paddleseg.cvlibs import Config, SegBuilder
+from my_seg.paddleseg.core.val import evaluate
+from my_seg.paddleseg.core.train import train
+from my_seg.paddleseg.utils import logger, utils
 
 
 def parse_args():
