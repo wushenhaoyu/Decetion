@@ -41,7 +41,6 @@ from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
 from haze.test_real import HazeRemover
 from my_detection.paddle_infer import my_paddledetection
-from seg_infer import PaddleSegCamera
 from dark.camera import VideoEnhancer
 seg_net =None
 haze_net = None
