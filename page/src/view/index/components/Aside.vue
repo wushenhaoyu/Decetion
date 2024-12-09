@@ -7,21 +7,9 @@
         @close="handleClose" 
         @select="handleSelect"
         :collapse="isCollapse">
-        <el-menu-item index="/">
-          <i class="el-icon-s-home"></i>
-          <span slot="title">起始页</span>
-        </el-menu-item>
-        <el-menu-item index="/detection/option1">         
+        <el-menu-item index="/">         
             <i class="el-icon-camera"></i>
             <span slot="title">摄像头检测</span>        
-        </el-menu-item>
-        <el-menu-item index="/detection/option2">        
-            <i class="el-icon-video-camera"></i>
-            <span slot="title">视频检测</span>        
-        </el-menu-item>
-        <el-menu-item index="/detection/option3">       
-            <i class="el-icon-picture-outline"></i>
-            <span slot="title">图片检测</span>          
         </el-menu-item>
         <el-menu-item index="/deletion">       
             <i class="el-icon-delete"></i>

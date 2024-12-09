@@ -1,11 +1,40 @@
 {
-  "name": "electron-app",
+  "name": "road-watcher",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
+  "description": "一个路况监控应用程序",
+  "author": "Wusehn",
   "devDependencies": {
-    "electron": "^10.4.7"
+    "electron": "^10.4.7",
+    "electron-builder": "^23.6.0"
+  },
+  "build": {
+    "appId": "BRAVO",
+    "productName": "road-watcher",
+    "directories": {
+      "output": "build"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "asar": false,
+      "icon": "icons/icon_256x256.png"
+    },
+     
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility",
+      "asar": false,
+      "icon": "icons/icon_256x256.png",
+      "maintainer": "Wusehn",  
+      "description": "一个路况监控应用程序"  
+    }
   }
 }

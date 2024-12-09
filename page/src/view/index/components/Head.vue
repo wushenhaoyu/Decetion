@@ -7,7 +7,7 @@
             </a>
         </div>
         <div class="spacer"></div>
-        <el-menu-item index="1">AIStudio部署版</el-menu-item>
+        <el-menu-item index="1">Jetson Nano 版</el-menu-item>
       </el-menu>
     </div>
   </template>
