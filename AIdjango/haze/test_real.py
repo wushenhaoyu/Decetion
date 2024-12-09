@@ -14,7 +14,7 @@ current_directory = os.getcwd()
 
 # 将子文件夹路径添加到 sys.path
 module_directory = os.path.join(current_directory)
-sys.path.append(module_directory)
+# sys.path.append(module_directory)
 
 
 from haze.model import GNet  

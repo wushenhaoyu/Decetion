@@ -25,23 +25,20 @@ from django.shortcuts import render
 import subprocess
 from django.core.cache import cache
 import io
-
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 current_directory = os.getcwd()
-
-
 module_directory = os.path.join(current_directory)
 
-
-sys.path.append(module_directory)
+# sys.path.append(module_directory)
 from django.http import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 from django.http import HttpResponse
 from multiprocessing import Process, Manager, Event
 from haze.test_real import HazeRemover
-from my_seg.deploy.python.infer import Predictor, parse_args
-from  my_seg.paddleseg.utils.visualize import get_pseudo_color_map
+# from my_seg.deploy.python.infer import Predictor, parse_args
+from my_seg.seg_infer import paddlesegCamera 
+# from  my_seg.paddleseg.utils.visualize import get_pseudo_color_map
 from my_detection.paddle_infer import my_paddledetection
 from dark.camera import VideoEnhancer
 seg_net =None
@@ -77,60 +74,7 @@ def Camchoice(request):
     else:
         return JsonResponse({ "success": 0}, status=200)
 
-class paddlesegCamera:
-    def __init__(self, cfg_file=None):
-        """
-        初始化 my_seg.paddlesegCamera 类，加载配置文件并初始化 Predictor。
-        """
-        # 解析命令行参数
-        self.args = parse_args()
-        
-        # 如果传入了自定义的配置文件路径，则使用它
-        if cfg_file:
-            self.args.cfg = cfg_file
-        else:
-            self.args.cfg = os.path.join(current_directory,'my_seg', 'output_inference', 'pp_liteseg_infer_model', 'deploy.yaml')
-        
-        # 初始化 Predictor
-        self.predictor = Predictor(self.args)
 
-    def process_frame(self, frame):
-        """
-        处理一帧图像并返回伪彩色输出。
-        """
-        output = self.predictor.run([frame])  # 输入图像列表
-        pseudo_color_output = get_pseudo_color_map(output[0])  # 获取伪彩色图像
-        pseudo_color_output = np.array(pseudo_color_output.convert('RGB'))  # 转换为 RGB 格式
-        pseudo_color_output = cv2.cvtColor(pseudo_color_output, cv2.COLOR_RGB2BGR)  # 转换为 BGR 格式
-        return pseudo_color_output
-
-    def run(self):
-        """
-        启动摄像头，实时显示处理后的图像。
-        """
-        # 打开摄像头
-        camera = cv2.VideoCapture(0)
-        
-        while True:
-            # 读取一帧图像
-            _, frame = camera.read()
-            
-            if frame is None:
-                break
-
-            # 处理当前帧
-            processed_frame = self.process_frame(frame)
-
-            # 显示处理后的图像
-            cv2.imshow("Segmentation Result", processed_frame)
-
-            # 按 'q' 键退出
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-        
-        # 释放摄像头资源并关闭所有 OpenCV 窗口
-        camera.release()
-        cv2.destroyAllWindows()
 
 
 

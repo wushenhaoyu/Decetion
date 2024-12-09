@@ -11,10 +11,6 @@ import threading
 import random
 import cv2
 from PIL import Image
-
-
-
-
 import numpy as np
 import math
 import paddle
@@ -22,19 +18,19 @@ from paddle.inference import Config
 import sys
 from paddle.inference import create_predictor
 current_directory = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(current_directory)
-from deploy.python.infer import Detector, visualize_box_mask
-from deploy.pipeline.pphuman.attr_infer import AttrDetector
-from deploy.pipeline.pipe_utils import crop_image_with_det, crop_image_with_mot, parse_mot_res
-from deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
-from deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
-from deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
-from deploy.pipeline.ppvehicle.lane_seg_infer import LaneSegPredictor
-from deploy.pptracking.python.mot_sde_infer import SDE_Detector
-from deploy.pptracking.python.mot.utils import flow_statistic, update_object_info
-from deploy.pipeline.datacollector import DataCollector
-from deploy.pptracking.python.mot.visualize import plot_tracking_dict
-from visualize import visualize_attr, visualize_lane, visualize_vehicleplate, visualize_vehiclepress
+# sys.path.append(current_directory)
+from my_detection.deploy.python.infer import Detector, visualize_box_mask
+from my_detection.deploy.pipeline.pphuman.attr_infer import AttrDetector
+from my_detection.deploy.pipeline.pipe_utils import crop_image_with_det, crop_image_with_mot, parse_mot_res
+from my_detection.deploy.pipeline.ppvehicle.vehicle_attr import VehicleAttr
+from my_detection.deploy.pipeline.ppvehicle.vehicle_plate import PlateRecognizer
+from my_detection.deploy.pipeline.ppvehicle.vehicle_pressing import VehiclePressingRecognizer
+from my_detection.deploy.pipeline.ppvehicle.lane_seg_infer import LaneSegPredictor
+from my_detection.deploy.pptracking.python.mot_sde_infer import SDE_Detector
+from my_detection.deploy.pptracking.python.mot.utils import flow_statistic, update_object_info
+from my_detection.deploy.pipeline.datacollector import DataCollector
+from my_detection.deploy.pptracking.python.mot.visualize import plot_tracking_dict
+from my_detection.deploy.python.visualize import visualize_attr, visualize_lane, visualize_vehicleplate, visualize_vehiclepress
 from collections import deque
 
 
