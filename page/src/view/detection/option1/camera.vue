@@ -67,7 +67,6 @@
           > </el-switch>
         </div>
         <el-divider></el-divider>
-        <el-divider></el-divider>
         <div style="user-select:none;">
           <div style="height: 4vh;line-height: 4vh;  user-select:none;">图像分割 </div>
           <el-switch
@@ -254,11 +253,11 @@
             <el-table-column prop="id" label="类别" width="60">
               <!-- <template slot-scope="scope">{{ scope.row.date }}</template> -->
             </el-table-column>
-            <el-table-column prop="time" label="时间" width="150">
+            <el-table-column prop="time" label="时间">
             </el-table-column>
             <el-table-column prop="location" label="坐标" width="150">
             </el-table-column>
-            <el-table-column label="操作" width="110">
+            <el-table-column label="操作" >
               <template slot-scope="scope">
                 <el-button
                   type="primary"

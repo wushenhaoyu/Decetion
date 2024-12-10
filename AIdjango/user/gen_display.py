@@ -102,7 +102,7 @@ def initialize():
         if seg_net is None:
             print("Start SEGNET Detection initialized.")
             seg_net = paddlesegCamera()
-            print("SEGNET Detection initialized.")
+            #print("SEGNET Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -154,6 +154,7 @@ def index(request):
 def ConfirmParams(request):
     global paddledetection_net
     global params
+    global seg_net
     data = json.loads(request.body)
     params = {
         'haze_enabled': data.get('haze'),#去黑
