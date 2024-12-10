@@ -5,9 +5,8 @@ const path = require('path');
 function createWindow() {
   // 创建浏览器窗口
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    maximized: true, // 设置窗口最大化
+    width: 1920,
+    height: 1280,
     resizable: false, // 禁止调整窗口大小
     webPreferences: {
       nodeIntegration: true, // 根据需要设置
@@ -16,7 +15,7 @@ function createWindow() {
   });
 
   // 加载本地 HTML 文件或远程 URL
-  mainWindow.loadURL('http://localhost:8080/index');
+  mainWindow.loadURL('http://127.0.0.1:8000/');
 
   // 打开开发者工具（可选）
   // mainWindow.webContents.openDevTools();
@@ -30,7 +29,7 @@ function startDjangoServer() {
 
   // 启动 Django 开发服务器
   djangoProcess = spawn('python', [djangoPath, 'runserver', '8080'], {
-    cwd: path.join(__dirname, '..', 'AIdjango'), // 设置工作目录为 AIdjango
+    cwd: path.join(__dirname, '..'), // 设置工作目录为 AIdjango
     shell: true
   });
 

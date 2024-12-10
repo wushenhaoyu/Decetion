@@ -156,7 +156,8 @@ def initialize():
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
         if seg_net is None:
-            seg_net = paddlesegCamera()
+            #print("Start SEGNET Detection initialized.")
+            #seg_net = paddlesegCamera()
             print("SEGNET Detection initialized.")
         if params is None:
             params = {
