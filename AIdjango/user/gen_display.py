@@ -99,10 +99,6 @@ def initialize():
         if paddledetection_net is None:
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
-        if seg_net is None:
-            print("Start SEGNET Detection initialized.")
-            seg_net = paddlesegCamera()
-            print("SEGNET Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -154,6 +150,11 @@ def index(request):
 def ConfirmParams(request):
     global paddledetection_net
     global params
+    global seg_net
+    if seg_net is None:
+            print("Start SEGNET Detection initialized.")
+            seg_net = paddlesegCamera()
+            print("SEGNET Detection initialized.")
     data = json.loads(request.body)
     params = {
         'haze_enabled': data.get('haze'),#去黑
@@ -636,6 +637,8 @@ def video_detection(video_name):
 
         if params["dark_enabled"]:
             frame = dark_net.process_frame(frame)
+        if params["seg_enable"]:
+            frame = seg_net.process_frame(frame)#传入RGB，传出RGB
         frame = paddledetection_net.predit(frame)
         # frame= cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         frame= cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -741,6 +744,8 @@ def photo_processing(photo_name):
     if params["dark_enabled"]:
         img = dark_net.process_frame(img)
        # 保存处理后的照片
+    if params["seg_enable"]:
+        img = seg_net.process_frame(img)#传入RGB，传出RGB
     
     img = paddledetection_net.predit(img)
     cv2.imwrite("hdr/"+urllib.parse.quote(photo_name), img)
