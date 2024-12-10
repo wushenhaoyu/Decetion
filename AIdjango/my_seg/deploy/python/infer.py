@@ -271,99 +271,24 @@ class Predictor:
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Test')
-    parser.add_argument("--config",
-                        dest="cfg",
-                        help="The config file.",
-                        default=None,
-                        type=str,
-                        required=False)
-    parser.add_argument(
-        '--image_path',
-        dest='image_path',
-        help='The directory or path or file list of the images to be predicted.',
-        type=str,
-        default=None,
-        required=False)
-    parser.add_argument('--batch_size',
-                        dest='batch_size',
-                        help='Mini batch size of one gpu or cpu.',
-                        type=int,
-                        default=1)
-    parser.add_argument('--save_dir',
-                        dest='save_dir',
-                        help='The directory for saving the predict result.',
-                        type=str,
-                        default='./output')
-    parser.add_argument(
-        '--device',
-        choices=['cpu', 'gpu', 'xpu', 'npu', 'mlu'],
-        default="gpu",
-        help="Select which device to inference, defaults to gpu.")
-
-    parser.add_argument(
-        '--use_trt',
-        default=False,
-        type=eval,
-        choices=[True, False],
-        help='Whether to use Nvidia TensorRT to accelerate prediction.')
-    parser.add_argument("--precision",
-                        default="fp32",
-                        type=str,
-                        choices=["fp32", "fp16", "int8"],
-                        help='The tensorrt precision.')
-    parser.add_argument('--min_subgraph_size',
-                        default=3,
-                        type=int,
-                        help='The min subgraph size in tensorrt prediction.')
-    parser.add_argument(
-        '--enable_auto_tune',
-        default=False,
-        type=eval,
-        choices=[True, False],
-        help=
-        'Whether to enable tuned dynamic shape. We uses some images to collect '
-        'the dynamic shape for trt sub graph, which avoids setting dynamic shape manually.'
-    )
-    parser.add_argument('--auto_tuned_shape_file',
-                        type=str,
-                        default="auto_tune_tmp.pbtxt",
-                        help='The temp file to save tuned dynamic shape.')
-
-    parser.add_argument('--cpu_threads',
-                        default=10,
-                        type=int,
-                        help='Number of threads to predict when using cpu.')
-    parser.add_argument('--enable_mkldnn',
-                        default=False,
-                        type=eval,
-                        choices=[True, False],
-                        help='Enable to use mkldnn to speed up when using cpu.')
-
-    parser.add_argument(
-        "--benchmark",
-        type=eval,
-        default=False,
-        help=
-        "Whether to log some information about environment, model, configuration and performance."
-    )
-    parser.add_argument(
-        "--model_name",
-        default="",
-        type=str,
-        help='When `--benchmark` is True, the specified model name is displayed.'
-    )
-
-    parser.add_argument('--with_argmax',
-                        dest='with_argmax',
-                        help='Perform argmax operation on the predict result.',
-                        action='store_true')
-    parser.add_argument('--print_detail',
-                        default=True,
-                        type=eval,
-                        choices=[True, False],
-                        help='Print GLOG information of Paddle Inference.')
-    return parser.parse_args()
+    return argparse.Namespace(
+            cfg="default_config.yaml",
+            image_path="./images",
+            batch_size=4,
+            save_dir="./output",
+            device="gpu",
+            use_trt=False,
+            precision="fp32",
+            min_subgraph_size=3,
+            enable_auto_tune=False,
+            auto_tuned_shape_file="auto_tune_tmp.pbtxt",
+            cpu_threads=10,
+            enable_mkldnn=False,
+            benchmark=False,
+            model_name="default_model",
+            with_argmax=False,
+            print_detail=True
+        )
 
 
 def main(args):

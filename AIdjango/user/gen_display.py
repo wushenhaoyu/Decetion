@@ -99,6 +99,10 @@ def initialize():
         if paddledetection_net is None:
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
+        if seg_net is None:
+            print("Start SEGNET Detection initialized.")
+            seg_net = paddlesegCamera()
+            #print("SEGNET Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -151,10 +155,6 @@ def ConfirmParams(request):
     global paddledetection_net
     global params
     global seg_net
-    if seg_net is None:
-            print("Start SEGNET Detection initialized.")
-            seg_net = paddlesegCamera()
-            print("SEGNET Detection initialized.")
     data = json.loads(request.body)
     params = {
         'haze_enabled': data.get('haze'),#去黑
