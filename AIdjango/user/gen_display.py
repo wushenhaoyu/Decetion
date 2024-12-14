@@ -100,9 +100,8 @@ def initialize():
             paddledetection_net = my_paddledetection()
             print("Vehicle License Detection initialized.")
         if seg_net is None:
-            print("Start SEGNET Detection initialized.")
             seg_net = paddlesegCamera()
-            #print("SEGNET Detection initialized.")
+            print("SEGNET Detection initialized.")
         if params is None:
             params = {
             'haze_enabled': False,
@@ -154,7 +153,6 @@ def index(request):
 def ConfirmParams(request):
     global paddledetection_net
     global params
-    global seg_net
     data = json.loads(request.body)
     params = {
         'haze_enabled': data.get('haze'),#去黑
@@ -269,6 +267,7 @@ def gen_display(camera):
     
     background_thread = threading.Thread(target=background_processing, daemon=True)
     background_thread.start()
+    # camera = cv2.VideoCapture('12.mp4')
     while True:
         # 读取图片
         if camera is None:
@@ -745,24 +744,72 @@ def photo_processing(photo_name):
         img = dark_net.process_frame(img)
        # 保存处理后的照片
     if params["seg_enable"]:
-        img = seg_net.process_frame(img)#传入RGB，传出RGB
-    
+        img= seg_net.process_frame(img)#传入RGB，传出RGB
     img = paddledetection_net.predit(img)
-    cv2.imwrite("hdr/"+urllib.parse.quote(photo_name), img)
+    
     if params["hdr_enabled"]:
+        img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        cv2.imwrite("hdr/"+urllib.parse.quote(photo_name), img)
         command = [
         "python", "hdr/expand.py",
         "hdr/"+urllib.parse.quote(photo_name),
         "--tone_map", "reinhard"
     ]
         result=subprocess.run(command, capture_output=True, text=True)
+        
         print(result)
     else:
         img= cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         cv2.imwrite(photo_path_Process_path, img)
+    conversion_thread = threading.Thread(target=convert_image_format, args=(photo_name, "AIdjango/dist/UploadphotoProcess"))
+    conversion_thread.start()  # 启动线程
+
+    rename_prediction_files("AIdjango/dist/UploadphotoProcess")
     delete_hdr_files(photo_path_Process)
     delete_photo_files("hdr/")
     queueISdeal =  False
+def convert_image_format(photo_name, directory):
+    # 对照片名称进行URL编码
+    encoded_name = urllib.parse.quote(photo_name)
+    
+    # 获取文件的完整路径
+    file_path = os.path.join(directory, encoded_name)
+    name = os.path.splitext(photo_name)[0]  # 获取文件名（不包含扩展名）
+    
+    # 尝试查找 .jpg 或 .png 文件
+    jpg_file_path = os.path.join(directory, f"{name}.jpg")
+    png_file_path = os.path.join(directory, f"{name}.png")
+    print(jpg_file_path,png_file_path)
+    # 检查文件是否存在
+    while True:
+        if os.path.exists(jpg_file_path):
+            # 如果找到 JPG 文件，则将其转换为 PNG 格式
+            try:
+                with Image.open(jpg_file_path) as img:
+                    new_png_file_path = os.path.join(directory, f"{name}.png")
+                    img.save(new_png_file_path, 'PNG')
+                    print(f"Converted {jpg_file_path} to {new_png_file_path}")
+                    break
+            except Exception as e:
+                print(f"Error converting {jpg_file_path} to PNG: {e}")
+                break
+        
+        elif os.path.exists(png_file_path):
+            # 如果找到 PNG 文件，则将其转换为 JPG 格式
+            try:
+                with Image.open(png_file_path) as img:
+                    new_jpg_file_path = os.path.join(directory, f"{name}.jpg")
+                    img.convert("RGB").save(new_jpg_file_path, 'JPEG')
+                    print(f"Converted {png_file_path} to {new_jpg_file_path}")
+                    break
+            except Exception as e:
+                print(f"Error converting {png_file_path} to JPG: {e}")
+                break
+                    
+        
+        else:
+            print(f"No .jpg or .png file found with the name {name} in the directory.")
+
         
 def rename_prediction_files(base_dir):
     # 遍历 base_dir 目录下的所有文件和文件夹
