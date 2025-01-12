@@ -1,4 +1,4 @@
-# 仓库结构
+# 仓库结构（最近整合到了Django中）
 ```bash
 │                                                
 ├───AIDjango          # 系统后端（Django）
